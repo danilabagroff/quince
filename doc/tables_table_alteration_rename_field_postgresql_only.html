@@ -1,0 +1,109 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>rename_field() (PostgreSQL only)</title>
+<link rel="stylesheet" href="../../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../../index.html" title="QUINCE: QUeries IN C++ Expressions">
+<link rel="up" href="../table_alteration.html" title="Table Alteration">
+<link rel="prev" href="drop_field_postgresql_only.html" title="drop_field() (PostgreSQL only)">
+<link rel="next" href="set_field_type_postgresql_only.html" title="set_field_type() (PostgreSQL only)">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<div class="spirit-nav">
+<a accesskey="p" href="drop_field_postgresql_only.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../table_alteration.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="set_field_type_postgresql_only.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="tables.table_alteration.rename_field_postgresql_only"></a><a class="link" href="rename_field_postgresql_only.html" title="rename_field() (PostgreSQL only)"><code class="computeroutput"><span class="identifier">rename_field</span><span class="special">()</span></code>
+          (PostgreSQL only)</a>
+</h3></div></div></div>
+<p>
+            All tables have a <code class="computeroutput"><span class="identifier">rename_field</span><span class="special">()</span></code> method, which renames one or more columns
+            in the <a class="link" href="../terminology.html#target">target</a>. It's a wrapper for SQL's
+            <code class="literal">ALTER TABLE</code> ... <code class="literal">RENAME COLUMN</code>.
+          </p>
+<p>
+            Continuing our story from the previous section, we have a table known
+            in C++ by the name <code class="computeroutput"><span class="identifier">new_points</span></code>,
+            its value type is <code class="computeroutput"><span class="identifier">point_xz</span></code>,
+            its target is the SQL table <code class="literal">points</code>, the target exists
+            and it <a class="link" href="../terminology.html#conforms_to">conforms to</a> <code class="computeroutput"><span class="identifier">new_points</span></code>.
+            We even have <code class="computeroutput"><span class="identifier">new_points</span></code>
+            open. Let's close it again:
+          </p>
+<pre class="programlisting"><span class="identifier">new_points</span><span class="special">.</span><span class="identifier">close</span><span class="special">();</span>
+</pre>
+<p>
+            because there's another alteration coming.
+          </p>
+<p>
+            Suppose we no longer like the C++ member name <code class="computeroutput"><span class="identifier">z</span></code>;
+            we now prefer <code class="computeroutput"><span class="identifier">height</span></code>.
+            In future we would like to be using this value type:
+          </p>
+<pre class="programlisting"><span class="keyword">struct</span> <span class="identifier">point_xh</span> <span class="special">{</span>
+    <span class="keyword">float</span> <span class="identifier">x</span><span class="special">;</span>
+    <span class="keyword">float</span> <span class="identifier">height</span><span class="special">;</span>
+<span class="special">};</span>
+<span class="identifier">QUINCE_MAP_CLASS</span><span class="special">(</span><span class="identifier">point_xh</span><span class="special">,</span> <span class="special">(</span><span class="identifier">x</span><span class="special">)(</span><span class="identifier">height</span><span class="special">))</span>
+</pre>
+<p>
+            and this is the table we want to be using:
+          </p>
+<pre class="programlisting"><span class="identifier">table</span><span class="special">&lt;</span><span class="identifier">point_xh</span><span class="special">&gt;</span> <span class="identifier">newer_points</span><span class="special">(</span><span class="identifier">db</span><span class="special">,</span> <span class="string">"points"</span><span class="special">,</span> <span class="special">&amp;</span><span class="identifier">point_xh</span><span class="special">::</span><span class="identifier">x</span><span class="special">);</span>
+</pre>
+<p>
+            We can't open <code class="computeroutput"><span class="identifier">newer_points</span></code>
+            yet because the target doesn't conform to it: one of its columns has
+            the wrong name. Here's the solution:
+          </p>
+<pre class="programlisting"><span class="identifier">newer_points</span><span class="special">.</span><span class="identifier">rename_field</span><span class="special">(</span><span class="identifier">new_points</span><span class="special">-&gt;</span><span class="identifier">z</span><span class="special">,</span> <span class="identifier">newer_points</span><span class="special">-&gt;</span><span class="identifier">height</span><span class="special">);</span>
+</pre>
+<p>
+            which says:
+          </p>
+<div class="blockquote"><blockquote class="blockquote"><p>
+              In <code class="computeroutput"><span class="identifier">newer_points</span></code>'s target,
+              replace the column name that the mapper <code class="computeroutput"><span class="identifier">new_points</span><span class="special">-&gt;</span><span class="identifier">z</span></code>
+              uses by the column name that the mapper <code class="computeroutput"><span class="identifier">newer_points</span><span class="special">-&gt;</span><span class="identifier">height</span></code>
+              uses.
+            </p></blockquote></div>
+<p>
+            (Or we could have written:
+          </p>
+<pre class="programlisting"><span class="identifier">new_points</span><span class="special">.</span><span class="identifier">rename_field</span><span class="special">(</span><span class="identifier">new_points</span><span class="special">-&gt;</span><span class="identifier">z</span><span class="special">,</span> <span class="identifier">newer_points</span><span class="special">-&gt;</span><span class="identifier">height</span><span class="special">);</span>
+</pre>
+<p>
+            which does the same thing.)
+          </p>
+<p>
+            Now the target conforms to <code class="computeroutput"><span class="identifier">newer_points</span></code>,
+            so we can call <code class="computeroutput"><span class="identifier">newer_points</span><span class="special">.</span><span class="identifier">open</span><span class="special">()</span></code> and proceed.
+          </p>
+<p>
+            In this example we passed <code class="computeroutput"><span class="keyword">float</span></code>
+            mappers to <code class="computeroutput"><span class="identifier">rename_field</span><span class="special">()</span></code>, so it renamed a single <code class="literal">REAL</code>
+            column; but the mappers can be for any mapped type, as long as it's the
+            same mapped type for both (checked at compile time). If it is a multi-column
+            type, then <code class="computeroutput"><span class="identifier">rename_field</span><span class="special">()</span></code> will rename multiple columns.
+          </p>
+<p>
+            To defend against programmer error, <em class="replaceable"><code>table</code></em><code class="computeroutput"><span class="special">.</span><span class="identifier">rename_field</span><span class="special">(</span></code><em class="replaceable"><code>old</code></em><code class="computeroutput"><span class="special">,</span></code> <em class="replaceable"><code>new</code></em><code class="computeroutput"><span class="special">)</span></code> checks (at run time) that either <em class="replaceable"><code>old</code></em>
+            or <em class="replaceable"><code>new</code></em> is part of <em class="replaceable"><code>table</code></em>'s
+            value mapper.
+          </p>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2014 Michael Shepanski<p>
+        Distributed under the Boost Software License, Version 1.0
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="drop_field_postgresql_only.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../table_alteration.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="set_field_type_postgresql_only.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

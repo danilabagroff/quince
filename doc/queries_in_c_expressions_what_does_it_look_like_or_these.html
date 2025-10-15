@@ -1,0 +1,131 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>... or these</title>
+<link rel="stylesheet" href="../../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../../index.html" title="QUINCE: QUeries IN C++ Expressions">
+<link rel="up" href="../what_does_it_look_like.html" title="What Does it Look Like?">
+<link rel="prev" href="../what_does_it_look_like.html" title="What Does it Look Like?">
+<link rel="next" href="../rise_of_the_monster_query.html" title="Rise of the Monster Query">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<div class="spirit-nav">
+<a accesskey="p" href="../what_does_it_look_like.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../what_does_it_look_like.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="../rise_of_the_monster_query.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="queries_in_c_expressions.what_does_it_look_like.or_these"></a><a class="link" href="or_these.html" title="... or these">...
+          or these</a>
+</h3></div></div></div>
+<p>
+            We have seen how to construct our query in a single C++ expression that
+            covered nine lines. Now let's try it in smaller steps.
+          </p>
+<p>
+            First we define a couple of C++ functions to build the mathematical parts
+            of the query: <a name="square"></a>
+          </p>
+<pre class="programlisting"><span class="comment">// Build a server-side expression that squares a float:</span>
+<span class="comment">//</span>
+<span class="identifier">exprn_mapper</span><span class="special">&lt;</span><span class="keyword">float</span><span class="special">&gt;</span>
+<span class="identifier">square</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">exprn_mapper</span><span class="special">&lt;</span><span class="keyword">float</span><span class="special">&gt;</span> <span class="special">&amp;</span><span class="identifier">arg</span><span class="special">)</span> <span class="special">{</span>
+    <span class="keyword">return</span> <span class="identifier">arg</span> <span class="special">*</span> <span class="identifier">arg</span><span class="special">;</span>
+<span class="special">}</span>
+
+<span class="comment">// Build a server-side expression that computes the square of the</span>
+<span class="comment">// distance between two points.</span>
+<span class="comment">//</span>
+<span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">typename</span> <span class="identifier">Point0</span><span class="special">,</span> <span class="keyword">typename</span> <span class="identifier">Point1</span><span class="special">&gt;</span>
+<span class="identifier">exprn_mapper</span><span class="special">&lt;</span><span class="keyword">float</span><span class="special">&gt;</span>
+<span class="identifier">distance_squared</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">Point0</span> <span class="special">&amp;</span><span class="identifier">point0</span><span class="special">,</span> <span class="keyword">const</span> <span class="identifier">Point1</span> <span class="special">&amp;</span><span class="identifier">point1</span><span class="special">)</span> <span class="special">{</span>
+    <span class="keyword">return</span> <span class="identifier">square</span><span class="special">(</span><span class="identifier">point0</span><span class="special">.</span><span class="identifier">x</span> <span class="special">-</span> <span class="identifier">point1</span><span class="special">.</span><span class="identifier">x</span><span class="special">)</span> <span class="special">+</span> <span class="identifier">square</span><span class="special">(</span><span class="identifier">point0</span><span class="special">.</span><span class="identifier">y</span> <span class="special">-</span> <span class="identifier">point1</span><span class="special">.</span><span class="identifier">y</span><span class="special">);</span>
+<span class="special">}</span>
+</pre>
+<p>
+            Then we build the query in stages:
+          </p>
+<pre class="programlisting"><span class="keyword">const</span> <span class="identifier">query</span><span class="special">&lt;</span><span class="identifier">cinema</span><span class="special">&gt;</span> <span class="identifier">local_cinemas</span> <span class="special">=</span>
+    <span class="identifier">cinemas</span>
+    <span class="special">.</span><span class="identifier">where</span><span class="special">(</span><span class="identifier">distance_squared</span><span class="special">(</span><span class="identifier">cinemas</span><span class="special">-&gt;</span><span class="identifier">location</span><span class="special">,</span> <span class="identifier">my_place</span><span class="special">)</span> <span class="special">&lt;=</span> <span class="identifier">square</span><span class="special">(</span><span class="identifier">max_radius</span><span class="special">));</span>
+
+<span class="keyword">const</span> <span class="identifier">query</span><span class="special">&lt;</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">tuple</span><span class="special">&lt;</span><span class="identifier">cinema</span><span class="special">,</span> <span class="identifier">screen</span><span class="special">&gt;&gt;</span> <span class="identifier">local_cinemas_and_their_screens</span> <span class="special">=</span>
+    <span class="identifier">local_cinemas</span>
+    <span class="special">.</span><span class="identifier">inner_join</span><span class="special">(</span>
+        <span class="identifier">screens</span><span class="special">,</span>
+        <span class="identifier">screens</span><span class="special">-&gt;</span><span class="identifier">cinema_id</span> <span class="special">==</span> <span class="identifier">local_cinemas</span><span class="special">-&gt;</span><span class="identifier">id</span>
+    <span class="special">);</span>
+
+<span class="keyword">const</span> <span class="identifier">query</span><span class="special">&lt;</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">tuple</span><span class="special">&lt;</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">tuple</span><span class="special">&lt;</span><span class="identifier">cinema</span><span class="special">,</span> <span class="identifier">screen</span><span class="special">&gt;,</span> <span class="identifier">movie</span><span class="special">&gt;&gt;</span> <span class="identifier">local_cinemas_and_their_screens_and_current_movies</span> <span class="special">=</span>
+    <span class="identifier">local_cinemas_and_their_screens</span>
+    <span class="special">.</span><span class="identifier">inner_join</span><span class="special">(</span>
+        <span class="identifier">movies</span><span class="special">,</span>
+        <span class="identifier">movies</span><span class="special">-&gt;</span><span class="identifier">id</span> <span class="special">==</span> <span class="identifier">local_cinemas_and_their_screens</span><span class="special">-&gt;</span><span class="identifier">get</span><span class="special">&lt;</span><span class="number">1</span><span class="special">&gt;().</span><span class="identifier">current_movie_id</span>
+    <span class="special">);</span>
+
+<span class="keyword">const</span> <span class="identifier">query</span><span class="special">&lt;</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">string</span><span class="special">&gt;</span> <span class="identifier">titles_playing_nearby</span> <span class="special">=</span>
+    <span class="identifier">local_cinemas_and_their_screens_and_current_movies</span>
+    <span class="special">.</span><span class="identifier">select</span><span class="special">(</span><span class="identifier">local_cinemas_and_their_screens_and_current_movies</span><span class="special">-&gt;</span><span class="identifier">get</span><span class="special">&lt;</span><span class="number">1</span><span class="special">&gt;().</span><span class="identifier">title</span><span class="special">)</span>
+    <span class="special">.</span><span class="identifier">distinct</span><span class="special">();</span>
+</pre>
+<p>
+            That spells out what was implicit in our first attempt, but now that
+            I see it I don't entirely like it. The two <span class="quote">&#8220;<span class="quote">joined</span>&#8221;</span> queries
+            (<code class="computeroutput"><span class="identifier">locals_cinemas_and_their_screens</span></code>
+            and <code class="computeroutput"><span class="identifier">local_cinemas_and_their_screens_and_current_movies</span></code>)
+            both produce tuples containing largely unused information. It's probably
+            not a performance issue, because those queries themselves are never executed.
+            (The only query that is executed is the final one, <code class="computeroutput"><span class="identifier">titles_playing_nearby</span></code>,
+            and it has enough information to let the DBMS make sensible optimizations.)
+            Nevertheless the tuples complicate the C++ source code, and for that
+            reason I prefer the following (with the definition of <code class="computeroutput"><span class="identifier">local_cinemas</span></code>
+            unchanged):
+          </p>
+<pre class="programlisting"><span class="keyword">const</span> <span class="identifier">query</span><span class="special">&lt;</span><span class="identifier">screen</span><span class="special">&gt;</span> <span class="identifier">local_screens</span> <span class="special">=</span>
+    <span class="identifier">local_cinemas</span>
+    <span class="special">.</span><span class="identifier">inner_join</span><span class="special">(</span><span class="identifier">screens</span><span class="special">,</span> <span class="identifier">screens</span><span class="special">-&gt;</span><span class="identifier">cinema_id</span> <span class="special">==</span> <span class="identifier">local_cinemas</span><span class="special">-&gt;</span><span class="identifier">id</span><span class="special">)</span>
+    <span class="special">.</span><span class="identifier">select</span><span class="special">(*</span><span class="identifier">screens</span><span class="special">);</span>
+
+<span class="keyword">const</span> <span class="identifier">query</span><span class="special">&lt;</span><span class="identifier">movie</span><span class="special">&gt;</span> <span class="identifier">local_movies</span> <span class="special">=</span>
+    <span class="identifier">local_screens</span>
+    <span class="special">.</span><span class="identifier">inner_join</span><span class="special">(</span><span class="identifier">movies</span><span class="special">,</span> <span class="identifier">movies</span><span class="special">-&gt;</span><span class="identifier">id</span> <span class="special">==</span> <span class="identifier">local_screens</span><span class="special">-&gt;</span><span class="identifier">current_movie_id</span><span class="special">)</span>
+    <span class="special">.</span><span class="identifier">select</span><span class="special">(*</span><span class="identifier">movies</span><span class="special">);</span>
+
+<span class="keyword">const</span> <span class="identifier">query</span><span class="special">&lt;</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">string</span><span class="special">&gt;</span> <span class="identifier">titles_playing_nearby</span> <span class="special">=</span>
+    <span class="identifier">local_movies</span>
+    <span class="special">.</span><span class="identifier">select</span><span class="special">(</span><span class="identifier">local_movies</span><span class="special">-&gt;</span><span class="identifier">title</span><span class="special">)</span>
+    <span class="special">.</span><span class="identifier">distinct</span><span class="special">();</span>
+</pre>
+<p>
+            The combination of <code class="computeroutput"><span class="identifier">inner_join</span><span class="special">()</span></code> and <code class="computeroutput"><span class="identifier">select</span><span class="special">()</span></code>, in the definitions of <code class="computeroutput"><span class="identifier">local_screens</span></code> and <code class="computeroutput"><span class="identifier">local_movies</span></code>,
+            serves to <span class="quote">&#8220;<span class="quote">jump across</span>&#8221;</span> from one query (or table) to another.
+            Quince has a convenience function, <code class="computeroutput"><span class="identifier">jump</span><span class="special">()</span></code>, whose job is to abbreviate that pattern.
+            So my last revision is:
+          </p>
+<pre class="programlisting"><span class="keyword">const</span> <span class="identifier">query</span><span class="special">&lt;</span><span class="identifier">screen</span><span class="special">&gt;</span> <span class="identifier">local_screens</span> <span class="special">=</span>
+    <span class="identifier">local_cinemas</span>
+    <span class="special">.</span><span class="identifier">jump</span><span class="special">(</span><span class="identifier">screens</span><span class="special">,</span> <span class="identifier">screens</span><span class="special">-&gt;</span><span class="identifier">cinema_id</span> <span class="special">==</span> <span class="identifier">local_cinemas</span><span class="special">-&gt;</span><span class="identifier">id</span><span class="special">);</span>
+
+<span class="keyword">const</span> <span class="identifier">query</span><span class="special">&lt;</span><span class="identifier">movie</span><span class="special">&gt;</span> <span class="identifier">local_movies</span> <span class="special">=</span>
+    <span class="identifier">local_screens</span>
+    <span class="special">.</span><span class="identifier">jump</span><span class="special">(</span><span class="identifier">movies</span><span class="special">,</span> <span class="identifier">movies</span><span class="special">-&gt;</span><span class="identifier">id</span> <span class="special">==</span> <span class="identifier">local_screens</span><span class="special">-&gt;</span><span class="identifier">current_movie_id</span><span class="special">);</span>
+
+<span class="keyword">const</span> <span class="identifier">query</span><span class="special">&lt;</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">string</span><span class="special">&gt;</span> <span class="identifier">titles_playing_nearby</span> <span class="special">=</span>
+    <span class="identifier">local_movies</span>
+    <span class="special">.</span><span class="identifier">select</span><span class="special">(</span><span class="identifier">local_movies</span><span class="special">-&gt;</span><span class="identifier">title</span><span class="special">)</span>
+    <span class="special">.</span><span class="identifier">distinct</span><span class="special">();</span>
+</pre>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2014 Michael Shepanski<p>
+        Distributed under the Boost Software License, Version 1.0
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="../what_does_it_look_like.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../what_does_it_look_like.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="../rise_of_the_monster_query.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

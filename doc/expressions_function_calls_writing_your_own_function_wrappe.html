@@ -1,0 +1,219 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Writing Your Own Function Wrappers</title>
+<link rel="stylesheet" href="../../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../../index.html" title="QUINCE: QUeries IN C++ Expressions">
+<link rel="up" href="../function_calls.html" title="Function Calls">
+<link rel="prev" href="scalar_and_aggregate_functions.html" title="&#8220;Scalar&#8221; and &#8220;Aggregate&#8221; Functions">
+<link rel="next" href="../relational.html" title="Relational Operations">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<div class="spirit-nav">
+<a accesskey="p" href="scalar_and_aggregate_functions.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../function_calls.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="../relational.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="expressions.function_calls.writing_your_own_function_wrappe"></a><a class="link" href="writing_your_own_function_wrappe.html" title="Writing Your Own Function Wrappers">Writing
+          Your Own Function Wrappers</a>
+</h3></div></div></div>
+<p>
+            Quince's wrappers let you call some SQL functions, but you may want to
+            call others. Then the best approach is to define new wrappers, using
+            the same technique that quince uses. E.g. here is quince's implementation
+            of <code class="computeroutput"><span class="identifier">length</span><span class="special">()</span></code>:
+          </p>
+<pre class="programlisting"><span class="identifier">exprn_mapper</span><span class="special">&lt;</span><span class="identifier">int32_t</span><span class="special">&gt;</span>
+<span class="identifier">length</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">abstract_mapper</span><span class="special">&lt;</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">string</span><span class="special">&gt;</span> <span class="special">&amp;</span><span class="identifier">arg</span><span class="special">)</span> <span class="special">{</span>
+    <span class="keyword">return</span> <span class="identifier">function</span><span class="special">&lt;</span><span class="identifier">int32_t</span><span class="special">&gt;(</span><span class="string">"length"</span><span class="special">,</span> <span class="identifier">arg</span><span class="special">);</span>
+<span class="special">}</span>
+</pre>
+<p>
+            <code class="computeroutput"><span class="identifier">length</span><span class="special">()</span></code>
+            is delegating most of its work to <code class="computeroutput"><span class="identifier">function</span><span class="special">()</span></code>, and that is what your wrappers should
+            do too. Here's what you need to know:
+          </p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+                <code class="computeroutput"><span class="identifier">function</span><span class="special">()</span></code>'s
+                template parameter is a C++ type that maps to the SQL function's
+                return type, on any target DBMS. (The template parameter type may
+                map to different SQL types on different DBMSes, and the function
+                may return different SQL types on different DBMSes. That's okay as
+                long as the two turn out the same on any given DBMS.)
+              </li>
+<li class="listitem">
+                <code class="computeroutput"><span class="identifier">function</span><span class="special">()</span></code>'s
+                first argument is the SQL name of the function you are wrapping.
+              </li>
+<li class="listitem">
+                Its remaining arguments are C++ representations of the SQL function
+                arguments. There's just one in this case, but <code class="computeroutput"><span class="identifier">function</span><span class="special">()</span></code> can take more. Their order corresponds
+                to the SQL argument order.
+              </li>
+<li class="listitem">
+                If <em class="replaceable"><code>sqlarg</code></em> is some argument to the SQL
+                function, and <em class="replaceable"><code>cpparg</code></em> is the corresponding
+                argument to <code class="computeroutput"><span class="identifier">function</span><span class="special">()</span></code>, then <em class="replaceable"><code>cpparg</code></em>
+                must be of type <em class="replaceable"><code>T</code></em> or <code class="computeroutput"><span class="identifier">abstract_mapper</span><span class="special">&lt;</span></code><em class="replaceable"><code>T</code></em><code class="computeroutput"><span class="special">&gt;</span></code>, where <em class="replaceable"><code>T</code></em>
+                is a C++ type that maps to <em class="replaceable"><code>sqlarg</code></em>'s type
+                on any target DBMS. (<em class="replaceable"><code>T</code></em> may map to different
+                SQL types on different DBMSes, and <em class="replaceable"><code>sqlarg</code></em>
+                may have different SQL types on different DBMSes. That's okay as
+                long as the two turn out the same on any given DBMS.).
+              </li>
+</ul></div>
+<p>
+            A word of caution. When you use <code class="computeroutput"><span class="identifier">function</span><span class="special">()</span></code> to wrap some SQL function <code class="literal">foo</code>,
+            quince cannot know how many arguments <code class="literal">foo</code> expects,
+            nor what types they should be, nor what type <code class="literal">foo</code> returns.
+            As the author of a wrapper, it is your duty to find that information
+            and code it into your wrapper, so that call sites will have the benefit
+            of static type checking. In particular:
+          </p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+                Your wrapper's argument declarations enforce type safety on the way
+                in: they stop anything of the wrong type from getting as far as
+                <code class="computeroutput"><span class="identifier">function</span><span class="special">()</span></code>.
+              </li>
+<li class="listitem">
+                The template parameter to <code class="computeroutput"><span class="identifier">function</span><span class="special">()</span></code> enforces type safety on the way
+                out, because <code class="computeroutput"><span class="identifier">function</span><span class="special">&lt;</span></code><em class="replaceable"><code>T</code></em><code class="computeroutput"><span class="special">&gt;()</span></code> returns an <code class="computeroutput"><span class="identifier">exprn_mapper</span><span class="special">&lt;</span></code><em class="replaceable"><code>T</code></em><code class="computeroutput"><span class="special">&gt;</span></code>, and whatever you do with that
+                will be type-checked by the C++ compiler.
+              </li>
+</ul></div>
+<h5>
+<a name="expressions.function_calls.writing_your_own_function_wrappe.h0"></a>
+            <span class="phrase"><a name="expressions.function_calls.writing_your_own_function_wrappe.allowing_for_null"></a></span><a class="link" href="writing_your_own_function_wrappe.html#expressions.function_calls.writing_your_own_function_wrappe.allowing_for_null">Allowing
+            for <code class="literal">NULL</code></a>
+          </h5>
+<p>
+            Be especially careful to check whether the SQL function can return <code class="literal">NULL</code>.
+            If it can, then the template parameter to <code class="computeroutput"><span class="identifier">function</span><span class="special">()</span></code> should be a <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">optional</span></code>.
+            E.g. here is a possible definition of the 16-bit version of <code class="computeroutput"><span class="identifier">max</span><span class="special">()</span></code>:
+          </p>
+<pre class="programlisting"><span class="identifier">exprn_mapper</span><span class="special">&lt;</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">optional</span><span class="special">&lt;</span><span class="identifier">int16_t</span><span class="special">&gt;&gt;</span>
+<span class="identifier">max</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">abstract_mapper</span><span class="special">&lt;</span><span class="identifier">int16_t</span><span class="special">&gt;</span> <span class="special">&amp;</span><span class="identifier">arg</span><span class="special">)</span> <span class="special">{</span>
+    <span class="keyword">return</span> <span class="identifier">function</span><span class="special">&lt;</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">optional</span><span class="special">&lt;</span><span class="identifier">int16_t</span><span class="special">&gt;&gt;(</span><span class="string">"max"</span><span class="special">,</span> <span class="identifier">arg</span><span class="special">);</span>
+<span class="special">}</span>
+</pre>
+<p>
+            <code class="computeroutput"><span class="identifier">function</span><span class="special">&lt;</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">optional</span><span class="special">&lt;</span><span class="identifier">int16_t</span><span class="special">&gt;&gt;()</span></code>
+            returns an <code class="computeroutput"><span class="identifier">exprn_mapper</span><span class="special">&lt;</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">optional</span><span class="special">&lt;</span><span class="identifier">int16_t</span><span class="special">&gt;&gt;</span></code>, which in this case we hand straight
+            back to our caller. If we wanted to give the caller an <code class="computeroutput"><span class="identifier">exprn_mapper</span><span class="special">&lt;</span><span class="identifier">int16_t</span><span class="special">&gt;</span></code>
+            then we would have to provide a default, e.g.:
+          </p>
+<pre class="programlisting"><span class="identifier">exprn_mapper</span><span class="special">&lt;</span><span class="identifier">int16_t</span><span class="special">&gt;</span>
+<span class="identifier">max_or_zero</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">abstract_mapper</span><span class="special">&lt;</span><span class="identifier">int16_t</span><span class="special">&gt;</span> <span class="special">&amp;</span><span class="identifier">arg</span><span class="special">)</span> <span class="special">{</span>
+    <span class="keyword">return</span> <span class="identifier">function</span><span class="special">&lt;</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">optional</span><span class="special">&lt;</span><span class="identifier">int16_t</span><span class="special">&gt;&gt;(</span><span class="string">"max"</span><span class="special">,</span> <span class="identifier">arg</span><span class="special">).</span><span class="identifier">get_value_or</span><span class="special">(</span><span class="number">0</span><span class="special">);</span>
+<span class="special">}</span>
+</pre>
+<h5>
+<a name="expressions.function_calls.writing_your_own_function_wrappe.h1"></a>
+            <span class="phrase"><a name="expressions.function_calls.writing_your_own_function_wrappe.allowing_for_dbms_dependent_type"></a></span><a class="link" href="writing_your_own_function_wrappe.html#expressions.function_calls.writing_your_own_function_wrappe.allowing_for_dbms_dependent_type">Allowing
+            for DBMS-dependent types</a>
+          </h5>
+<p>
+            Often the arguments or return values of an SQL function depend on the
+            DBMS. E.g. on PostgreSQL you can apply the SQL <code class="literal">abs</code>
+            function to a <code class="literal">smallint</code> (which represents an <code class="computeroutput"><span class="identifier">int16_t</span></code>), and the result will be a
+            <code class="literal">smallint</code>; whereas on sqlite there is nothing like
+            <code class="literal">smallint</code>: if you want to take the absolute value of
+            an integer, no matter how small, you pass <code class="literal">abs</code> an
+            <code class="literal">INTEGER</code>, which can hold up to 64 bits, and it returns
+            an <code class="literal">INTEGER</code>.
+          </p>
+<p>
+            That sort of DBMS-dependency takes no effort. E.g. here is quince's implementation
+            of the 16-bit overload of <code class="computeroutput"><span class="identifier">abs</span><span class="special">()</span></code>:
+          </p>
+<pre class="programlisting"><span class="identifier">exprn_mapper</span><span class="special">&lt;</span><span class="identifier">int16_t</span><span class="special">&gt;</span>
+<span class="identifier">abs</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">abstract_mapper</span><span class="special">&lt;</span><span class="identifier">int16_t</span><span class="special">&gt;</span> <span class="special">&amp;</span><span class="identifier">arg</span><span class="special">)</span> <span class="special">{</span>
+    <span class="keyword">return</span> <span class="identifier">function</span><span class="special">&lt;</span><span class="identifier">int16_t</span><span class="special">&gt;(</span><span class="string">"abs"</span><span class="special">,</span> <span class="identifier">arg</span><span class="special">);</span>
+<span class="special">}</span>
+</pre>
+<p>
+            We use the polymorphically mapped type <code class="computeroutput"><span class="identifier">int16_t</span></code>,
+            which quince_postgresql maps to <code class="literal">smallint</code>; and quince_sqlite
+            backend maps to <code class="literal">INTEGER</code>. So it always turns out the
+            same as SQL <code class="literal">abs</code>'s argument, and SQL <code class="literal">abs</code>'s
+            return value.
+          </p>
+<p>
+            Other cases are harder. Take <code class="computeroutput"><span class="identifier">avg</span><span class="special">()</span></code>. On PostgreSQL, if you apply the SQL
+            <code class="computeroutput"><span class="identifier">avg</span></code> function to inputs
+            of integral type, the result is a variable-precision type called <code class="literal">numeric</code>,
+            which quince does not currently map to any C++ type at all. On sqlite,
+            however, if you apply <code class="computeroutput"><span class="identifier">avg</span></code>
+            to inputs of integral type, the result is <code class="literal">REAL</code>.
+          </p>
+<p>
+            The approach we took with <code class="computeroutput"><span class="identifier">abs</span><span class="special">()</span></code> is not immediately available, because
+            there is no C++ type that maps to <code class="literal">numeric</code> on one DBMS
+            and to <code class="literal">REAL</code> on the other.
+          </p>
+<p>
+            The solution is to ask for more help from the DBMSes. After evaluating
+            <code class="literal">avg</code>, the DBMSes must convert the result to something
+            that <span class="emphasis"><em>is</em></span> mapped by a single C++ type -- some C++
+            type that will be acceptable to all parties. In this case, I nominate
+            <code class="computeroutput"><span class="keyword">double</span></code>.
+          </p>
+<p>
+            So here's how quince implements <code class="computeroutput"><span class="identifier">avg</span><span class="special">()</span></code> with an <code class="computeroutput"><span class="identifier">int16_t</span></code>
+            argument:
+          </p>
+<pre class="programlisting"><span class="identifier">QUINCE_DEFINE_SERVER_ONLY_TYPE</span><span class="special">(</span><span class="identifier">any_avg</span><span class="special">);</span>
+
+<span class="identifier">exprn_mapper</span><span class="special">&lt;</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">optional</span><span class="special">&lt;</span><span class="keyword">double</span><span class="special">&gt;&gt;</span>
+<span class="identifier">avg</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">abstract_mapper</span><span class="special">&lt;</span><span class="identifier">int16_t</span><span class="special">&gt;</span> <span class="special">&amp;</span><span class="identifier">arg</span><span class="special">)</span> <span class="special">{</span>
+    <span class="keyword">return</span> <span class="identifier">cast</span><span class="special">&lt;</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">optional</span><span class="special">&lt;</span><span class="keyword">double</span><span class="special">&gt;&gt;(</span><span class="identifier">function</span><span class="special">&lt;</span><span class="identifier">any_avg</span><span class="special">&gt;(</span><span class="string">"avg"</span><span class="special">,</span> <span class="identifier">arg</span><span class="special">));</span>
+<span class="special">}</span>
+</pre>
+<p>
+            The first line defines a type <code class="computeroutput"><span class="identifier">any_avg</span></code>,
+            which will be the C++ counterpart of any type that SQL's <code class="literal">avg</code>
+            returns, even allowing <code class="literal">NULL</code>s <a href="#ftn.expressions.function_calls.writing_your_own_function_wrappe.f0" class="footnote" name="expressions.function_calls.writing_your_own_function_wrappe.f0"><sup class="footnote">[9]</sup></a> . We will be using <code class="computeroutput"><span class="identifier">any_avg</span></code>
+            as if it were a mapped type, but only for intermediate values within
+            server-side expressions. Its values will never get converted either to
+            or from any C++ type, and its SQL typename will never be be mentioned:
+            not in quince, not in backends, not in application code. So quince doesn't
+            need to know anything about the type <code class="computeroutput"><span class="identifier">any_avg</span></code>,
+            except that we're using it consistently. The macro <code class="computeroutput"><span class="identifier">QUINCE_DEFINE_SERVER_ONLY_TYPE</span></code>
+            defines types that fit this very limited role.
+          </p>
+<p>
+            When <code class="computeroutput"><span class="identifier">avg</span><span class="special">()</span></code>
+            calls <code class="computeroutput"><span class="identifier">function</span><span class="special">()</span></code>,
+            to build the call to SQL's <code class="literal">avg</code> with its obscure, possibly
+            <code class="literal">NULL</code> return type, the template parameter is <code class="computeroutput"><span class="identifier">any_avg</span></code>. That causes <code class="computeroutput"><span class="identifier">function</span><span class="special">()</span></code>
+            to return an <code class="computeroutput"><span class="identifier">exprn_mapper</span><span class="special">&lt;</span><span class="identifier">any_avg</span><span class="special">&gt;</span></code>. We pass that to <code class="computeroutput"><span class="identifier">cast</span><span class="special">&lt;</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">optional</span><span class="special">&lt;</span><span class="keyword">double</span><span class="special">&gt;&gt;()</span></code>, which represents a server-side
+            cast, from the possibly-<code class="literal">NULL</code> obscure thing to a possibly
+            <code class="literal">NULL</code> value of whatever type is represented by <code class="computeroutput"><span class="keyword">double</span></code> on the particular DBMS. The result
+            is an <code class="computeroutput"><span class="identifier">exprn_mapper</span><span class="special">&lt;</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">optional</span><span class="special">&lt;</span><span class="keyword">double</span><span class="special">&gt;&gt;</span></code>,
+            which users can put to work in all the normal ways, safely and without
+            regard to the chicanery that went into making it.
+          </p>
+<div class="footnotes">
+<br><hr style="width:100; text-align:left;margin-left: 0">
+<div id="ftn.expressions.function_calls.writing_your_own_function_wrappe.f0" class="footnote"><p><a href="#expressions.function_calls.writing_your_own_function_wrappe.f0" class="para"><sup class="para">[9] </sup></a>
+              because SQL's <code class="literal">avg</code> is an aggregate function that
+              returns <code class="literal">NULL</code> on empty input.
+            </p></div>
+</div>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2014 Michael Shepanski<p>
+        Distributed under the Boost Software License, Version 1.0
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="scalar_and_aggregate_functions.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../function_calls.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="../relational.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

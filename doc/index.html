@@ -1,0 +1,176 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>QUINCE: QUeries IN C++ Expressions</title>
+<link rel="stylesheet" href="boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="index.html" title="QUINCE: QUeries IN C++ Expressions">
+<link rel="next" href="introduction.html" title="Part&#160;I.&#160;Introduction">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<div class="spirit-nav"><a accesskey="n" href="introduction.html"><img src="images/next.png" alt="Next"></a></div>
+<div class="book">
+<div class="titlepage">
+<div>
+<div><h1 class="title">
+<a name="Quince"></a>QUINCE: QUeries IN C++ Expressions</h1></div>
+<div><div class="authorgroup"><div class="author"><h3 class="author">
+<span class="firstname">Michael</span> <span class="surname">Shepanski</span>
+</h3></div></div></div>
+<div><p class="copyright">Copyright &#169; 2014 Michael Shepanski</p></div>
+<div><div class="legalnotice">
+<a name="Quince.legal"></a><p>
+        Distributed under the Boost Software License, Version 1.0
+      </p>
+</div></div>
+</div>
+<hr>
+</div>
+<div class="toc">
+<p><b>Table of Contents</b></p>
+<dl class="toc">
+<dt><span class="part"><a href="introduction.html">I. Introduction</a></span></dt>
+<dd><dl>
+<dt><span class="chapter"><a href="queries_in_c_expressions.html">1. Queries in C++ Expressions</a></span></dt>
+<dd><dl>
+<dt><span class="section"><a href="queries_in_c_expressions.html#queries_in_c_expressions.what_why_how_and_for_whom">What,
+        Why, How, and for Whom?</a></span></dt>
+<dt><span class="section"><a href="queries_in_c_expressions/what_does_it_look_like.html">What
+        Does it Look Like?</a></span></dt>
+<dt><span class="section"><a href="queries_in_c_expressions/rise_of_the_monster_query.html">Rise
+        of the Monster Query</a></span></dt>
+<dt><span class="section"><a href="queries_in_c_expressions/the_quincessential_dot_points.html">The
+        Quincessential Dot Points</a></span></dt>
+</dl></dd>
+<dt><span class="chapter"><a href="preparation.html">2. Preparation</a></span></dt>
+<dd><dl>
+<dt><span class="section"><a href="preparation.html#preparation.which_dbms_es_will_you_be_using">Which
+        DBMS(es) Will You Be Using?</a></span></dt>
+<dt><span class="section"><a href="preparation/prerequisites.html">Prerequisites</a></span></dt>
+<dt><span class="section"><a href="preparation/downloading_quince_and_the_backe.html">Downloading
+        Quince and the Backends</a></span></dt>
+<dt><span class="section"><a href="preparation/configuring_boost_build.html">Configuring Boost.Build</a></span></dt>
+<dt><span class="section"><a href="preparation/building_quince_and_the_backends.html">Building
+        Quince and the Backends</a></span></dt>
+<dt><span class="section"><a href="preparation/building_an_application.html">Building an Application</a></span></dt>
+</dl></dd>
+<dt><span class="chapter"><a href="getting_started.html">3. Getting Started</a></span></dt>
+<dd><dl>
+<dt><span class="section"><a href="getting_started.html#getting_started.ahem">Ahem</a></span></dt>
+<dt><span class="section"><a href="getting_started/defining_mapped_class_types.html">Defining
+        Mapped Class Types</a></span></dt>
+<dt><span class="section"><a href="getting_started/creating_the_database_object.html">Creating
+        the Database Object</a></span></dt>
+<dt><span class="section"><a href="getting_started/creating_the_table_objects.html">Creating
+        the Table Objects</a></span></dt>
+<dt><span class="section"><a href="getting_started/opening_the_tables.html">Opening the Tables</a></span></dt>
+<dt><span class="section"><a href="getting_started/clearing_the_tables.html">Clearing the Tables</a></span></dt>
+<dt><span class="section"><a href="getting_started/populating_the_tables.html">Populating the
+        Tables</a></span></dt>
+<dt><span class="section"><a href="getting_started/building_expressions_for_server_.html">Building
+        Expressions for Server-Side Evaluation</a></span></dt>
+<dt><span class="section"><a href="getting_started/buliding_a_query.html">Buliding a Query</a></span></dt>
+<dt><span class="section"><a href="getting_started/building_further.html">Building Further</a></span></dt>
+<dt><span class="section"><a href="getting_started/ceci_n_est_pas_une_pipe.html"><span class="emphasis"><em>Ceci
+        n'est pas une pipe</em></span></a></span></dt>
+<dt><span class="section"><a href="getting_started/executing_the_query.html">Executing the
+        Query</a></span></dt>
+<dt><span class="section"><a href="getting_started/the_end.html">The End</a></span></dt>
+</dl></dd>
+</dl></dd>
+<dt><span class="part"><a href="depth.html">II. The Quince API in Depth</a></span></dt>
+<dd><dl>
+<dt><span class="chapter"><a href="exceptions.html">4. Exceptions</a></span></dt>
+<dt><span class="chapter"><a href="mapped_data_types.html">5. Mapped Data Types</a></span></dt>
+<dd><dl>
+<dt><span class="section"><a href="mapped_data_types.html#mapped_data_types.definition_taxonomy">Definition,
+        Taxonomy</a></span></dt>
+<dt><span class="section"><a href="mapped_data_types/polymorphically_mapped_types.html">Polymorphically
+        Mapped Types</a></span></dt>
+<dt><span class="section"><a href="mapped_data_types/boost_optional.html"><code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">optional</span><span class="special">&lt;</span></code>...<code class="computeroutput"><span class="special">&gt;</span></code></a></span></dt>
+<dt><span class="section"><a href="mapped_data_types/std_tuple.html"><code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">tuple</span><span class="special">&lt;</span></code>...<code class="computeroutput"><span class="special">&gt;</span></code></a></span></dt>
+<dt><span class="section"><a href="mapped_data_types/user_defined_class_types.html">User-Defined
+        Class Types </a></span></dt>
+</dl></dd>
+<dt><span class="chapter"><a href="expressions.html">6. Expressions for Server-Side Execution</a></span></dt>
+<dd><dl>
+<dt><span class="section"><a href="expressions.html#expressions.server_side_expressions_in_gener">Server-Side
+        Expressions in General</a></span></dt>
+<dt><span class="section"><a href="expressions/arithmetic_operations.html">Arithmetic Operations
+        </a></span></dt>
+<dt><span class="section"><a href="expressions/strcat.html">String Concatenation</a></span></dt>
+<dt><span class="section"><a href="expressions/cast.html"><code class="computeroutput"><span class="identifier">cast</span><span class="special">&lt;</span></code>...<code class="computeroutput"><span class="special">&gt;()</span></code></a></span></dt>
+<dt><span class="section"><a href="expressions/function_calls.html">Function Calls</a></span></dt>
+<dt><span class="section"><a href="expressions/relational.html">Relational Operations </a></span></dt>
+<dt><span class="section"><a href="expressions/predicate_s_and_logical_operatio.html"><code class="computeroutput"><span class="identifier">predicate</span></code>s and Logical Operations</a></span></dt>
+<dt><span class="section"><a href="expressions/exists.html"><code class="computeroutput"><span class="identifier">exists</span><span class="special">()</span></code></a></span></dt>
+<dt><span class="section"><a href="expressions/in.html"><code class="computeroutput"><span class="identifier">in</span><span class="special">()</span></code></a></span></dt>
+<dt><span class="section"><a href="expressions/collective.html">Collective Comparisons (PostgreSQL
+        only)</a></span></dt>
+<dt><span class="section"><a href="expressions/scalar.html">Scalar Subqueries</a></span></dt>
+<dt><span class="section"><a href="expressions/choose.html"><code class="computeroutput"><span class="identifier">choose</span><span class="special">()</span></code></a></span></dt>
+<dt><span class="section"><a href="expressions/visibility.html">Visibility</a></span></dt>
+</dl></dd>
+<dt><span class="chapter"><a href="queries.html">7. Queries</a></span></dt>
+<dd><dl>
+<dt><span class="section"><a href="queries.html#queries.queries_in_general">Queries in General </a></span></dt>
+<dt><span class="section"><a href="queries/compositionality.html">Compositionality</a></span></dt>
+<dt><span class="section"><a href="queries/select.html"><code class="computeroutput"><span class="identifier">select</span><span class="special">()</span></code></a></span></dt>
+<dt><span class="section"><a href="queries/where.html"><code class="computeroutput"><span class="identifier">where</span><span class="special">()</span></code></a></span></dt>
+<dt><span class="section"><a href="queries/order.html"><code class="computeroutput"><span class="identifier">order</span><span class="special">()</span></code></a></span></dt>
+<dt><span class="section"><a href="queries/distinct_and_distinct_on.html"><code class="computeroutput"><span class="identifier">distinct</span><span class="special">()</span></code> and <code class="computeroutput"><span class="identifier">distinct_on</span><span class="special">()</span></code></a></span></dt>
+<dt><span class="section"><a href="queries/join.html">The <code class="computeroutput"><span class="identifier">join</span><span class="special">()</span></code> Family of Functions</a></span></dt>
+<dt><span class="section"><a href="queries/set_theoretic_operations.html">Set-Theoretic Operations</a></span></dt>
+<dt><span class="section"><a href="queries/skip_and_limit.html"><code class="computeroutput"><span class="identifier">skip</span><span class="special">()</span></code> and <code class="computeroutput"><span class="identifier">limit</span><span class="special">()</span></code></a></span></dt>
+<dt><span class="section"><a href="queries/executing.html">Executing Queries</a></span></dt>
+</dl></dd>
+<dt><span class="chapter"><a href="tables.html">8. Tables</a></span></dt>
+<dd><dl>
+<dt><span class="section"><a href="tables.html#tables.tables_in_general">Tables in General </a></span></dt>
+<dt><span class="section"><a href="tables/terminology.html">Terminology</a></span></dt>
+<dt><span class="section"><a href="tables/life_cycle_of_a_table_object.html">Life Cycle of
+        a Table Object</a></span></dt>
+<dt><span class="section"><a href="tables/construction.html">Construction and Primary Key</a></span></dt>
+<dt><span class="section"><a href="tables/indexes_and_foreign_key_constrai.html">Indexes and
+        Foreign Key Constraints</a></span></dt>
+<dt><span class="section"><a href="tables/manipulation.html">Data Manipulation</a></span></dt>
+<dt><span class="section"><a href="tables/table_alteration.html">Table Alteration</a></span></dt>
+</dl></dd>
+<dt><span class="chapter"><a href="custom.html">9. Custom Mappings</a></span></dt>
+<dd><dl>
+<dt><span class="section"><a href="custom.html#custom.degrees_of_freedom">Degrees of Freedom</a></span></dt>
+<dt><span class="section"><a href="custom/predefined.html">Predefined Concrete Mapper Class
+        Templates</a></span></dt>
+<dt><span class="section"><a href="custom/deployment.html">Deployment</a></span></dt>
+</dl></dd>
+<dt><span class="chapter"><a href="transactions.html">10. Transactions</a></span></dt>
+<dt><span class="chapter"><a href="connection_management.html">11. Connection Management</a></span></dt>
+</dl></dd>
+<dt><span class="part"><a href="the_back_end_libraries.html">III. The Back-End Libraries</a></span></dt>
+<dd><dl>
+<dt><span class="chapter"><a href="quince_postgresql.html">12. quince_postgresql</a></span></dt>
+<dd><dl>
+<dt><span class="section"><a href="quince_postgresql.html#quince_postgresql.constructor">The <code class="computeroutput"><span class="identifier">quince_postgresql</span><span class="special">::</span><span class="identifier">database</span></code>
+        constructor</a></span></dt>
+<dt><span class="section"><a href="quince_postgresql/basic.html">Basic conversions</a></span></dt>
+<dt><span class="section"><a href="quince_postgresql/mappers.html">Default mappers</a></span></dt>
+</dl></dd>
+<dt><span class="chapter"><a href="quince_sqlite.html">13. quince_sqlite</a></span></dt>
+<dd><dl>
+<dt><span class="section"><a href="quince_sqlite.html#quince_sqlite.constructor">The <code class="computeroutput"><span class="identifier">quince_sqlite</span><span class="special">::</span><span class="identifier">database</span></code>
+        constructor</a></span></dt>
+<dt><span class="section"><a href="quince_sqlite/basic.html">Basic conversions</a></span></dt>
+<dt><span class="section"><a href="quince_sqlite/mappers.html">Default mappers</a></span></dt>
+</dl></dd>
+</dl></dd>
+</dl>
+</div>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"><p><small>Last revised: May 23, 2015 at 07:29:14 GMT</small></p></td>
+<td align="right"><div class="copyright-footer"></div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav"><a accesskey="n" href="introduction.html"><img src="images/next.png" alt="Next"></a></div>
+</body>
+</html>

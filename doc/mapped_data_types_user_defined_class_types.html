@@ -1,0 +1,310 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>User-Defined Class Types</title>
+<link rel="stylesheet" href="../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../index.html" title="QUINCE: QUeries IN C++ Expressions">
+<link rel="up" href="../mapped_data_types.html" title="Chapter&#160;5.&#160;Mapped Data Types">
+<link rel="prev" href="std_tuple.html" title="std::tuple&lt;...&gt;">
+<link rel="next" href="../expressions.html" title="Chapter&#160;6.&#160;Expressions for Server-Side Execution">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<div class="spirit-nav">
+<a accesskey="p" href="std_tuple.html"><img src="../images/prev.png" alt="Prev"></a><a accesskey="u" href="../mapped_data_types.html"><img src="../images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../images/home.png" alt="Home"></a><a accesskey="n" href="../expressions.html"><img src="../images/next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="mapped_data_types.user_defined_class_types"></a><a class="link" href="user_defined_class_types.html" title="User-Defined Class Types">User-Defined
+        Class Types </a>
+</h2></div></div></div>
+<p>
+          
+        </p>
+<h4>
+<a name="mapped_data_types.user_defined_class_types.h0"></a>
+          <span class="phrase"><a name="mapped_data_types.user_defined_class_types.defining_a_mapper_class"></a></span><a class="link" href="user_defined_class_types.html#mapped_data_types.user_defined_class_types.defining_a_mapper_class">Defining
+          a mapper class</a>
+        </h4>
+<h5>
+<a name="mapped_data_types.user_defined_class_types.h1"></a>
+          <span class="phrase"><a name="mapped_data_types.user_defined_class_types.without_mapped_bases"></a></span><a class="link" href="user_defined_class_types.html#mapped_data_types.user_defined_class_types.without_mapped_bases">Without
+          mapped bases ...</a>
+        </h5>
+<p>
+          We have seen this sort of thing several times:
+        </p>
+<pre class="programlisting"><span class="keyword">namespace</span> <span class="identifier">cinemascope</span> <span class="special">{</span>
+    <span class="keyword">struct</span> <span class="identifier">point</span> <span class="special">{</span>
+        <span class="keyword">float</span> <span class="identifier">x</span><span class="special">;</span>
+        <span class="keyword">float</span> <span class="identifier">y</span><span class="special">;</span>
+    <span class="special">};</span>
+    <span class="identifier">QUINCE_MAP_CLASS</span><span class="special">(</span><span class="identifier">point</span><span class="special">,</span> <span class="special">(</span><span class="identifier">x</span><span class="special">)(</span><span class="identifier">y</span><span class="special">))</span>
+<span class="special">}</span>
+</pre>
+<p>
+          The second-last line defines a mapper class, which maps a <code class="computeroutput"><span class="identifier">point</span></code> by mapping its <code class="computeroutput"><span class="identifier">x</span></code>
+          and <code class="computeroutput"><span class="identifier">y</span></code> members.
+        </p>
+<p>
+          The type being mapped (<code class="computeroutput"><span class="identifier">point</span></code>
+          in the example) can be a <code class="computeroutput"><span class="keyword">class</span></code>
+          or <code class="computeroutput"><span class="keyword">struct</span></code>. I use the term
+          <span class="quote">&#8220;<span class="quote">class</span>&#8221;</span> for both.
+        </p>
+<p>
+          The type being mapped must have a public no-arguments constructor and a
+          public destructor, either handwritten or (as here) compiler-generated.
+        </p>
+<p>
+          The type being mapped must be defined in some named namespace (nested is
+          okay). It may or may not also be in an unnamed namespace.
+        </p>
+<p>
+          <code class="computeroutput"><span class="identifier">QUINCE_MAP_CLASS</span></code> must be
+          invoked from a location that meets two criteria:
+        </p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+              It is in the same named namespace as the class.
+            </li>
+<li class="listitem">
+              It comes before any code that uses the mapper type, in any compilation
+              unit.
+            </li>
+</ul></div>
+<p>
+          The sure and easy way to meet both criteria, regardless of whether the
+          class is defined in a <code class="literal">.h</code> or a <code class="literal">.cpp</code>
+          file, is to invoke the macro immediately after the class's definition.
+        </p>
+<p>
+          <code class="computeroutput"><span class="identifier">QUINCE_MAP_CLASS</span></code>'s second
+          argument gives a sequence of <span class="emphasis"><em>mapped members</em></span>, i.e.
+          non-static, non-const data members that should be mapped, in order to map
+          the class. They must be of mapped types, and they must be direct members
+          of the class, not members by inheritance. (Inherited members can be mapped
+          by other means that we shall see very soon).
+        </p>
+<p>
+          The members in this sequence must be individually parenthesized (it's a
+          <a href="http://www.boost.org/doc/libs/1_55_0/libs/preprocessor/doc/data/sequences.html" target="_top"><code class="computeroutput"><span class="identifier">BOOST_PP_SEQ</span></code></a>).
+        </p>
+<p>
+          The ordering of members in the sequence determines their significance for
+          <a class="link" href="user_defined_class_types.html#class_order">comparisons and sorting</a>, and it is also
+          important if the class is used as a collector class for <a class="link" href="../queries/select/collector.html" title="With Multiple Arguments and a Collector Class"><code class="computeroutput"><span class="identifier">select</span><span class="special">()</span></code></a>
+          or <a class="link" href="../queries/join/collector.html" title="With a Collector Class">functions in the <code class="computeroutput"><span class="identifier">join</span><span class="special">()</span></code>
+          family</a>. It does not need to match the order of member declarations
+          within the class.
+        </p>
+<p>
+          The mapped members must be accessable to quince. This can be achieved in
+          either of two ways:
+        </p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+              by the members being <code class="computeroutput"><span class="keyword">public</span></code>
+              (which they are implicitly in the example, since <code class="computeroutput"><span class="identifier">point</span></code>
+              is a <code class="computeroutput"><span class="keyword">struct</span></code>), or
+            </li>
+<li class="listitem">
+              by the class declaring the relevant parts of quince to be its <code class="computeroutput"><span class="keyword">friend</span></code>. It can do this by invoking the
+              macro <code class="computeroutput"><span class="identifier">QUINCE_IS_MY_FRIEND</span></code>
+              at any place where a <code class="computeroutput"><span class="keyword">friend</span></code>
+              declaration is allowed. The macro takes your class name (the same as
+              the first argument to <code class="computeroutput"><span class="identifier">QUINCE_MAP_CLASS</span><span class="special">(</span></code>...<code class="computeroutput"><span class="special">)</span></code>)
+              as its argument, e.g. <code class="computeroutput"><span class="identifier">QUINCE_IS_MY_FRIEND</span><span class="special">(</span><span class="identifier">point</span><span class="special">)</span></code>.
+            </li>
+</ul></div>
+<p>
+          The class may have other members, not mentioned to <code class="computeroutput"><span class="identifier">QUINCE_MAP_CLASS</span></code>
+          and hence not mapped. Quince will not touch those, except insofar as it
+          implicitly constructs and destructs them via the class's no-arguments constructor
+          and destructor.
+        </p>
+<p>
+          The class may also have bases, which cannot be mentioned to <code class="computeroutput"><span class="identifier">QUINCE_MAP_CLASS</span></code>, and are not mapped.
+          Quince will not touch those either (with the same exception for construction
+          and destruction).
+        </p>
+<h5>
+<a name="mapped_data_types.user_defined_class_types.h2"></a>
+          <span class="phrase"><a name="mapped_data_types.user_defined_class_types.or_with_mapped_bases"></a></span><a class="link" href="user_defined_class_types.html#mapped_data_types.user_defined_class_types.or_with_mapped_bases">...
+          or with mapped bases</a>
+        </h5>
+<p>
+          The macro <code class="computeroutput"><span class="identifier">QUINCE_MAP_CLASS_WITH_BASES</span></code>
+          generalizes <code class="computeroutput"><span class="identifier">QUINCE_MAP_CLASS</span></code>,
+          to allow for classes with mapped bases as well as mapped members.
+        </p>
+<pre class="programlisting"><span class="keyword">namespace</span> <span class="identifier">cinemascope</span> <span class="special">{</span>
+    <span class="keyword">struct</span> <span class="identifier">colored_point</span> <span class="special">:</span> <span class="identifier">point</span> <span class="special">{</span>
+        <span class="keyword">int</span> <span class="identifier">r</span><span class="special">;</span>
+        <span class="keyword">int</span> <span class="identifier">g</span><span class="special">;</span>
+        <span class="keyword">int</span> <span class="identifier">b</span><span class="special">;</span>
+    <span class="special">};</span>
+    <span class="identifier">QUINCE_MAP_CLASS_WITH_BASES</span><span class="special">(</span><span class="identifier">colored_point</span><span class="special">,</span> <span class="special">(</span><span class="identifier">point</span><span class="special">),</span> <span class="special">(</span><span class="identifier">r</span><span class="special">)(</span><span class="identifier">g</span><span class="special">)(</span><span class="identifier">b</span><span class="special">))</span>
+<span class="special">}</span>
+</pre>
+<p>
+          The first and third arguments to <code class="computeroutput"><span class="identifier">QUINCE_MAP_CLASS_WITH_BASES</span></code>
+          are the same as the first and second arguments to <code class="computeroutput"><span class="identifier">QUINCE_MAP_CLASS</span></code>:
+          <span class="emphasis"><em>viz.</em></span> the name of the class and a list of its mapped
+          (direct) members. The second argument is a list of the mapped bases (just
+          one in this case), individually parenthesized.
+        </p>
+<p>
+          So: our use of <code class="computeroutput"><span class="identifier">QUINCE_MAP_CLASS_WITH_BASES</span></code>
+          defines a mapper class, which maps a <code class="computeroutput"><span class="identifier">colored_point</span></code>
+          by mapping its <code class="computeroutput"><span class="identifier">point</span></code> base
+          and its <code class="computeroutput"><span class="identifier">r</span></code>, <code class="computeroutput"><span class="identifier">g</span></code>, <code class="computeroutput"><span class="identifier">b</span></code>
+          members.
+        </p>
+<p>
+          Everything said above about <code class="computeroutput"><span class="identifier">QUINCE_MAP_CLASS</span></code>
+          applies to <code class="computeroutput"><span class="identifier">QUINCE_MAP_CLASS_WITH_BASES</span></code>
+          also, with these additions:
+        </p>
+<p>
+          The mapped bases must be of mapped types.
+        </p>
+<p>
+          The ordering of bases in the second argument determines their significance
+          for <a class="link" href="user_defined_class_types.html#class_order">comparisons and sorting</a>. It does
+          not need to match the order in the C++ base class list.
+        </p>
+<p>
+          The mapped bases must be accessable to quince.
+        </p>
+<p>
+          The class may have other bases, not mentioned to <code class="computeroutput"><span class="identifier">QUINCE_MAP_CLASS_WITH_BASES</span></code>
+          and hence not mapped. Quince will not touch those (with the exceptions
+          for construction and destruction).
+        </p>
+<p>
+          <span class="quote">&#8220;<span class="quote">Diamond-pattern</span>&#8221;</span> class hierarchies, where some class <em class="replaceable"><code>B</code></em>
+          is a base of some class <em class="replaceable"><code>D</code></em> via more than one
+          path, are not permitted when <em class="replaceable"><code>B</code></em> is (directly
+          or indirectly) a mapped base of <em class="replaceable"><code>D</code></em>.
+        </p>
+<a name="class_mapper"></a><h4>
+<a name="mapped_data_types.user_defined_class_types.h3"></a>
+          <span class="phrase"><a name="mapped_data_types.user_defined_class_types.classes_mapper_classes_class_map"></a></span><a class="link" href="user_defined_class_types.html#mapped_data_types.user_defined_class_types.classes_mapper_classes_class_map">Classes'
+          mapper classes: <code class="computeroutput"><span class="identifier">class_mapper</span><span class="special">&lt;</span></code>...<code class="computeroutput"><span class="special">&gt;</span></code></a>
+        </h4>
+<p>
+          Following an invocation of <code class="computeroutput"><span class="identifier">QUINCE_MAP_CLASS</span><span class="special">(</span></code><em class="replaceable"><code>C</code></em><code class="computeroutput"><span class="special">,</span></code> ...<code class="computeroutput"><span class="special">)</span></code>
+          or <code class="computeroutput"><span class="identifier">QUINCE_MAP_CLASS_WITH_BASES</span><span class="special">(</span></code><em class="replaceable"><code>C</code></em><code class="computeroutput"><span class="special">,</span></code> ...<code class="computeroutput"><span class="special">)</span></code>,
+          the class type <em class="replaceable"><code>C</code></em> becomes a mapped type. Furthermore,
+          <em class="replaceable"><code>C</code></em> is statically mapped: its mapper class is
+          always <code class="computeroutput"><span class="identifier">class_mapper</span><span class="special">&lt;</span></code><em class="replaceable"><code>C</code></em><code class="computeroutput"><span class="special">&gt;</span></code>.
+        </p>
+<p>
+          <a name="class_mapper_detail"></a>(Detail: <code class="computeroutput"><span class="identifier">class_mapper</span><span class="special">&lt;</span></code><em class="replaceable"><code>C</code></em><code class="computeroutput"><span class="special">&gt;</span></code> is not the name that <code class="computeroutput"><span class="identifier">QUINCE_MAP_CLASS</span><span class="special">(</span></code><em class="replaceable"><code>C</code></em><code class="computeroutput"><span class="special">,</span></code> ...<code class="computeroutput"><span class="special">)</span></code>
+          or <code class="computeroutput"><span class="identifier">QUINCE_MAP_CLASS_WITH_BASES</span><span class="special">(</span></code><em class="replaceable"><code>C</code></em><code class="computeroutput"><span class="special">,</span></code> ...<code class="computeroutput"><span class="special">)</span></code>
+          defines. Those macros give the mapper class an obscure name, in the same
+          namespace as <em class="replaceable"><code>C</code></em>. <code class="computeroutput"><span class="identifier">class_mapper</span><span class="special">&lt;</span></code><em class="replaceable"><code>C</code></em><code class="computeroutput"><span class="special">&gt;</span></code> is an alias of that obscure name.
+          <code class="computeroutput"><span class="identifier">class_mapper</span><span class="special">&lt;</span></code>...<code class="computeroutput"><span class="special">&gt;</span></code>, like <code class="computeroutput"><span class="identifier">optional_mapper</span><span class="special">&lt;</span></code>...<code class="computeroutput"><span class="special">&gt;</span></code>
+          and <code class="computeroutput"><span class="identifier">tuple_mapper</span><span class="special">&lt;</span></code>...<code class="computeroutput"><span class="special">&gt;</span></code>, is defined in namespace <code class="computeroutput"><span class="identifier">quince</span></code>.)
+        </p>
+<p>
+          In addition to mapping <em class="replaceable"><code>C</code></em> to and from column
+          formats, <code class="computeroutput"><span class="identifier">class_mapper</span><span class="special">&lt;</span></code><em class="replaceable"><code>C</code></em><code class="computeroutput"><span class="special">&gt;</span></code> provides two features that act as analogs,
+          within quince expressions, of features that <em class="replaceable"><code>C</code></em>
+          provides for normal C++ expressions:
+        </p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+              For each mapped base <em class="replaceable"><code>B</code></em> of <em class="replaceable"><code>C</code></em>,
+              <code class="computeroutput"><span class="identifier">class_mapper</span><span class="special">&lt;</span></code><em class="replaceable"><code>C</code></em><code class="computeroutput"><span class="special">&gt;</span></code> has a public base class <code class="computeroutput"><span class="identifier">class_mapper</span><span class="special">&lt;</span></code><em class="replaceable"><code>B</code></em><code class="computeroutput"><span class="special">&gt;</span></code>.
+            </li>
+<li class="listitem">
+              For each mapped member <em class="replaceable"><code>m</code></em> of <em class="replaceable"><code>C</code></em>,
+              <code class="computeroutput"><span class="identifier">class_mapper</span><span class="special">&lt;</span></code><em class="replaceable"><code>C</code></em><code class="computeroutput"><span class="special">&gt;</span></code> has a public member, also called
+              <em class="replaceable"><code>m</code></em>, which is a const reference to the mapper
+              for <em class="replaceable"><code>C</code></em><code class="computeroutput"><span class="special">::</span></code><em class="replaceable"><code>m</code></em>.
+            </li>
+</ul></div>
+<p>
+          Or in <a href="http://lmgtfy.com/?q=trochaic+heptameter" target="_top">trochaic heptameter</a>:
+        </p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+              <span class="emphasis"><em>The bases of the mapper are the mappers of the bases.</em></span>
+            </li>
+<li class="listitem">
+              <span class="emphasis"><em>The members of the mapper are the mappers of the members.</em></span>
+            </li>
+</ul></div>
+<p>
+          It follows that, if <em class="replaceable"><code>C</code></em> inherits a mapped member
+          <em class="replaceable"><code>bm</code></em> from a mapped base <em class="replaceable"><code>B</code></em>,
+          then <code class="computeroutput"><span class="identifier">class_mapper</span><span class="special">&lt;</span></code><em class="replaceable"><code>C</code></em><code class="computeroutput"><span class="special">&gt;</span></code> inherits a member called <em class="replaceable"><code>bm</code></em>,
+          which is a const reference to the mapper for <em class="replaceable"><code>B</code></em><code class="computeroutput"><span class="special">::</span></code><em class="replaceable"><code>bm</code></em>. Or if you
+          insist<a href="#ftn.mapped_data_types.user_defined_class_types.f0" class="footnote" name="mapped_data_types.user_defined_class_types.f0"><sup class="footnote">[7]</sup></a>:
+        </p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
+              <span class="emphasis"><em>The mapper inherits the mappers that map the inherited members.</em></span>
+            </li></ul></div>
+<h4>
+<a name="mapped_data_types.user_defined_class_types.h4"></a>
+          <span class="phrase"><a name="mapped_data_types.user_defined_class_types.example"></a></span><a class="link" href="user_defined_class_types.html#mapped_data_types.user_defined_class_types.example">Example</a>
+        </h4>
+<pre class="programlisting"><span class="comment">// Include the two code fragments above</span>
+
+<span class="keyword">extern</span> <span class="identifier">table</span><span class="special">&lt;</span><span class="identifier">point</span><span class="special">&gt;</span> <span class="identifier">points</span><span class="special">;</span>
+
+<span class="keyword">const</span> <span class="identifier">query</span><span class="special">&lt;</span><span class="keyword">float</span><span class="special">&gt;</span> <span class="identifier">xs</span> <span class="special">=</span> <span class="identifier">points</span><span class="special">.</span><span class="identifier">select</span><span class="special">(</span><span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">x</span><span class="special">);</span>  <span class="comment">// member of mapper</span>
+
+<span class="keyword">extern</span> <span class="identifier">table</span><span class="special">&lt;</span><span class="identifier">colored_point</span><span class="special">&gt;</span> <span class="identifier">colored_points</span><span class="special">;</span>
+
+<span class="keyword">const</span> <span class="identifier">query</span><span class="special">&lt;</span><span class="keyword">float</span><span class="special">&gt;</span> <span class="identifier">colored_xs</span> <span class="special">=</span> <span class="identifier">colored_points</span><span class="special">.</span><span class="identifier">select</span><span class="special">(</span><span class="identifier">colored_points</span><span class="special">-&gt;</span><span class="identifier">x</span><span class="special">);</span>  <span class="comment">// inherited member of mapper</span>
+</pre>
+<a name="class_order"></a><h4>
+<a name="mapped_data_types.user_defined_class_types.h5"></a>
+          <span class="phrase"><a name="mapped_data_types.user_defined_class_types.order"></a></span><a class="link" href="user_defined_class_types.html#mapped_data_types.user_defined_class_types.order">Order</a>
+        </h4>
+<p>
+          When classes are compared on the server side with the relational operators,
+          or sorted on the server side with <code class="computeroutput"><span class="identifier">order</span><span class="special">()</span></code>, then the order is lexicographic, with
+          the first mapped base most significant, followed by the second mapped base,
+          and so on; then the first mapped member, the second mapped member, and
+          so on.
+        </p>
+<h4>
+<a name="mapped_data_types.user_defined_class_types.h6"></a>
+          <span class="phrase"><a name="mapped_data_types.user_defined_class_types.representation"></a></span><a class="link" href="user_defined_class_types.html#mapped_data_types.user_defined_class_types.representation">Representation</a>
+        </h4>
+<p>
+          <code class="computeroutput"><span class="identifier">class_mapper</span></code> represents
+          data by delegating to each of the base mappers and member mappers.
+        </p>
+<p>
+          When a class mapper with name <em class="replaceable"><code>N</code></em> delegates to
+          member mapper <em class="replaceable"><code>m</code></em>, it prepends <em class="replaceable"><code>N</code></em>
+          and a period to all the column names that <em class="replaceable"><code>m</code></em>
+          produces. This principle is applied recursively, so that classes can be
+          nested to any depth, and the column names are always fully qualified, to
+          avoid clashes.
+        </p>
+<div class="footnotes">
+<br><hr style="width:100; text-align:left;margin-left: 0">
+<div id="ftn.mapped_data_types.user_defined_class_types.f0" class="footnote"><p><a href="#mapped_data_types.user_defined_class_types.f0" class="para"><sup class="para">[7] </sup></a>
+            dactylic hexameter this time.
+          </p></div>
+</div>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2014 Michael Shepanski<p>
+        Distributed under the Boost Software License, Version 1.0
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="std_tuple.html"><img src="../images/prev.png" alt="Prev"></a><a accesskey="u" href="../mapped_data_types.html"><img src="../images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../images/home.png" alt="Home"></a><a accesskey="n" href="../expressions.html"><img src="../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

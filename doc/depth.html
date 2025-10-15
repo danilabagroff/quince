@@ -1,0 +1,161 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Part&#160;II.&#160;The Quince API in Depth</title>
+<link rel="stylesheet" href="boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="index.html" title="QUINCE: QUeries IN C++ Expressions">
+<link rel="up" href="index.html" title="QUINCE: QUeries IN C++ Expressions">
+<link rel="prev" href="getting_started/the_end.html" title="The End">
+<link rel="next" href="exceptions.html" title="Chapter&#160;4.&#160;Exceptions">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<div class="spirit-nav">
+<a accesskey="p" href="getting_started/the_end.html"><img src="images/prev.png" alt="Prev"></a><a accesskey="u" href="index.html"><img src="images/up.png" alt="Up"></a><a accesskey="h" href="index.html"><img src="images/home.png" alt="Home"></a><a accesskey="n" href="exceptions.html"><img src="images/next.png" alt="Next"></a>
+</div>
+<div class="part">
+<div class="titlepage"><div><div><h1 class="title">
+<a name="depth"></a>Part&#160;II.&#160;The Quince API in Depth</h1></div></div></div>
+<div class="toc">
+<p><b>Table of Contents</b></p>
+<dl class="toc">
+<dt><span class="chapter"><a href="exceptions.html">4. Exceptions</a></span></dt>
+<dt><span class="chapter"><a href="mapped_data_types.html">5. Mapped Data Types</a></span></dt>
+<dd><dl>
+<dt><span class="section"><a href="mapped_data_types.html#mapped_data_types.definition_taxonomy">Definition,
+        Taxonomy</a></span></dt>
+<dt><span class="section"><a href="mapped_data_types/polymorphically_mapped_types.html">Polymorphically
+        Mapped Types</a></span></dt>
+<dt><span class="section"><a href="mapped_data_types/boost_optional.html"><code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">optional</span><span class="special">&lt;</span></code>...<code class="computeroutput"><span class="special">&gt;</span></code></a></span></dt>
+<dt><span class="section"><a href="mapped_data_types/std_tuple.html"><code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">tuple</span><span class="special">&lt;</span></code>...<code class="computeroutput"><span class="special">&gt;</span></code></a></span></dt>
+<dt><span class="section"><a href="mapped_data_types/user_defined_class_types.html">User-Defined
+        Class Types </a></span></dt>
+</dl></dd>
+<dt><span class="chapter"><a href="expressions.html">6. Expressions for Server-Side Execution</a></span></dt>
+<dd><dl>
+<dt><span class="section"><a href="expressions.html#expressions.server_side_expressions_in_gener">Server-Side
+        Expressions in General</a></span></dt>
+<dt><span class="section"><a href="expressions/arithmetic_operations.html">Arithmetic Operations
+        </a></span></dt>
+<dt><span class="section"><a href="expressions/strcat.html">String Concatenation</a></span></dt>
+<dt><span class="section"><a href="expressions/cast.html"><code class="computeroutput"><span class="identifier">cast</span><span class="special">&lt;</span></code>...<code class="computeroutput"><span class="special">&gt;()</span></code></a></span></dt>
+<dt><span class="section"><a href="expressions/function_calls.html">Function Calls</a></span></dt>
+<dd><dl>
+<dt><span class="section"><a href="expressions/function_calls.html#expressions.function_calls.pre_wrapped_functions">Pre-wrapped
+          functions</a></span></dt>
+<dt><span class="section"><a href="expressions/function_calls/scalar_and_aggregate_functions.html"><span class="quote">&#8220;<span class="quote">Scalar</span>&#8221;</span>
+          and <span class="quote">&#8220;<span class="quote">Aggregate</span>&#8221;</span> Functions</a></span></dt>
+<dt><span class="section"><a href="expressions/function_calls/writing_your_own_function_wrappe.html">Writing
+          Your Own Function Wrappers</a></span></dt>
+</dl></dd>
+<dt><span class="section"><a href="expressions/relational.html">Relational Operations </a></span></dt>
+<dt><span class="section"><a href="expressions/predicate_s_and_logical_operatio.html"><code class="computeroutput"><span class="identifier">predicate</span></code>s and Logical Operations</a></span></dt>
+<dt><span class="section"><a href="expressions/exists.html"><code class="computeroutput"><span class="identifier">exists</span><span class="special">()</span></code></a></span></dt>
+<dt><span class="section"><a href="expressions/in.html"><code class="computeroutput"><span class="identifier">in</span><span class="special">()</span></code></a></span></dt>
+<dt><span class="section"><a href="expressions/collective.html">Collective Comparisons (PostgreSQL
+        only)</a></span></dt>
+<dt><span class="section"><a href="expressions/scalar.html">Scalar Subqueries</a></span></dt>
+<dt><span class="section"><a href="expressions/choose.html"><code class="computeroutput"><span class="identifier">choose</span><span class="special">()</span></code></a></span></dt>
+<dt><span class="section"><a href="expressions/visibility.html">Visibility</a></span></dt>
+</dl></dd>
+<dt><span class="chapter"><a href="queries.html">7. Queries</a></span></dt>
+<dd><dl>
+<dt><span class="section"><a href="queries.html#queries.queries_in_general">Queries in General </a></span></dt>
+<dt><span class="section"><a href="queries/compositionality.html">Compositionality</a></span></dt>
+<dt><span class="section"><a href="queries/select.html"><code class="computeroutput"><span class="identifier">select</span><span class="special">()</span></code></a></span></dt>
+<dd><dl>
+<dt><span class="section"><a href="queries/select.html#queries.select.with_one_argument">With One Argument</a></span></dt>
+<dt><span class="section"><a href="queries/select/with_multiple_arguments.html">With Multiple
+          Arguments</a></span></dt>
+<dt><span class="section"><a href="queries/select/collector.html">With Multiple Arguments
+          and a Collector Class</a></span></dt>
+<dt><span class="section"><a href="queries/select/with_group.html">With <code class="computeroutput"><span class="identifier">group</span><span class="special">(</span></code>...<code class="computeroutput"><span class="special">)</span></code></a></span></dt>
+<dt><span class="section"><a href="queries/select/performance_tip_avoid_repeated_s.html">Performance
+          Tip: Avoid Repeated Subexpressions</a></span></dt>
+</dl></dd>
+<dt><span class="section"><a href="queries/where.html"><code class="computeroutput"><span class="identifier">where</span><span class="special">()</span></code></a></span></dt>
+<dt><span class="section"><a href="queries/order.html"><code class="computeroutput"><span class="identifier">order</span><span class="special">()</span></code></a></span></dt>
+<dt><span class="section"><a href="queries/distinct_and_distinct_on.html"><code class="computeroutput"><span class="identifier">distinct</span><span class="special">()</span></code> and <code class="computeroutput"><span class="identifier">distinct_on</span><span class="special">()</span></code></a></span></dt>
+<dt><span class="section"><a href="queries/join.html">The <code class="computeroutput"><span class="identifier">join</span><span class="special">()</span></code> Family of Functions</a></span></dt>
+<dd><dl>
+<dt><span class="section"><a href="queries/join.html#queries.join.join"><code class="computeroutput"><span class="identifier">join</span><span class="special">()</span></code></a></span></dt>
+<dt><span class="section"><a href="queries/join/inner_join.html"><code class="computeroutput"><span class="identifier">inner_join</span><span class="special">()</span></code></a></span></dt>
+<dt><span class="section"><a href="queries/join/left_join.html"><code class="computeroutput"><span class="identifier">left_join</span><span class="special">()</span></code></a></span></dt>
+<dt><span class="section"><a href="queries/join/right_join.html"><code class="computeroutput"><span class="identifier">right_join</span><span class="special">()</span></code></a></span></dt>
+<dt><span class="section"><a href="queries/join/full_join_postgresql_only.html"><code class="computeroutput"><span class="identifier">full_join</span><span class="special">()</span></code>
+          (PostgreSQL only)</a></span></dt>
+<dt><span class="section"><a href="queries/join/jump.html"><code class="computeroutput"><span class="identifier">jump</span><span class="special">()</span></code></a></span></dt>
+<dt><span class="section"><a href="queries/join/collector.html">With a Collector Class</a></span></dt>
+<dt><span class="section"><a href="queries/join/self_joins.html">Self Joins</a></span></dt>
+</dl></dd>
+<dt><span class="section"><a href="queries/set_theoretic_operations.html">Set-Theoretic Operations</a></span></dt>
+<dt><span class="section"><a href="queries/skip_and_limit.html"><code class="computeroutput"><span class="identifier">skip</span><span class="special">()</span></code> and <code class="computeroutput"><span class="identifier">limit</span><span class="special">()</span></code></a></span></dt>
+<dt><span class="section"><a href="queries/executing.html">Executing Queries</a></span></dt>
+<dd><dl>
+<dt><span class="section"><a href="queries/executing.html#queries.executing.with_multi_record_output_begin_a">With
+          Multi-Record Output: <code class="computeroutput"><span class="identifier">begin</span><span class="special">()</span></code> and <code class="computeroutput"><span class="identifier">const_iterator</span></code></a></span></dt>
+<dt><span class="section"><a href="queries/executing/with_at_most_single_record_outpu.html">With
+          (at most) Single-Record Output: <code class="computeroutput"><span class="identifier">get</span><span class="special">()</span></code></a></span></dt>
+<dt><span class="section"><a href="queries/executing/evaluate.html">With Single-Value Output:
+          <code class="computeroutput"><span class="identifier">evaluate</span><span class="special">()</span></code></a></span></dt>
+</dl></dd>
+</dl></dd>
+<dt><span class="chapter"><a href="tables.html">8. Tables</a></span></dt>
+<dd><dl>
+<dt><span class="section"><a href="tables.html#tables.tables_in_general">Tables in General </a></span></dt>
+<dt><span class="section"><a href="tables/terminology.html">Terminology</a></span></dt>
+<dt><span class="section"><a href="tables/life_cycle_of_a_table_object.html">Life Cycle of
+        a Table Object</a></span></dt>
+<dt><span class="section"><a href="tables/construction.html">Construction and Primary Key</a></span></dt>
+<dt><span class="section"><a href="tables/indexes_and_foreign_key_constrai.html">Indexes and
+        Foreign Key Constraints</a></span></dt>
+<dt><span class="section"><a href="tables/manipulation.html">Data Manipulation</a></span></dt>
+<dd><dl>
+<dt><span class="section"><a href="tables/manipulation.html#tables.manipulation.insert"><code class="computeroutput"><span class="identifier">insert</span><span class="special">()</span></code></a></span></dt>
+<dt><span class="section"><a href="tables/manipulation/update.html"><code class="computeroutput"><span class="identifier">update</span><span class="special">()</span></code></a></span></dt>
+<dt><span class="section"><a href="tables/manipulation/remove.html"><code class="computeroutput"><span class="identifier">remove</span><span class="special">()</span></code></a></span></dt>
+</dl></dd>
+<dt><span class="section"><a href="tables/table_alteration.html">Table Alteration</a></span></dt>
+<dd><dl>
+<dt><span class="section"><a href="tables/table_alteration.html#tables.table_alteration.rename_from"><code class="computeroutput"><span class="identifier">rename_from</span><span class="special">()</span></code></a></span></dt>
+<dt><span class="section"><a href="tables/table_alteration/add_field.html"><code class="computeroutput"><span class="identifier">add_field</span><span class="special">()</span></code></a></span></dt>
+<dt><span class="section"><a href="tables/table_alteration/drop_field_postgresql_only.html"><code class="computeroutput"><span class="identifier">drop_field</span><span class="special">()</span></code>
+          (PostgreSQL only)</a></span></dt>
+<dt><span class="section"><a href="tables/table_alteration/rename_field_postgresql_only.html"><code class="computeroutput"><span class="identifier">rename_field</span><span class="special">()</span></code>
+          (PostgreSQL only)</a></span></dt>
+<dt><span class="section"><a href="tables/table_alteration/set_field_type_postgresql_only.html"><code class="computeroutput"><span class="identifier">set_field_type</span><span class="special">()</span></code>
+          (PostgreSQL only)</a></span></dt>
+</dl></dd>
+</dl></dd>
+<dt><span class="chapter"><a href="custom.html">9. Custom Mappings</a></span></dt>
+<dd><dl>
+<dt><span class="section"><a href="custom.html#custom.degrees_of_freedom">Degrees of Freedom</a></span></dt>
+<dt><span class="section"><a href="custom/predefined.html">Predefined Concrete Mapper Class
+        Templates</a></span></dt>
+<dt><span class="section"><a href="custom/deployment.html">Deployment</a></span></dt>
+<dd><dl>
+<dt><span class="section"><a href="custom/deployment.html#custom.deployment.database">To a Database ...</a></span></dt>
+<dt><span class="section"><a href="custom/deployment/table.html">... or to a Table</a></span></dt>
+</dl></dd>
+</dl></dd>
+<dt><span class="chapter"><a href="transactions.html">10. Transactions</a></span></dt>
+<dt><span class="chapter"><a href="connection_management.html">11. Connection Management</a></span></dt>
+</dl>
+</div>
+<p>
+      
+    </p>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"><p><small>Last revised: May 23, 2015 at 07:29:14 GMT</small></p></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2014 Michael Shepanski<p>
+        Distributed under the Boost Software License, Version 1.0
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="getting_started/the_end.html"><img src="images/prev.png" alt="Prev"></a><a accesskey="u" href="index.html"><img src="images/up.png" alt="Up"></a><a accesskey="h" href="index.html"><img src="images/home.png" alt="Home"></a><a accesskey="n" href="exceptions.html"><img src="images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

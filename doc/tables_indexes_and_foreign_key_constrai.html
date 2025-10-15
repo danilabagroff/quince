@@ -1,0 +1,162 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Indexes and Foreign Key Constraints</title>
+<link rel="stylesheet" href="../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../index.html" title="QUINCE: QUeries IN C++ Expressions">
+<link rel="up" href="../tables.html" title="Chapter&#160;8.&#160;Tables">
+<link rel="prev" href="construction.html" title="Construction and Primary Key">
+<link rel="next" href="manipulation.html" title="Data Manipulation">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<div class="spirit-nav">
+<a accesskey="p" href="construction.html"><img src="../images/prev.png" alt="Prev"></a><a accesskey="u" href="../tables.html"><img src="../images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../images/home.png" alt="Home"></a><a accesskey="n" href="manipulation.html"><img src="../images/next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="tables.indexes_and_foreign_key_constrai"></a><a class="link" href="indexes_and_foreign_key_constrai.html" title="Indexes and Foreign Key Constraints">Indexes and
+        Foreign Key Constraints</a>
+</h2></div></div></div>
+<p>
+          
+        </p>
+<h4>
+<a name="tables.indexes_and_foreign_key_constrai.h0"></a>
+          <span class="phrase"><a name="tables.indexes_and_foreign_key_constrai.indexes"></a></span><a class="link" href="indexes_and_foreign_key_constrai.html#tables.indexes_and_foreign_key_constrai.indexes">Indexes</a>
+        </h4>
+<p>
+          A table (of any kind) can have an SQL index, if you call its <code class="computeroutput"><span class="identifier">specify_index</span><span class="special">()</span></code>
+          method before it is opened the first time.
+        </p>
+<pre class="programlisting"><span class="identifier">points</span><span class="special">.</span><span class="identifier">specify_index</span><span class="special">(</span><span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">y</span><span class="special">);</span>
+</pre>
+<p>
+          Now, if a subsequent call to <code class="computeroutput"><span class="identifier">points</span><span class="special">.</span><span class="identifier">open</span><span class="special">()</span></code> creates the <a class="link" href="terminology.html#target">target</a>,
+          it will also create an index on the column that represents member <code class="computeroutput"><span class="identifier">y</span></code>.
+        </p>
+<p>
+          Like <code class="computeroutput"><span class="identifier">specify_key</span><span class="special">()</span></code>,
+          <code class="computeroutput"><span class="identifier">specify_index</span><span class="special">()</span></code>
+          accepts multiple mappers as arguments, and each one can map any mapped
+          type, with any number of columns.
+        </p>
+<p>
+          So we can generalize to <em class="replaceable"><code>table</code></em><code class="computeroutput"><span class="special">.</span><span class="identifier">specify_index</span><span class="special">(</span></code><em class="replaceable"><code>mapper0</code></em><code class="computeroutput"><span class="special">,</span></code> <em class="replaceable"><code>mapper1</code></em><code class="computeroutput"><span class="special">,</span></code> ...<code class="computeroutput"><span class="special">)</span></code>.
+        </p>
+<p>
+          <em class="replaceable"><code>table</code></em>'s value mapper will be <a class="link" href="../expressions/visibility.html" title="Visibility">visible</a>
+          to each of the <em class="replaceable"><code>mapperi</code></em>s.
+        </p>
+<p>
+          Then the index will be one that orders the elements of <em class="replaceable"><code>table</code></em>
+          by the <em class="replaceable"><code>mapperi</code></em>s, with <em class="replaceable"><code>mapper0</code></em>
+          the most significant, <em class="replaceable"><code>mapper1</code></em> the next most
+          significant, and so on. The ordering for each <em class="replaceable"><code>mapperi</code></em>
+          will be the ordering described <a class="link" href="../mapped_data_types/boost_optional.html#optional_order">here</a>,
+          <a class="link" href="../mapped_data_types/std_tuple.html#tuple_order">here</a>, or <a class="link" href="../mapped_data_types/user_defined_class_types.html#class_order">here</a>
+          if it's an <code class="computeroutput"><span class="identifier">optional_mapper</span></code>,
+          <code class="computeroutput"><span class="identifier">tuple_mapper</span></code> or <code class="computeroutput"><span class="identifier">class_mapper</span></code>; and the DBMS's ordering
+          otherwise.
+        </p>
+<p>
+          You can call <em class="replaceable"><code>table</code></em><code class="computeroutput"><span class="special">.</span><span class="identifier">specify_index</span><span class="special">()</span></code>
+          any number of times, and then if <em class="replaceable"><code>table</code></em><code class="computeroutput"><span class="special">.</span><span class="identifier">open</span><span class="special">()</span></code> creates the target, it will create all
+          the indexes you have specified.
+        </p>
+<h6>
+<a name="tables.indexes_and_foreign_key_constrai.h1"></a>
+          <span class="phrase"><a name="tables.indexes_and_foreign_key_constrai.postgresql_specific_extensions"></a></span><a class="link" href="indexes_and_foreign_key_constrai.html#tables.indexes_and_foreign_key_constrai.postgresql_specific_extensions">PostgreSQL-specific
+          extensions</a>
+        </h6>
+<p>
+          For tables in a PostgreSQL database, <code class="computeroutput"><span class="identifier">specify_index</span><span class="special">()</span></code> also allows:
+        </p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+              indexing by computed values, e.g. <code class="computeroutput"><span class="identifier">points</span><span class="special">.</span><span class="identifier">specify_index</span><span class="special">(</span><span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">x</span>
+              <span class="special">+</span> <span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">y</span><span class="special">);</span></code>
+            </li>
+<li class="listitem">
+              A combination of ascending and descending orderings, using the special
+              overloads of prefix <code class="computeroutput"><span class="special">+</span></code>
+              and <code class="computeroutput"><span class="special">-</span></code> <a class="link" href="../queries/order.html#ascending_descending">in
+              the same way as the <code class="computeroutput"><span class="identifier">order</span><span class="special">()</span></code> method</a>.
+            </li>
+</ul></div>
+<p>
+          So, for a PostgreSQL table, the general form is <em class="replaceable"><code>table</code></em><code class="computeroutput"><span class="special">.</span><span class="identifier">specify_index</span><span class="special">(</span></code><em class="replaceable"><code>exprn0</code></em><code class="computeroutput"><span class="special">,</span></code> <em class="replaceable"><code>exprn1</code></em><code class="computeroutput"><span class="special">,</span></code> ...<code class="computeroutput"><span class="special">)</span></code>,
+          where the <code class="computeroutput"><span class="identifier">exprni</span></code>s are any
+          expressions that would be allowed as arguments to <em class="replaceable"><code>table</code></em><code class="computeroutput"><span class="special">.</span><span class="identifier">order</span><span class="special">()</span></code>.
+        </p>
+<p>
+          <em class="replaceable"><code>table</code></em>'s value mapper will be <a class="link" href="../expressions/visibility.html" title="Visibility">visible</a>
+          to each of the <em class="replaceable"><code>exprni</code></em>s.
+        </p>
+<p>
+          Then the resulting index will be one that orders the elements of <em class="replaceable"><code>table</code></em>
+          in the same way as <a class="link" href="../queries/order.html" title="order()"><em class="replaceable"><code>table</code></em><code class="computeroutput"><span class="special">.</span><span class="identifier">order</span><span class="special">(</span></code><em class="replaceable"><code>exprn0</code></em><code class="computeroutput"><span class="special">,</span></code> <em class="replaceable"><code>exprn1</code></em><code class="computeroutput"><span class="special">,</span></code> ...<code class="computeroutput"><span class="special">)</span></code></a>.
+        </p>
+<h4>
+<a name="tables.indexes_and_foreign_key_constrai.h2"></a>
+          <span class="phrase"><a name="tables.indexes_and_foreign_key_constrai.uniqueness"></a></span><a class="link" href="indexes_and_foreign_key_constrai.html#tables.indexes_and_foreign_key_constrai.uniqueness">Uniqueness</a>
+        </h4>
+<p>
+          The method <code class="computeroutput"><span class="identifier">specify_unique</span><span class="special">()</span></code> is the same as <code class="computeroutput"><span class="identifier">specify_index</span><span class="special">()</span></code>, except it does one more thing: it imposes
+          uniqueness.
+        </p>
+<p>
+          That is to say, if you call <em class="replaceable"><code>table</code></em><code class="computeroutput"><span class="special">.</span><span class="identifier">specify_unique</span><span class="special">(</span></code><em class="replaceable"><code>mapper0</code></em><code class="computeroutput"><span class="special">,</span></code> <em class="replaceable"><code>mapper1</code></em><code class="computeroutput"><span class="special">,</span></code> ...<code class="computeroutput"><span class="special">)</span></code>
+          (or on PostgreSQL: <em class="replaceable"><code>table</code></em><code class="computeroutput"><span class="special">.</span><span class="identifier">specify_unique</span><span class="special">(</span></code><em class="replaceable"><code>exprn0</code></em><code class="computeroutput"><span class="special">,</span></code> <em class="replaceable"><code>exprn1</code></em><code class="computeroutput"><span class="special">,</span></code> ...<code class="computeroutput"><span class="special">)</span></code>),
+          and if a subsequent call to <em class="replaceable"><code>table</code></em><code class="computeroutput"><span class="special">.</span><span class="identifier">open</span><span class="special">()</span></code> creates the target, then the table will
+          not be allowed to contain any two records for which all the <em class="replaceable"><code>mapperi</code></em>s
+          (PostgreSQL: all the <em class="replaceable"><code>exprni</code></em>s) evaluate equal.
+          Any operation that would violate this constraint will be caught by the
+          DBMS, leading quince to throw a <code class="computeroutput"><span class="identifier">dbms_exception</span></code>.
+        </p>
+<h4>
+<a name="tables.indexes_and_foreign_key_constrai.h3"></a>
+          <span class="phrase"><a name="tables.indexes_and_foreign_key_constrai.foreign_keys"></a></span><a class="link" href="indexes_and_foreign_key_constrai.html#tables.indexes_and_foreign_key_constrai.foreign_keys">Foreign
+          Keys</a>
+        </h4>
+<p>
+          To give a table a foreign key constraint, call its <code class="computeroutput"><span class="identifier">specify_foreign</span><span class="special">()</span></code> method before it is opened the first
+          time.
+        </p>
+<pre class="programlisting"><span class="identifier">points</span><span class="special">.</span><span class="identifier">specify_foreign</span><span class="special">(</span><span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">y</span><span class="special">,</span> <span class="identifier">cinemas</span><span class="special">,</span> <span class="identifier">cinemas</span><span class="special">-&gt;</span><span class="identifier">location</span><span class="special">.</span><span class="identifier">y</span><span class="special">);</span>
+</pre>
+<p>
+          Now, if a subsequent call to <code class="computeroutput"><span class="identifier">points</span><span class="special">.</span><span class="identifier">open</span><span class="special">()</span></code> creates the target, it will bind its
+          <code class="computeroutput"><span class="identifier">y</span></code> values to the <code class="computeroutput"><span class="identifier">location</span><span class="special">.</span><span class="identifier">y</span></code> values of the <code class="computeroutput"><span class="identifier">cinemas</span></code>
+          table, in this sense: <code class="computeroutput"><span class="identifier">points</span></code>
+          is only allowed to hold records whose <code class="computeroutput"><span class="identifier">y</span></code>
+          member is equal to the <code class="computeroutput"><span class="identifier">location</span><span class="special">.</span><span class="identifier">y</span></code> member
+          of some record in <code class="computeroutput"><span class="identifier">cinemas</span></code>.
+          Any attempted violation will be caught by the DBMS, leading quince to throw
+          a <code class="computeroutput"><span class="identifier">dbms_exception</span></code>.
+        </p>
+<p>
+          The foreign key can be of any mapped type, with any number of columns,
+          provided that it is of the same type as the field to which it is bound.
+          In other words, in <em class="replaceable"><code>t</code></em><code class="computeroutput"><span class="special">.</span><span class="identifier">specify_foreign</span><span class="special">(</span></code><em class="replaceable"><code>m</code></em><code class="computeroutput"><span class="special">,</span></code> <em class="replaceable"><code>t'</code></em><code class="computeroutput"><span class="special">,</span></code> <em class="replaceable"><code>m'</code></em><code class="computeroutput"><span class="special">)</span></code>, the mappers <em class="replaceable"><code>m</code></em>
+          and <em class="replaceable"><code>m'</code></em> must be mappers of the same mapped type.
+        </p>
+<p>
+          In the common case where <em class="replaceable"><code>m'</code></em> is the primary key
+          of <em class="replaceable"><code>t'</code></em>, <em class="replaceable"><code>m'</code></em> can be
+          omitted from the call.
+        </p>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2014 Michael Shepanski<p>
+        Distributed under the Boost Software License, Version 1.0
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="construction.html"><img src="../images/prev.png" alt="Prev"></a><a accesskey="u" href="../tables.html"><img src="../images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../images/home.png" alt="Home"></a><a accesskey="n" href="manipulation.html"><img src="../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

@@ -1,0 +1,96 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>remove()</title>
+<link rel="stylesheet" href="../../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../../index.html" title="QUINCE: QUeries IN C++ Expressions">
+<link rel="up" href="../manipulation.html" title="Data Manipulation">
+<link rel="prev" href="update.html" title="update()">
+<link rel="next" href="../table_alteration.html" title="Table Alteration">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<div class="spirit-nav">
+<a accesskey="p" href="update.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../manipulation.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="../table_alteration.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="tables.manipulation.remove"></a><a class="link" href="remove.html" title="remove()"><code class="computeroutput"><span class="identifier">remove</span><span class="special">()</span></code></a>
+</h3></div></div></div>
+<p>
+            The <code class="computeroutput"><span class="identifier">remove</span><span class="special">()</span></code>
+            method is a wrapper for SQL's <code class="literal">DELETE</code>. In its simplest
+            form, it removes all of a table's records, e.g.:
+          </p>
+<pre class="programlisting"><span class="identifier">points</span><span class="special">.</span><span class="identifier">remove</span><span class="special">();</span>
+</pre>
+<p>
+            leaves the table <code class="computeroutput"><span class="identifier">points</span></code>
+            empty.
+          </p>
+<p>
+            To remove only some of the records in the table, we can add a call to
+            <code class="computeroutput"><span class="identifier">where</span><span class="special">()</span></code>
+            before <code class="computeroutput"><span class="identifier">remove</span><span class="special">()</span></code>.
+            E.g. to remove all <code class="computeroutput"><span class="identifier">point</span></code>s
+            whose <code class="computeroutput"><span class="identifier">x</span></code> is greater than
+            5:
+          </p>
+<pre class="programlisting"><span class="identifier">points</span><span class="special">.</span><span class="identifier">where</span><span class="special">(</span><span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">x</span> <span class="special">&gt;</span> <span class="number">5.0f</span><span class="special">).</span><span class="identifier">remove</span><span class="special">();</span>
+</pre>
+<p>
+            Or we can use other querying features, as we did with <code class="computeroutput"><span class="identifier">update</span><span class="special">()</span></code>, e.g.:
+          </p>
+<pre class="programlisting"><span class="identifier">points</span><span class="special">.</span><span class="identifier">order</span><span class="special">(</span><span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">x</span><span class="special">).</span><span class="identifier">limit</span><span class="special">(</span><span class="number">3</span><span class="special">).</span><span class="identifier">remove</span><span class="special">();</span>
+</pre>
+<p>
+            to remove the points with the three lowest <code class="computeroutput"><span class="identifier">x</span></code>
+            values, or:
+          </p>
+<pre class="programlisting"><span class="identifier">screens</span>
+<span class="special">.</span><span class="identifier">jump</span><span class="special">(</span><span class="identifier">movies</span><span class="special">,</span> <span class="identifier">screens</span><span class="special">-&gt;</span><span class="identifier">current_movie_id</span> <span class="special">==</span> <span class="identifier">movies</span><span class="special">-&gt;</span><span class="identifier">id</span><span class="special">)</span>
+<span class="special">.</span><span class="identifier">remove</span><span class="special">();</span>
+</pre>
+<p>
+            to remove all the movies that are currently being screened.
+          </p>
+<p>
+            The rule here is the same as for <code class="computeroutput"><span class="identifier">update</span><span class="special">()</span></code>: the query's value mapper must be identical
+            to, or a copy of, some table's value mapper. That lets quince know which
+            table to remove records from (the one whose value mapper matches the
+            query's), and also which records to remove (the ones whose values are
+            equal to one or more of the values produced by the query).
+          </p>
+<p>
+            If the query generates no records, then <code class="computeroutput"><span class="identifier">remove</span><span class="special">()</span></code> does nothing. If you want to treat
+            this condition specially, you can call one of the following instead of
+            <code class="computeroutput"><span class="identifier">remove</span><span class="special">()</span></code>:
+          </p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+                <code class="computeroutput"><span class="identifier">remove_if_exists</span><span class="special">()</span></code> returns a <code class="computeroutput"><span class="keyword">bool</span></code>,
+                which is true iff at least one record was removed.
+              </li>
+<li class="listitem">
+                <code class="computeroutput"><span class="identifier">remove_existing</span><span class="special">()</span></code>
+                throws a <code class="computeroutput"><span class="identifier">no_row_exception</span></code>
+                if there is nothing to remove.
+              </li>
+</ul></div>
+<p>
+            In all other respects <code class="computeroutput"><span class="identifier">remove_if_exists</span><span class="special">()</span></code> and <code class="computeroutput"><span class="identifier">remove_existing</span><span class="special">()</span></code> behave exactly like <code class="computeroutput"><span class="identifier">remove</span><span class="special">()</span></code>.
+          </p>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2014 Michael Shepanski<p>
+        Distributed under the Boost Software License, Version 1.0
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="update.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../manipulation.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="../table_alteration.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

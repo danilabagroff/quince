@@ -1,0 +1,149 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Chapter&#160;8.&#160;Tables</title>
+<link rel="stylesheet" href="boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="index.html" title="QUINCE: QUeries IN C++ Expressions">
+<link rel="up" href="depth.html" title="Part&#160;II.&#160;The Quince API in Depth">
+<link rel="prev" href="queries/executing/evaluate.html" title="With Single-Value Output: evaluate()">
+<link rel="next" href="tables/terminology.html" title="Terminology">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<div class="spirit-nav">
+<a accesskey="p" href="queries/executing/evaluate.html"><img src="images/prev.png" alt="Prev"></a><a accesskey="u" href="depth.html"><img src="images/up.png" alt="Up"></a><a accesskey="h" href="index.html"><img src="images/home.png" alt="Home"></a><a accesskey="n" href="tables/terminology.html"><img src="images/next.png" alt="Next"></a>
+</div>
+<div class="chapter">
+<div class="titlepage"><div><div><h2 class="title">
+<a name="tables"></a>Chapter&#160;8.&#160;Tables</h2></div></div></div>
+<div class="toc">
+<p><b>Table of Contents</b></p>
+<dl class="toc">
+<dt><span class="section"><a href="tables.html#tables.tables_in_general">Tables in General </a></span></dt>
+<dt><span class="section"><a href="tables/terminology.html">Terminology</a></span></dt>
+<dt><span class="section"><a href="tables/life_cycle_of_a_table_object.html">Life Cycle of
+        a Table Object</a></span></dt>
+<dt><span class="section"><a href="tables/construction.html">Construction and Primary Key</a></span></dt>
+<dt><span class="section"><a href="tables/indexes_and_foreign_key_constrai.html">Indexes and
+        Foreign Key Constraints</a></span></dt>
+<dt><span class="section"><a href="tables/manipulation.html">Data Manipulation</a></span></dt>
+<dd><dl>
+<dt><span class="section"><a href="tables/manipulation.html#tables.manipulation.insert"><code class="computeroutput"><span class="identifier">insert</span><span class="special">()</span></code></a></span></dt>
+<dt><span class="section"><a href="tables/manipulation/update.html"><code class="computeroutput"><span class="identifier">update</span><span class="special">()</span></code></a></span></dt>
+<dt><span class="section"><a href="tables/manipulation/remove.html"><code class="computeroutput"><span class="identifier">remove</span><span class="special">()</span></code></a></span></dt>
+</dl></dd>
+<dt><span class="section"><a href="tables/table_alteration.html">Table Alteration</a></span></dt>
+<dd><dl>
+<dt><span class="section"><a href="tables/table_alteration.html#tables.table_alteration.rename_from"><code class="computeroutput"><span class="identifier">rename_from</span><span class="special">()</span></code></a></span></dt>
+<dt><span class="section"><a href="tables/table_alteration/add_field.html"><code class="computeroutput"><span class="identifier">add_field</span><span class="special">()</span></code></a></span></dt>
+<dt><span class="section"><a href="tables/table_alteration/drop_field_postgresql_only.html"><code class="computeroutput"><span class="identifier">drop_field</span><span class="special">()</span></code>
+          (PostgreSQL only)</a></span></dt>
+<dt><span class="section"><a href="tables/table_alteration/rename_field_postgresql_only.html"><code class="computeroutput"><span class="identifier">rename_field</span><span class="special">()</span></code>
+          (PostgreSQL only)</a></span></dt>
+<dt><span class="section"><a href="tables/table_alteration/set_field_type_postgresql_only.html"><code class="computeroutput"><span class="identifier">set_field_type</span><span class="special">()</span></code>
+          (PostgreSQL only)</a></span></dt>
+</dl></dd>
+</dl>
+</div>
+<p>
+        
+      </p>
+<div class="section">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="tables.tables_in_general"></a><a class="link" href="tables.html#tables.tables_in_general" title="Tables in General">Tables in General </a>
+</h2></div></div></div>
+<p>
+          I use the noun <span class="quote">&#8220;<span class="quote">table</span>&#8221;</span>, in normal font, for objects of two
+          C++ types: <code class="computeroutput"><span class="identifier">table</span></code> and <code class="computeroutput"><span class="identifier">serial_table</span></code>. There are differences between
+          them, as we shall see, but they have 99% of their DNA in common. Every
+          table has the following features:
+        </p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+              It represents an SQL table at a specific <span class="emphasis"><em>site</em></span>,
+              which means:
+              <div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: circle; ">
+<li class="listitem">
+                    with a specific SQL name,
+                  </li>
+<li class="listitem">
+                    in a specific database,
+                  </li>
+<li class="listitem">
+                    in a specific schema (PostgreSQL only),
+                  </li>
+<li class="listitem">
+                    optionally, in a specific attached database (sqlite only).
+                  </li>
+</ul></div>
+            </li>
+<li class="listitem">
+              It is a kind of query, so it has a value type and a value mapper, and
+              its value mapper is accessible via <code class="computeroutput"><span class="special">*</span></code>
+              and <code class="computeroutput"><span class="special">-&gt;</span></code>.
+            </li>
+<li class="listitem">
+              It has an SQL name.
+            </li>
+<li class="listitem">
+              It has two states: closed and open.
+            </li>
+<li class="listitem">
+              When it's closed, you can:
+              <div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: circle; ">
+<li class="listitem">
+                    specify a primary key, indexes, and foreign key constraints,
+                  </li>
+<li class="listitem">
+                    alter the nature of the SQL table it represents, i.e. change
+                    its name, add or remove columns, or change the columns' names
+                    or types,
+                  </li>
+<li class="listitem">
+                    delete the SQL table it represents,
+                  </li>
+<li class="listitem">
+                    customize the mapping of polymorphically mapped types within
+                    the table,
+                  </li>
+<li class="listitem">
+                    open it.
+                  </li>
+</ul></div>
+            </li>
+<li class="listitem">
+              When it's open, you can:
+              <div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: circle; ">
+<li class="listitem">
+                    manipulate its data, i.e. add, remove, or update records.
+                  </li>
+<li class="listitem">
+                    use it as a query,
+                  </li>
+<li class="listitem">
+                    close it.
+                  </li>
+</ul></div>
+            </li>
+</ul></div>
+<p>
+          We discussed queries in <a class="link" href="queries.html" title="Chapter&#160;7.&#160;Queries">the previous chapter</a>,
+          and there is nothing extra to be said about using a table in that way.
+          We'll come to mapping customizations in <a class="link" href="custom.html" title="Chapter&#160;9.&#160;Custom Mappings">the next
+          chapter</a>. The present chapter, then, is for the other items.
+        </p>
+</div>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2014 Michael Shepanski<p>
+        Distributed under the Boost Software License, Version 1.0
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="queries/executing/evaluate.html"><img src="images/prev.png" alt="Prev"></a><a accesskey="u" href="depth.html"><img src="images/up.png" alt="Up"></a><a accesskey="h" href="index.html"><img src="images/home.png" alt="Home"></a><a accesskey="n" href="tables/terminology.html"><img src="images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

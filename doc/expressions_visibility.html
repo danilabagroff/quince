@@ -1,0 +1,305 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Visibility</title>
+<link rel="stylesheet" href="../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../index.html" title="QUINCE: QUeries IN C++ Expressions">
+<link rel="up" href="../expressions.html" title="Chapter&#160;6.&#160;Expressions for Server-Side Execution">
+<link rel="prev" href="choose.html" title="choose()">
+<link rel="next" href="../queries.html" title="Chapter&#160;7.&#160;Queries">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<div class="spirit-nav">
+<a accesskey="p" href="choose.html"><img src="../images/prev.png" alt="Prev"></a><a accesskey="u" href="../expressions.html"><img src="../images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../images/home.png" alt="Home"></a><a accesskey="n" href="../queries.html"><img src="../images/next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="expressions.visibility"></a><a class="link" href="visibility.html" title="Visibility">Visibility</a>
+</h2></div></div></div>
+<p>
+          
+        </p>
+<p>
+          So far in this chapter, we have seen how to build well formed expressions
+          for server-side execution. We've reached the point where we can build such
+          an expression, and we can hold it in an <code class="computeroutput"><span class="identifier">exprn_mapper</span></code>
+          variable. But before we can execute it, we need to place it in some other
+          context, e.g. a query, and that requires something else: compatibility
+          with the context.
+        </p>
+<p>
+          Type compatibility is one necessary aspect (e.g. you can't use <code class="computeroutput"><span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">x</span> <span class="special">+</span> <span class="number">3.14f</span></code> in a context that requires a <code class="computeroutput"><span class="identifier">predicate</span></code> or an <code class="computeroutput"><span class="identifier">abstract_mapper</span><span class="special">&lt;</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">string</span><span class="special">&gt;</span></code>), but type compatibility is not sufficient.
+          For consider this: <code class="computeroutput"><span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">x</span> <span class="special">+</span> <span class="number">3.14f</span></code> is
+          allowed here:
+        </p>
+<pre class="programlisting"><span class="keyword">const</span> <span class="identifier">query</span><span class="special">&lt;</span><span class="keyword">float</span><span class="special">&gt;</span> <span class="identifier">x_plus_3_14</span> <span class="special">=</span> <span class="identifier">points</span><span class="special">.</span><span class="identifier">select</span><span class="special">(</span><span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">x</span> <span class="special">+</span> <span class="number">3.14f</span><span class="special">);</span>
+</pre>
+<p>
+          but not here:
+        </p>
+<pre class="programlisting"><span class="keyword">const</span> <span class="identifier">query</span><span class="special">&lt;</span><span class="keyword">float</span><span class="special">&gt;</span> <span class="identifier">nonsense</span> <span class="special">=</span> <span class="identifier">oscars</span><span class="special">.</span><span class="identifier">select</span><span class="special">(</span><span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">x</span> <span class="special">+</span> <span class="number">3.14f</span><span class="special">);</span>  <span class="comment">// wrong</span>
+</pre>
+<p>
+          To clarify what's at issue, let me introduce the term <span class="emphasis"><em>visible</em></span>,
+          used in this way: a <span class="emphasis"><em>mapper</em></span> is visible to an <span class="emphasis"><em>expression</em></span>.
+        </p>
+<p>
+          In <code class="computeroutput"><span class="identifier">points</span><span class="special">.</span><span class="identifier">select</span><span class="special">(</span><span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">x</span> <span class="special">+</span> <span class="number">3.14f</span><span class="special">)</span></code>, the
+          value mapper for the <code class="computeroutput"><span class="identifier">points</span></code>
+          table (aka <code class="computeroutput"><span class="special">*</span><span class="identifier">points</span></code>)
+          is visible to the expression <code class="computeroutput"><span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">x</span> <span class="special">+</span> <span class="number">3.14f</span></code>.
+          That's due to a general rule that, for any query <em class="replaceable"><code>q</code></em>
+          and server-side expression <em class="replaceable"><code>e</code></em>, <em class="replaceable"><code>q</code></em><code class="computeroutput"><span class="special">.</span><span class="identifier">select</span><span class="special">(</span></code><em class="replaceable"><code>e</code></em><code class="computeroutput"><span class="special">)</span></code> makes <em class="replaceable"><code>q</code></em>'s value
+          mapper visible to <em class="replaceable"><code>e</code></em>. Still more generally, all
+          of the quince constructs that enclose server-side expressions within non-expression
+          contexts make some mappers visible to the expressions they enclose. The
+          specific rules are documented along with the constructs: watch for the
+          phrase <span class="quote">&#8220;<span class="quote">will be visible to</span>&#8221;</span> in the chapters that follow.
+        </p>
+<p>
+          The rest of what you need to know about visibility is:
+        </p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+              Whatever is visible to an expression is visible to its subexpressions.
+            </li>
+<li class="listitem">
+              If an expression encloses a subquery (see <a class="link" href="exists.html" title="exists()"><code class="computeroutput"><span class="identifier">exists</span><span class="special">(</span></code>...<code class="computeroutput"><span class="special">)</span></code></a>, <a class="link" href="in.html#in_subquery"><code class="computeroutput"><span class="identifier">in</span><span class="special">(</span></code>...<code class="computeroutput"><span class="special">)</span></code></a>, <a class="link" href="collective.html" title="Collective Comparisons (PostgreSQL only)">collective
+              comparisons</a>, and <a class="link" href="scalar.html" title="Scalar Subqueries"><code class="computeroutput"><span class="identifier">scalar</span><span class="special">(</span></code>...<code class="computeroutput"><span class="special">)</span></code></a>), then whatever is visible
+              to the expression is visible to all the expressions inside the subquery.
+            </li>
+<li class="listitem">
+              Wherever an <code class="computeroutput"><span class="identifier">optional_mapper</span></code>
+              is visible, so is its content mapper.
+            </li>
+<li class="listitem">
+              Wherever a <code class="computeroutput"><span class="identifier">tuple_mapper</span></code>
+              is visible, so are all its member mappers.
+            </li>
+<li class="listitem">
+              Wherever a <code class="computeroutput"><span class="identifier">class_mapper</span></code>
+              is visible, so are all its member mappers and base mappers.
+            </li>
+<li class="listitem">
+              Nothing else is visible.
+            </li>
+</ul></div>
+<p>
+          So that's visibility defined. Now how does it affect which expressions
+          may be evaluated?
+        </p>
+<p>
+          A necessary condition for <em class="replaceable"><code>exprn</code></em> to be evaluated
+          is that it be <span class="emphasis"><em>visibility-correct</em></span>. It is visibility
+          correct if and only if at least one of the following hold:
+        </p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+              <em class="replaceable"><code>exprn</code></em> is not a mapper: it's a value, like
+              3.14f.
+            </li>
+<li class="listitem">
+              <em class="replaceable"><code>exprn</code></em> is a mapper (possibly an <code class="computeroutput"><span class="identifier">exprn_mapper</span></code>), and it is visible
+              to itself.
+            </li>
+<li class="listitem">
+              <em class="replaceable"><code>exprn</code></em> is an <code class="computeroutput"><span class="identifier">exprn_mapper</span></code>,
+              and all of its subexpressions are visibility-correct.
+            </li>
+</ul></div>
+<p>
+          Currently quince does not check visibility correctness. That is left to
+          the DBMS at run-time, so your application will see any violation in the
+          form of a <code class="computeroutput"><span class="identifier">dbms_exception</span></code>.
+        </p>
+<h5>
+<a name="expressions.visibility.h0"></a>
+          <span class="phrase"><a name="expressions.visibility.example_1"></a></span><a class="link" href="visibility.html#expressions.visibility.example_1">Example
+          1</a>
+        </h5>
+<pre class="programlisting"><span class="keyword">const</span> <span class="identifier">query</span><span class="special">&lt;</span><span class="keyword">float</span><span class="special">&gt;</span> <span class="identifier">x_plus_3_14</span> <span class="special">=</span> <span class="identifier">points</span><span class="special">.</span><span class="identifier">select</span><span class="special">(</span><span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">x</span> <span class="special">+</span> <span class="number">3.14f</span><span class="special">);</span>
+</pre>
+<div class="orderedlist"><ol class="orderedlist" type="1">
+<li class="listitem">
+              The context <code class="computeroutput"><span class="identifier">points</span><span class="special">.</span><span class="identifier">select</span><span class="special">(</span></code>...<code class="computeroutput"><span class="special">)</span></code>
+              makes <code class="computeroutput"><span class="special">*</span><span class="identifier">points</span></code>
+              (that's <code class="computeroutput"><span class="identifier">points</span></code>'s value
+              mapper) visible to <code class="computeroutput"><span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">x</span>
+              <span class="special">+</span> <span class="number">3.14f</span></code>.
+            </li>
+<li class="listitem">
+              From 1: <code class="computeroutput"><span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">x</span></code> is visible to <code class="computeroutput"><span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">x</span>
+              <span class="special">+</span> <span class="number">3.14f</span></code>,
+              because <code class="computeroutput"><span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">x</span></code> a member of <code class="computeroutput"><span class="special">*</span><span class="identifier">points</span></code>.
+            </li>
+<li class="listitem">
+              From 2: <code class="computeroutput"><span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">x</span></code> is visible to <code class="computeroutput"><span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">x</span></code>
+              and to <code class="computeroutput"><span class="number">3.14f</span></code>, because they
+              are subexpressions of <code class="computeroutput"><span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">x</span>
+              <span class="special">+</span> <span class="number">3.14f</span></code>.
+            </li>
+<li class="listitem">
+              From 3: <code class="computeroutput"><span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">x</span></code> is visibility-correct because it's
+              visible to itself.
+            </li>
+<li class="listitem">
+              <code class="computeroutput"><span class="number">3.14f</span></code> is visibility-correct
+              because it's not a mapper.
+            </li>
+<li class="listitem">
+              From 4 and 5: <code class="computeroutput"><span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">x</span>
+              <span class="special">+</span> <span class="number">3.14f</span></code>
+              is visibility-correct because both of its subexpressions are visibility-correct.
+            </li>
+</ol></div>
+<h5>
+<a name="expressions.visibility.h1"></a>
+          <span class="phrase"><a name="expressions.visibility.example_2"></a></span><a class="link" href="visibility.html#expressions.visibility.example_2">Example
+          2</a>
+        </h5>
+<pre class="programlisting"><span class="keyword">const</span> <span class="identifier">query</span><span class="special">&lt;</span><span class="keyword">float</span><span class="special">&gt;</span> <span class="identifier">xs</span> <span class="special">=</span> <span class="identifier">points</span><span class="special">.</span><span class="identifier">select</span><span class="special">(</span><span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">x</span><span class="special">);</span>
+<span class="keyword">const</span> <span class="identifier">query</span><span class="special">&lt;</span><span class="keyword">float</span><span class="special">&gt;</span> <span class="identifier">x_plus_3_14</span> <span class="special">=</span> <span class="identifier">xs</span><span class="special">.</span><span class="identifier">select</span><span class="special">(</span><span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">x</span> <span class="special">+</span> <span class="number">3.14f</span><span class="special">);</span>
+</pre>
+<p>
+          On the last line:
+        </p>
+<div class="orderedlist"><ol class="orderedlist" type="1">
+<li class="listitem">
+              The context <code class="computeroutput"><span class="identifier">xs</span><span class="special">.</span><span class="identifier">select</span><span class="special">(</span></code>...<code class="computeroutput"><span class="special">)</span></code> makes <code class="computeroutput"><span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">x</span></code>
+              (that's <code class="computeroutput"><span class="identifier">xs</span></code>'s value
+              mapper) visible to <code class="computeroutput"><span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">x</span>
+              <span class="special">+</span> <span class="number">3.14f</span></code>.
+            </li>
+<li class="listitem">
+              From 1: <code class="computeroutput"><span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">x</span></code> is visible to <code class="computeroutput"><span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">x</span></code>
+              and to <code class="computeroutput"><span class="number">3.14f</span></code>, because they
+              are subexpressions of <code class="computeroutput"><span class="identifier">points</span></code>.
+            </li>
+<li class="listitem">
+              From 2: <code class="computeroutput"><span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">x</span></code> is visibility-correct because it's
+              visible to itself.
+            </li>
+<li class="listitem">
+              <code class="computeroutput"><span class="number">3.14f</span></code> is visibility-correct
+              because it's not a mapper.
+            </li>
+<li class="listitem">
+              From 3 and 4: <code class="computeroutput"><span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">x</span>
+              <span class="special">+</span> <span class="number">314f</span></code>
+              is visibility-correct because both of its subexpressions are visibility-correct.
+            </li>
+</ol></div>
+<h5>
+<a name="expressions.visibility.h2"></a>
+          <span class="phrase"><a name="expressions.visibility.example_3"></a></span><a class="link" href="visibility.html#expressions.visibility.example_3">Example
+          3</a>
+        </h5>
+<pre class="programlisting"><span class="keyword">const</span> <span class="identifier">query</span><span class="special">&lt;</span><span class="keyword">float</span><span class="special">&gt;</span> <span class="identifier">x_plus_3_14</span> <span class="special">=</span> <span class="identifier">points</span><span class="special">.</span><span class="identifier">select</span><span class="special">(</span><span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">x</span><span class="special">).</span><span class="identifier">select</span><span class="special">(</span><span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">x</span> <span class="special">+</span> <span class="number">3.14f</span><span class="special">);</span>
+</pre>
+<p>
+          Okay because it's the same as example 2.
+        </p>
+<h5>
+<a name="expressions.visibility.h3"></a>
+          <span class="phrase"><a name="expressions.visibility.example_4"></a></span><a class="link" href="visibility.html#expressions.visibility.example_4">Example
+          4</a>
+        </h5>
+<pre class="programlisting"><span class="keyword">const</span> <span class="identifier">exprn_mapper</span><span class="special">&lt;</span><span class="keyword">float</span><span class="special">&gt;</span> <span class="identifier">additionA</span> <span class="special">=</span> <span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">x</span> <span class="special">+</span> <span class="number">3.14f</span><span class="special">;</span>
+<span class="keyword">const</span> <span class="identifier">exprn_mapper</span><span class="special">&lt;</span><span class="keyword">float</span><span class="special">&gt;</span> <span class="identifier">additionB</span> <span class="special">=</span> <span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">x</span> <span class="special">+</span> <span class="number">3.14f</span><span class="special">;</span>
+<span class="keyword">const</span> <span class="identifier">query</span><span class="special">&lt;</span><span class="keyword">float</span><span class="special">&gt;</span> <span class="identifier">x_plus_3_14</span> <span class="special">=</span> <span class="identifier">points</span><span class="special">.</span><span class="identifier">select</span><span class="special">(</span><span class="identifier">additionA</span><span class="special">);</span>
+<span class="keyword">const</span> <span class="identifier">query</span><span class="special">&lt;</span><span class="keyword">float</span><span class="special">&gt;</span> <span class="identifier">attempted_reselect</span> <span class="special">=</span> <span class="identifier">x_plus_3_14</span><span class="special">.</span><span class="identifier">select</span><span class="special">(</span><span class="identifier">additionB</span><span class="special">);</span>  <span class="comment">// wrong</span>
+</pre>
+<p>
+          On the last line:
+        </p>
+<div class="orderedlist"><ol class="orderedlist" type="1">
+<li class="listitem">
+              <code class="computeroutput"><span class="identifier">x_plus_3_14</span><span class="special">.</span><span class="identifier">select</span><span class="special">(</span></code>...<code class="computeroutput"><span class="special">)</span></code> makes <code class="computeroutput"><span class="identifier">additionA</span></code>
+              (that's <code class="computeroutput"><span class="identifier">x_plus_3_14</span></code>'s
+              value mapper) visible to <code class="computeroutput"><span class="identifier">additionB</span></code>.
+            </li>
+<li class="listitem">
+              <code class="computeroutput"><span class="identifier">additionB</span></code> is not visible
+              here, since <code class="computeroutput"><span class="identifier">additionB</span></code>
+              is not the same mapper as <code class="computeroutput"><span class="identifier">additionA</span></code>.
+            </li>
+<li class="listitem">
+              <code class="computeroutput"><span class="identifier">additionB</span></code> has subexpressions
+              <code class="computeroutput"><span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">x</span></code> and <code class="computeroutput"><span class="number">3.14f</span></code>.
+            </li>
+<li class="listitem">
+              <code class="computeroutput"><span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">x</span></code> is not visible here.
+            </li>
+<li class="listitem">
+              From 4: <code class="computeroutput"><span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">x</span></code> is not visibility-correct.
+            </li>
+<li class="listitem">
+              From 5: Not all the subexpressions of <code class="computeroutput"><span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">x</span>
+              <span class="special">+</span> <span class="number">3.14f</span></code>
+              are visibility-correct.
+            </li>
+<li class="listitem">
+              From 2 and 6: <code class="computeroutput"><span class="identifier">additionB</span></code>
+              is not visibility-correct.
+            </li>
+</ol></div>
+<h5>
+<a name="expressions.visibility.h4"></a>
+          <span class="phrase"><a name="expressions.visibility.example_5"></a></span><a class="link" href="visibility.html#expressions.visibility.example_5">Example
+          5</a>
+        </h5>
+<pre class="programlisting"><span class="keyword">const</span> <span class="identifier">query</span><span class="special">&lt;</span><span class="keyword">float</span><span class="special">&gt;</span> <span class="identifier">attempted_reselect</span> <span class="special">=</span> <span class="identifier">points</span><span class="special">.</span><span class="identifier">select</span><span class="special">(</span><span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">x</span> <span class="special">+</span> <span class="number">3.14f</span><span class="special">).</span><span class="identifier">select</span><span class="special">(</span><span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">x</span> <span class="special">+</span> <span class="number">3.14f</span><span class="special">);</span>  <span class="comment">// wrong</span>
+</pre>
+<p>
+          Wrong because it's the same as example 4.
+        </p>
+<h5>
+<a name="expressions.visibility.h5"></a>
+          <span class="phrase"><a name="expressions.visibility.example_6"></a></span><a class="link" href="visibility.html#expressions.visibility.example_6">Example
+          6</a>
+        </h5>
+<pre class="programlisting"><span class="keyword">const</span> <span class="identifier">exprn_mapper</span><span class="special">&lt;</span><span class="keyword">float</span><span class="special">&gt;</span> <span class="identifier">addition</span> <span class="special">=</span> <span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">x</span> <span class="special">+</span> <span class="number">3.14f</span><span class="special">;</span>
+<span class="keyword">const</span> <span class="identifier">query</span><span class="special">&lt;</span><span class="keyword">float</span><span class="special">&gt;</span> <span class="identifier">x_plus_3_14</span> <span class="special">=</span> <span class="identifier">points</span><span class="special">.</span><span class="identifier">select</span><span class="special">(</span><span class="identifier">addition</span><span class="special">);</span>
+<span class="keyword">const</span> <span class="identifier">query</span><span class="special">&lt;</span><span class="keyword">float</span><span class="special">&gt;</span> <span class="identifier">reselect</span> <span class="special">=</span> <span class="identifier">x_plus_3_14</span><span class="special">.</span><span class="identifier">select</span><span class="special">(</span><span class="identifier">addition</span><span class="special">);</span>
+</pre>
+<p>
+          On the last line:
+        </p>
+<div class="orderedlist"><ol class="orderedlist" type="1">
+<li class="listitem">
+              The context <code class="computeroutput"><span class="identifier">x_plus_3_14</span><span class="special">.</span><span class="identifier">select</span><span class="special">(</span></code>...<code class="computeroutput"><span class="special">)</span></code>
+              makes <code class="computeroutput"><span class="identifier">addition</span></code> (that's
+              <code class="computeroutput"><span class="identifier">x_plus_3_14</span></code>'s value
+              mapper) visible to <code class="computeroutput"><span class="identifier">addition</span></code>.
+            </li>
+<li class="listitem">
+              From 1: <code class="computeroutput"><span class="identifier">addition</span></code> is
+              visibility-correct because it's visible to itself.
+            </li>
+</ol></div>
+<h5>
+<a name="expressions.visibility.h6"></a>
+          <span class="phrase"><a name="expressions.visibility.example_7"></a></span><a class="link" href="visibility.html#expressions.visibility.example_7">Example
+          7</a>
+        </h5>
+<pre class="programlisting"><span class="keyword">const</span> <span class="identifier">exprn_mapper</span><span class="special">&lt;</span><span class="keyword">float</span><span class="special">&gt;</span> <span class="identifier">addition</span> <span class="special">=</span> <span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">x</span> <span class="special">+</span> <span class="number">3.14f</span><span class="special">;</span>
+<span class="keyword">const</span> <span class="identifier">query</span><span class="special">&lt;</span><span class="keyword">float</span><span class="special">&gt;</span> <span class="identifier">reselect</span> <span class="special">=</span> <span class="identifier">points</span><span class="special">.</span><span class="identifier">select</span><span class="special">(</span><span class="identifier">addition</span><span class="special">).</span><span class="identifier">select</span><span class="special">(</span><span class="identifier">addition</span><span class="special">);</span>
+</pre>
+<p>
+          Okay because it's the same as example 6.
+        </p>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2014 Michael Shepanski<p>
+        Distributed under the Boost Software License, Version 1.0
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="choose.html"><img src="../images/prev.png" alt="Prev"></a><a accesskey="u" href="../expressions.html"><img src="../images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../images/home.png" alt="Home"></a><a accesskey="n" href="../queries.html"><img src="../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

@@ -1,0 +1,94 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Terminology</title>
+<link rel="stylesheet" href="../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../index.html" title="QUINCE: QUeries IN C++ Expressions">
+<link rel="up" href="../tables.html" title="Chapter&#160;8.&#160;Tables">
+<link rel="prev" href="../tables.html" title="Chapter&#160;8.&#160;Tables">
+<link rel="next" href="life_cycle_of_a_table_object.html" title="Life Cycle of a Table Object">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<div class="spirit-nav">
+<a accesskey="p" href="../tables.html"><img src="../images/prev.png" alt="Prev"></a><a accesskey="u" href="../tables.html"><img src="../images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../images/home.png" alt="Home"></a><a accesskey="n" href="life_cycle_of_a_table_object.html"><img src="../images/next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="tables.terminology"></a><a class="link" href="terminology.html" title="Terminology">Terminology</a>
+</h2></div></div></div>
+<p>
+          
+        </p>
+<a name="target"></a><h6>
+<a name="tables.terminology.h0"></a>
+          <span class="phrase"><a name="tables.terminology.target"></a></span><a class="link" href="terminology.html#tables.terminology.target"><span class="quote">&#8220;<span class="quote">Target</span>&#8221;</span></a>
+        </h6>
+<p>
+          If a table object <em class="replaceable"><code>to</code></em> represents an SQL table
+          at some site, and an actual SQL table <em class="replaceable"><code>st</code></em> exists
+          at that site, then <em class="replaceable"><code>st</code></em> is called the <span class="emphasis"><em>target</em></span>
+          of <em class="replaceable"><code>to</code></em>.
+        </p>
+<p>
+          That is to say, <em class="replaceable"><code>st</code></em> is the target of <em class="replaceable"><code>to</code></em>
+          when <em class="replaceable"><code>st</code></em> agrees with <em class="replaceable"><code>to</code></em>
+          on the following points:
+        </p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+              SQL table name,
+            </li>
+<li class="listitem">
+              database,
+            </li>
+<li class="listitem">
+              schema (PostgreSQL only), and
+            </li>
+<li class="listitem">
+              attached database (sqlite only).
+            </li>
+</ul></div>
+<a name="conforms_to"></a><h6>
+<a name="tables.terminology.h1"></a>
+          <span class="phrase"><a name="tables.terminology.conforms_to"></a></span><a class="link" href="terminology.html#tables.terminology.conforms_to"><span class="quote">&#8220;<span class="quote">Conforms
+          to</span>&#8221;</span></a>
+        </h6>
+<p>
+          An SQL table <em class="replaceable"><code>st</code></em> is said to <span class="emphasis"><em>conform
+          to</em></span> a table object <em class="replaceable"><code>to</code></em> when:
+        </p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+              <em class="replaceable"><code>st</code></em> is <em class="replaceable"><code>to</code></em>'s target,
+            </li>
+<li class="listitem">
+              <em class="replaceable"><code>st</code></em> has all the column names that <em class="replaceable"><code>to</code></em>'s
+              value mapper uses,
+            </li>
+<li class="listitem">
+              those columns have the types that <em class="replaceable"><code>to</code></em>'s value
+              mapper expects,
+            </li>
+<li class="listitem">
+              those columns' <code class="literal">NOT NULL</code> constraints have the settings
+              that <em class="replaceable"><code>to</code></em>'s value mapper expects, and
+            </li>
+<li class="listitem">
+              <em class="replaceable"><code>st</code></em> does not have any other columns.
+            </li>
+</ul></div>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2014 Michael Shepanski<p>
+        Distributed under the Boost Software License, Version 1.0
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="../tables.html"><img src="../images/prev.png" alt="Prev"></a><a accesskey="u" href="../tables.html"><img src="../images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../images/home.png" alt="Home"></a><a accesskey="n" href="life_cycle_of_a_table_object.html"><img src="../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

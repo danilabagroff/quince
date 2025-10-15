@@ -1,0 +1,96 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>... or to a Table</title>
+<link rel="stylesheet" href="../../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../../index.html" title="QUINCE: QUeries IN C++ Expressions">
+<link rel="up" href="../deployment.html" title="Deployment">
+<link rel="prev" href="../deployment.html" title="Deployment">
+<link rel="next" href="../../transactions.html" title="Chapter&#160;10.&#160;Transactions">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<div class="spirit-nav">
+<a accesskey="p" href="../deployment.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../deployment.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="../../transactions.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="custom.deployment.table"></a><a class="link" href="table.html" title="... or to a Table">... or to a Table</a>
+</h3></div></div></div>
+<p>
+            To customize mappings within a table, pass a <code class="computeroutput"><span class="identifier">mapping_customization</span></code>
+            as an extra argument to the table's constructor. All the <a class="link" href="../../tables/construction.html" title="Construction and Primary Key">various
+            forms of <code class="computeroutput"><span class="identifier">table</span></code> and <code class="computeroutput"><span class="identifier">serial_table</span></code> constructors</a> allow
+            this extra argument at the end. Thus:
+          </p>
+<pre class="programlisting"><span class="identifier">serial_table</span><span class="special">&lt;</span><span class="identifier">animal</span><span class="special">&gt;</span> <span class="identifier">animals</span><span class="special">(</span><span class="identifier">db</span><span class="special">,</span> <span class="string">"animals"</span><span class="special">,</span> <span class="special">&amp;</span><span class="identifier">animal</span><span class="special">::</span><span class="identifier">id</span><span class="special">,</span> <span class="identifier">my_customization</span><span class="special">());</span>
+</pre>
+<p>
+            Now all the <code class="computeroutput"><span class="identifier">uint16_t</span></code>s
+            and <code class="computeroutput"><span class="identifier">uint32_t</span></code>s in <code class="computeroutput"><span class="identifier">animals</span></code> will be represented in signed
+            integer columns of 16 and 32 bits respectively, as specified in <a class="link" href="../deployment.html#my_customization"><code class="computeroutput"><span class="identifier">my_customization</span></code></a>.
+            For any other polymorphically mapped type <em class="replaceable"><code>T</code></em>,
+            the choice of mapper class falls back to the database: it will apply
+            its own custom mapper for <em class="replaceable"><code>T</code></em>, if it has one,
+            or else fall back to the defaults from the backend library.
+          </p>
+<h5>
+<a name="custom.deployment.table.h0"></a>
+            <span class="phrase"><a name="custom.deployment.table.warning_beware_caution_caveat"></a></span><a class="link" href="table.html#custom.deployment.table.warning_beware_caution_caveat">Warning,
+            Beware, Caution, <span class="emphasis"><em>Caveat</em></span></a>
+          </h5>
+<p>
+            Table-level customizations are fine as long as you are storing values
+            like this:
+          </p>
+<pre class="programlisting"><span class="identifier">animals</span>
+<span class="special">.</span><span class="identifier">where</span><span class="special">(</span><span class="identifier">animals</span><span class="special">-&gt;</span><span class="identifier">id</span> <span class="special">==</span> <span class="identifier">jumbo_id</span><span class="special">)</span>
+<span class="special">.</span><span class="identifier">update</span><span class="special">(</span><span class="identifier">animals</span><span class="special">-&gt;</span><span class="identifier">n_legs</span><span class="special">,</span> <span class="identifier">uint16_t</span><span class="special">(</span><span class="number">4</span><span class="special">));</span>
+</pre>
+<p>
+            and retrieving them like this:
+          </p>
+<pre class="programlisting"><span class="keyword">const</span> <span class="identifier">optional</span><span class="special">&lt;</span><span class="identifier">uint16_t</span><span class="special">&gt;</span> <span class="identifier">n_legs</span> <span class="special">=</span> <span class="identifier">animals</span>
+    <span class="special">.</span><span class="identifier">where</span><span class="special">(</span><span class="identifier">animals</span><span class="special">-&gt;</span><span class="identifier">id</span> <span class="special">==</span> <span class="identifier">jumbo_id</span><span class="special">)</span>
+    <span class="special">.</span><span class="identifier">select</span><span class="special">(</span><span class="identifier">animals</span><span class="special">-&gt;</span><span class="identifier">n_legs</span><span class="special">)</span>
+    <span class="special">.</span><span class="identifier">get</span><span class="special">();</span>
+</pre>
+<p>
+            but any use of table-level customized data in server-side expressions
+            is fraught with hazards. E.g. in the expression <code class="computeroutput"><span class="identifier">animals</span><span class="special">-&gt;</span><span class="identifier">n_legs</span>
+            <span class="special">+</span> <span class="number">2u</span></code>,
+            the left operand is mapped according to the table's customized mapping,
+            but the <code class="computeroutput"><span class="number">2u</span></code> (in that context)
+            does not belong to the table, so it is mapped according to the database's
+            mapping (which may or may not have its own customizations). And the expression
+            as a whole does not belong to the table, so if it's value goes back to
+            the client, it will be converted to C++ data by the database's mapping,
+            not the table's.
+          </p>
+<p>
+            My advice is: use table-level customization sparingly. It is for situations
+            where you have a large amount of data that needs to be stored compactly,
+            but then you need to keep <span class="emphasis"><em>that</em></span> data away from server-side
+            expressions.
+          </p>
+<p>
+            All uses of <code class="computeroutput"><span class="identifier">numeric_cast_mapper</span></code>
+            and <code class="computeroutput"><span class="identifier">reinterpret_cast_mapper</span></code>
+            have their problems, as we know, but if the deployments stay at the database
+            level, then at least you can be sure that a consistent set of mappings
+            will apply across any given query.
+          </p>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2014 Michael Shepanski<p>
+        Distributed under the Boost Software License, Version 1.0
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="../deployment.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../deployment.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="../../transactions.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

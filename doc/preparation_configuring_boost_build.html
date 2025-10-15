@@ -1,0 +1,126 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Configuring Boost.Build</title>
+<link rel="stylesheet" href="../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../index.html" title="QUINCE: QUeries IN C++ Expressions">
+<link rel="up" href="../preparation.html" title="Chapter&#160;2.&#160;Preparation">
+<link rel="prev" href="downloading_quince_and_the_backe.html" title="Downloading Quince and the Backends">
+<link rel="next" href="building_quince_and_the_backends.html" title="Building Quince and the Backends">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<div class="spirit-nav">
+<a accesskey="p" href="downloading_quince_and_the_backe.html"><img src="../images/prev.png" alt="Prev"></a><a accesskey="u" href="../preparation.html"><img src="../images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../images/home.png" alt="Home"></a><a accesskey="n" href="building_quince_and_the_backends.html"><img src="../images/next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="preparation.configuring_boost_build"></a><a class="link" href="configuring_boost_build.html" title="Configuring Boost.Build">Configuring Boost.Build</a>
+</h2></div></div></div>
+<p>
+          Boost.Build is the product that will build each of the libraries in the
+          quince family, but first you must configure it, in two steps.
+        </p>
+<h4>
+<a name="preparation.configuring_boost_build.h0"></a>
+          <span class="phrase"><a name="preparation.configuring_boost_build.user_config_jam"></a></span><a class="link" href="configuring_boost_build.html#preparation.configuring_boost_build.user_config_jam">user-config.jam</a>
+        </h4>
+<p>
+          You need to create the file <code class="literal">user-config.jam</code> in your
+          home directory, or in one of the other <a href="http://www.boost.org/boost-build2/doc/html/bbv2/overview/configuration.html" target="_top">approved
+          places</a>, unless it already exists. Then you need to add some lines.
+        </p>
+<p>
+          Here are the lines I have added on my Windows machine:
+        </p>
+<pre class="programlisting"><span class="identifier">use</span><span class="special">-</span><span class="identifier">project</span> <span class="special">/</span><span class="identifier">boost</span> <span class="special">:</span> <span class="string">"C:/local/boost_1_56_0"</span> <span class="special">;</span>
+
+<span class="identifier">constant</span> <span class="identifier">libpq</span><span class="special">-</span><span class="identifier">name</span> <span class="special">:</span> <span class="string">"libpq"</span> <span class="special">;</span>
+<span class="identifier">path</span><span class="special">-</span><span class="identifier">constant</span> <span class="identifier">libpq</span><span class="special">-</span><span class="identifier">include</span><span class="special">-</span><span class="identifier">dir</span> <span class="special">:</span> <span class="string">"C:/Program Files/PostgreSQL/9.3/include"</span> <span class="special">;</span>
+<span class="identifier">path</span><span class="special">-</span><span class="identifier">constant</span> <span class="identifier">libpq</span><span class="special">-</span><span class="identifier">lib</span><span class="special">-</span><span class="identifier">dir</span> <span class="special">:</span> <span class="string">"C:/Program Files/PostgreSQL/9.3/lib"</span> <span class="special">;</span>
+<span class="identifier">path</span><span class="special">-</span><span class="identifier">constant</span> <span class="identifier">sqlite</span><span class="special">-</span><span class="identifier">root</span> <span class="special">:</span> <span class="string">"C:/local/sqlite"</span> <span class="special">;</span>
+
+<span class="identifier">use</span><span class="special">-</span><span class="identifier">project</span> <span class="special">/</span><span class="identifier">quince</span> <span class="special">:</span> <span class="string">"C:/Users/shep/quince/quince"</span> <span class="special">;</span>
+<span class="identifier">use</span><span class="special">-</span><span class="identifier">project</span> <span class="special">/</span><span class="identifier">quince</span><span class="special">-</span><span class="identifier">postgresql</span> <span class="special">:</span> <span class="string">"C:/Users/shep/quince/quince_postgresql"</span> <span class="special">;</span>
+<span class="identifier">use</span><span class="special">-</span><span class="identifier">project</span> <span class="special">/</span><span class="identifier">quince</span><span class="special">-</span><span class="identifier">sqlite</span> <span class="special">:</span> <span class="string">"C:/Users/shep/quince/quince_sqlite"</span> <span class="special">;</span>
+</pre>
+<p>
+          Yours should be similar, but:
+        </p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+              If you aren't a PostgreSQL user, delete the lines that define <code class="literal">libpq-name</code>,
+              <code class="literal">libpq-include-dir</code>, <code class="literal">libpq-lib-dir</code>,
+              and <code class="literal">quince-postgresql</code>.
+            </li>
+<li class="listitem">
+              If you aren't an sqlite user, delete the lines that define <code class="literal">sqlite-root</code>
+              and <code class="literal">quince-sqlite</code>.
+            </li>
+<li class="listitem">
+              If you are a PostgreSQL user on a Unix-like system (one where the linker's
+              commandline takes libraries in the <code class="literal">-l</code><em class="replaceable"><code>foo</code></em><code class="literal">.a</code>
+              style), then change <code class="literal">"libpq"</code> to <code class="literal">"pq"</code>
+              in the definition of <code class="literal">libpq-name</code>
+            </li>
+<li class="listitem">
+              Change all my absolute pathnames to absolute pathnames that are correct
+              for your system. To clarify the ones that are not completely obvious:
+              <div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: circle; ">
+<li class="listitem">
+                    <code class="literal">C:/local/boost_1_56_0</code> is the root of my boost
+                    installation. That's the directory directly above <code class="literal">boost</code>
+                    and <code class="literal">include</code>.
+                  </li>
+<li class="listitem">
+                    <code class="literal">C:/local/sqlite</code> is the directory directly
+                    above <code class="literal">sqlite.h</code> and <code class="literal">sqlite.c</code>.
+                  </li>
+<li class="listitem">
+                    The final three should be the directories where you downloaded
+                    quince and the backends. Each of these is a directory directly
+                    above <code class="literal">src</code> and <code class="literal">include</code>.
+                  </li>
+</ul></div>
+            </li>
+</ul></div>
+<h4>
+<a name="preparation.configuring_boost_build.h1"></a>
+          <span class="phrase"><a name="preparation.configuring_boost_build.boost_build_jam"></a></span><a class="link" href="configuring_boost_build.html#preparation.configuring_boost_build.boost_build_jam">boost-build.jam</a>
+        </h4>
+<p>
+          You need to create a one-line file called <code class="literal">boost-build.jam</code>.
+        </p>
+<p>
+          If possible, put this file in some directory that is a common ancestor
+          of the directories in which you downloaded quince and each of its backends.
+          If there is no plausible common ancestor, then you can create multiple
+          <code class="literal">boost-build.jam</code> files -- just so long as some <code class="computeroutput"><span class="identifier">boost</span><span class="special">-</span><span class="identifier">build</span><span class="special">.</span><span class="identifier">jam</span></code> exists at or above each of the directories
+          in which you'll be building.
+        </p>
+<p>
+          The purpose of this file is to guide Boost.Build to its own parent directory.
+          Mine has the following content:
+        </p>
+<pre class="programlisting"><span class="identifier">boost</span><span class="special">-</span><span class="identifier">build</span> <span class="identifier">C</span><span class="special">:/</span><span class="identifier">local</span><span class="special">/</span><span class="identifier">boost_1_56_0</span><span class="special">/</span><span class="identifier">tools</span><span class="special">/</span><span class="identifier">build</span><span class="special">/</span><span class="identifier">src</span> <span class="special">;</span>
+</pre>
+<p>
+          You just need to replace the absolute path with the absolute path of the
+          corresponding directory on your machine. (Hint: if you are using boost
+          1.55 then it ends with <code class="literal">tools/build/v2</code>, and if you are
+          using boost 1.56 then it ends with <code class="literal">tools/build/src</code>.)
+        </p>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2014 Michael Shepanski<p>
+        Distributed under the Boost Software License, Version 1.0
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="downloading_quince_and_the_backe.html"><img src="../images/prev.png" alt="Prev"></a><a accesskey="u" href="../preparation.html"><img src="../images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../images/home.png" alt="Home"></a><a accesskey="n" href="building_quince_and_the_backends.html"><img src="../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

@@ -1,0 +1,103 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Chapter&#160;1.&#160;Queries in C++ Expressions</title>
+<link rel="stylesheet" href="boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="index.html" title="QUINCE: QUeries IN C++ Expressions">
+<link rel="up" href="introduction.html" title="Part&#160;I.&#160;Introduction">
+<link rel="prev" href="introduction.html" title="Part&#160;I.&#160;Introduction">
+<link rel="next" href="queries_in_c_expressions/what_does_it_look_like.html" title="What Does it Look Like?">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<div class="spirit-nav">
+<a accesskey="p" href="introduction.html"><img src="images/prev.png" alt="Prev"></a><a accesskey="u" href="introduction.html"><img src="images/up.png" alt="Up"></a><a accesskey="h" href="index.html"><img src="images/home.png" alt="Home"></a><a accesskey="n" href="queries_in_c_expressions/what_does_it_look_like.html"><img src="images/next.png" alt="Next"></a>
+</div>
+<div class="chapter">
+<div class="titlepage"><div><div><h2 class="title">
+<a name="queries_in_c_expressions"></a>Chapter&#160;1.&#160;Queries in C++ Expressions</h2></div></div></div>
+<div class="toc">
+<p><b>Table of Contents</b></p>
+<dl class="toc">
+<dt><span class="section"><a href="queries_in_c_expressions.html#queries_in_c_expressions.what_why_how_and_for_whom">What,
+        Why, How, and for Whom?</a></span></dt>
+<dt><span class="section"><a href="queries_in_c_expressions/what_does_it_look_like.html">What
+        Does it Look Like?</a></span></dt>
+<dd><dl>
+<dt><span class="section"><a href="queries_in_c_expressions/what_does_it_look_like.html#queries_in_c_expressions.what_does_it_look_like.like_this">Like
+          this ...</a></span></dt>
+<dt><span class="section"><a href="queries_in_c_expressions/what_does_it_look_like/or_these.html">...
+          or these</a></span></dt>
+</dl></dd>
+<dt><span class="section"><a href="queries_in_c_expressions/rise_of_the_monster_query.html">Rise
+        of the Monster Query</a></span></dt>
+<dt><span class="section"><a href="queries_in_c_expressions/the_quincessential_dot_points.html">The
+        Quincessential Dot Points</a></span></dt>
+</dl>
+</div>
+<p>
+        
+      </p>
+<div class="section">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="queries_in_c_expressions.what_why_how_and_for_whom"></a><a class="link" href="queries_in_c_expressions.html#queries_in_c_expressions.what_why_how_and_for_whom" title="What, Why, How, and for Whom?">What,
+        Why, How, and for Whom?</a>
+</h2></div></div></div>
+<p>
+          Quince is a library that allows C++ programs to create SQL commands, and
+          to have them executed on a relational DBMS. When data accompanies an outgoing
+          command, quince first converts the data from C++ types (including user-defined
+          classes and structs) to the DBMS's formats; and when data comes back in
+          reply, quince makes the reverse conversion. So quince is an <span class="emphasis"><em>Object
+          Relational Mapper</em></span> (ORM).
+        </p>
+<p>
+          The difference between quince and existing ORMs is this: <span class="emphasis"><em>Quince
+          offers more support for sophisticated queries</em></span>. A user who knows
+          the power of a relational database will want to harness it, by issuing
+          commands that employ server-side calculations, WHERE clauses, SELECT clauses,
+          JOINs, DISTINCT, GROUP BY, INTERSECT, and so on, all combined and interconnected
+          according to the user's own design. Quince treats such a user as the normal
+          case, not an outlier. Of course it is also sometimes necessary to store
+          or retrieve a single record, and quince makes that very easy to do; but
+          it is only one point on a wide spectrum of possible uses. This reflects
+          an underlying belief that an RDBMS is an engine of data processing as much
+          as it is an engine of data storage.
+        </p>
+<p>
+          Other ORMs make room for sophisticated queries, if at all, by asking users
+          to enter literal SQL text. For an ORM to insist on this is in several ways
+          retrograde: it forces the user to juggle two syntactically different languages,
+          C++ and SQL, with two unrelated type systems, and while any errors of syntax
+          or type consistency on the C++ side are detected early, any such errors
+          on the other side go undetected until run-time, when the SQL hits the DBMS.
+        </p>
+<p>
+          To avoid these difficulties, quince re-presents the SQL concepts in C++,
+          so the user works full-time in C++ syntax with C++ data types. There are
+          C++ functions <code class="computeroutput"><span class="identifier">join</span><span class="special">()</span></code>,
+          <code class="computeroutput"><span class="identifier">distinct</span><span class="special">()</span></code>
+          <code class="computeroutput"><span class="identifier">where</span><span class="special">()</span></code>
+          etc., corresponding to the SQL keywords, and there are C++ operator overloads
+          corresponding to SQL's arithmetic, string, relational, and logic operators.
+          All of these devices are statically typed, so that type errors are caught
+          at compile time. At run time, they work together to build a data structure
+          that represents the user's query. And finally, when the running application
+          is ready for the query to be executed, quince renders the data structure
+          as correct SQL and hands it off to the DBMS.
+        </p>
+</div>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2014 Michael Shepanski<p>
+        Distributed under the Boost Software License, Version 1.0
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="introduction.html"><img src="images/prev.png" alt="Prev"></a><a accesskey="u" href="introduction.html"><img src="images/up.png" alt="Up"></a><a accesskey="h" href="index.html"><img src="images/home.png" alt="Home"></a><a accesskey="n" href="queries_in_c_expressions/what_does_it_look_like.html"><img src="images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

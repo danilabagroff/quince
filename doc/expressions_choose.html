@@ -1,0 +1,154 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>choose()</title>
+<link rel="stylesheet" href="../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../index.html" title="QUINCE: QUeries IN C++ Expressions">
+<link rel="up" href="../expressions.html" title="Chapter&#160;6.&#160;Expressions for Server-Side Execution">
+<link rel="prev" href="scalar.html" title="Scalar Subqueries">
+<link rel="next" href="visibility.html" title="Visibility">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<div class="spirit-nav">
+<a accesskey="p" href="scalar.html"><img src="../images/prev.png" alt="Prev"></a><a accesskey="u" href="../expressions.html"><img src="../images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../images/home.png" alt="Home"></a><a accesskey="n" href="visibility.html"><img src="../images/next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="expressions.choose"></a><a class="link" href="choose.html" title="choose()"><code class="computeroutput"><span class="identifier">choose</span><span class="special">()</span></code></a>
+</h2></div></div></div>
+<p>
+          
+        </p>
+<p>
+          <code class="computeroutput"><span class="identifier">choose</span><span class="special">()</span></code>
+          builds and returns an SQL expression that represents a choice among several
+          subexpressions, based on the values of other subexpressions. It's a wrapper
+          for the SQL <code class="literal">CASE</code> construct.
+        </p>
+<p>
+          <code class="computeroutput"><span class="identifier">choose</span><span class="special">()</span></code>
+          takes the following arguments, in order:
+        </p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+              Optionally, a <span class="emphasis"><em>switch-expression</em></span>
+            </li>
+<li class="listitem">
+              One or more arguments of the form <code class="computeroutput"><span class="identifier">when</span><span class="special">(</span></code><em class="replaceable"><code>comparand</code></em><code class="computeroutput"><span class="special">,</span> </code><em class="replaceable"><code>result</code></em><code class="computeroutput"><span class="special">)</span></code>
+            </li>
+<li class="listitem">
+              Optionally, a <span class="emphasis"><em>default-expression</em></span>.
+            </li>
+</ul></div>
+<p>
+          There must be two mapped types, <em class="replaceable"><code>C</code></em> (the <span class="emphasis"><em>comparand
+          type</em></span>) and <em class="replaceable"><code>R</code></em> (the <span class="emphasis"><em>result
+          type</em></span>), such that:
+        </p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+              If the switch-expression is not present, then <em class="replaceable"><code>C</code></em>
+              is <code class="computeroutput"><span class="keyword">bool</span></code>.
+            </li>
+<li class="listitem">
+              Each of the <em class="replaceable"><code>comparand</code></em>s is an <code class="computeroutput"><span class="identifier">abstract_mapper</span><span class="special">&lt;</span></code><em class="replaceable"><code>C</code></em><code class="computeroutput"><span class="special">&gt;</span></code> or a <em class="replaceable"><code>C</code></em>.
+            </li>
+<li class="listitem">
+              Each of the <em class="replaceable"><code>result</code></em>s is an <code class="computeroutput"><span class="identifier">abstract_mapper</span><span class="special">&lt;</span></code><em class="replaceable"><code>R</code></em><code class="computeroutput"><span class="special">&gt;</span></code> or an <em class="replaceable"><code>R</code></em>.
+            </li>
+<li class="listitem">
+              The switch-expression, if present, is an <code class="computeroutput"><span class="identifier">abstract_mapper</span><span class="special">&lt;</span></code><em class="replaceable"><code>C</code></em><code class="computeroutput"><span class="special">&gt;</span></code> or a <em class="replaceable"><code>C</code></em>.
+            </li>
+<li class="listitem">
+              The default-expression, if present, is an <code class="computeroutput"><span class="identifier">abstract_mapper</span><span class="special">&lt;</span></code><em class="replaceable"><code>R</code></em><code class="computeroutput"><span class="special">&gt;</span></code> or an <em class="replaceable"><code>R</code></em>.
+            </li>
+<li class="listitem">
+              <em class="replaceable"><code>C</code></em> and <em class="replaceable"><code>R</code></em> are both
+              single-column types (this is checked at run time).
+            </li>
+<li class="listitem">
+              <em class="replaceable"><code>C</code></em> is not a <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">optional</span></code>,
+              and nor are any of <em class="replaceable"><code>C</code></em>'s mapped members (if
+              <em class="replaceable"><code>C</code></em> is a user-defined class, or a <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">tuple</span></code>), and nor are any of <span class="emphasis"><em>their</em></span>
+              mapped members, etc. (this is checked at compile time).
+            </li>
+</ul></div>
+<p>
+          The result is an <code class="computeroutput"><span class="identifier">exprn_mapper</span><span class="special">&lt;</span></code><em class="replaceable"><code>R</code></em><code class="computeroutput"><span class="special">&gt;</span></code>.
+        </p>
+<p>
+          If the switch-expression and default-expression are both present, then
+          the resulting <code class="computeroutput"><span class="identifier">exprn_mapper</span><span class="special">&lt;</span></code><em class="replaceable"><code>R</code></em><code class="computeroutput"><span class="special">&gt;</span></code> does the following when executed: It
+          evaluates the switch-expression, then it evaluates the <em class="replaceable"><code>comparand</code></em>s
+          in order, until one is found whose value is equal to the switch-expression's.
+          Then it delegates to the corresponding <em class="replaceable"><code>result</code></em>,
+          which provides the result for the whole construct. If no matching <em class="replaceable"><code>comparand</code></em>
+          is found, then it delegates to the default-expression.
+        </p>
+<p>
+          If the switch-expression is not present, then it as though it were present
+          with a value <code class="computeroutput"><span class="keyword">true</span></code>. So the
+          execution process is the same, except that, instead of looking for a <em class="replaceable"><code>comparand</code></em>
+          that evaluates to a value matching the switch, it looks for a <em class="replaceable"><code>comparand</code></em>
+          that evaluates to <code class="computeroutput"><span class="keyword">true</span></code>.
+        </p>
+<p>
+          If the default expression is not present, then quince supplies one, which
+          is a default-constructed <em class="replaceable"><code>R</code></em>.
+        </p>
+<h4>
+<a name="expressions.choose.h0"></a>
+          <span class="phrase"><a name="expressions.choose.examples"></a></span><a class="link" href="choose.html#expressions.choose.examples">Examples</a>
+        </h4>
+<pre class="programlisting"><span class="keyword">const</span> <span class="identifier">query</span><span class="special">&lt;</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">string</span><span class="special">&gt;</span> <span class="identifier">commentary_about_x</span> <span class="special">=</span> <span class="identifier">points</span><span class="special">.</span><span class="identifier">select</span><span class="special">(</span>
+    <span class="identifier">choose</span><span class="special">(</span>
+        <span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">x</span><span class="special">,</span>
+        <span class="identifier">when</span><span class="special">(</span><span class="number">0.0f</span><span class="special">,</span> <span class="string">"Zero!"</span><span class="special">),</span>
+        <span class="identifier">when</span><span class="special">(</span><span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">y</span><span class="special">,</span> <span class="string">"Same as y!"</span><span class="special">),</span>
+        <span class="string">"Nothing special."</span>
+    <span class="special">)</span>
+<span class="special">);</span>
+
+<span class="keyword">const</span> <span class="identifier">query</span><span class="special">&lt;</span><span class="keyword">float</span><span class="special">&gt;</span> <span class="identifier">higher_coords</span> <span class="special">=</span> <span class="identifier">points</span><span class="special">.</span><span class="identifier">select</span><span class="special">(</span>
+    <span class="identifier">choose</span><span class="special">(</span>
+        <span class="identifier">when</span><span class="special">(</span><span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">x</span> <span class="special">&gt;=</span> <span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">y</span><span class="special">,</span> <span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">x</span><span class="special">),</span>
+        <span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">y</span>
+    <span class="special">)</span>
+<span class="special">);</span>
+
+<span class="comment">// http://en.wikipedia.org/wiki/Quadrant_%28plane_geometry%29</span>
+<span class="comment">//</span>
+<span class="keyword">const</span> <span class="identifier">query</span><span class="special">&lt;</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">string</span><span class="special">&gt;</span> <span class="identifier">quadrants</span> <span class="special">=</span> <span class="identifier">points</span><span class="special">.</span><span class="identifier">select</span><span class="special">(</span>
+    <span class="identifier">choose</span><span class="special">(</span>
+        <span class="identifier">when</span><span class="special">(</span><span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">y</span> <span class="special">&gt;=</span> <span class="number">0.0f</span> <span class="special">&amp;&amp;</span> <span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">x</span> <span class="special">&gt;=</span> <span class="number">0.0f</span><span class="special">,</span> <span class="string">"I"</span><span class="special">),</span>
+        <span class="identifier">when</span><span class="special">(</span><span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">y</span> <span class="special">&gt;=</span> <span class="number">0.0f</span> <span class="special">&amp;&amp;</span> <span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">x</span> <span class="special">&lt;</span> <span class="number">0.0f</span><span class="special">,</span> <span class="string">"II"</span><span class="special">),</span>
+        <span class="identifier">when</span><span class="special">(</span><span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">y</span> <span class="special">&lt;</span> <span class="number">0.0f</span> <span class="special">&amp;&amp;</span> <span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">x</span> <span class="special">&lt;</span> <span class="number">0.0f</span><span class="special">,</span> <span class="string">"III"</span><span class="special">),</span>
+        <span class="identifier">when</span><span class="special">(</span><span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">y</span> <span class="special">&lt;</span> <span class="number">0.0f</span> <span class="special">&amp;&amp;</span> <span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">x</span> <span class="special">&gt;=</span> <span class="number">0.0f</span><span class="special">,</span> <span class="string">"IV"</span><span class="special">)</span>
+    <span class="special">)</span>
+<span class="special">);</span>
+
+<span class="keyword">const</span> <span class="identifier">query</span><span class="special">&lt;</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">string</span><span class="special">&gt;</span> <span class="identifier">quadrants_again</span> <span class="special">=</span> <span class="identifier">points</span><span class="special">.</span><span class="identifier">select</span><span class="special">(</span>
+    <span class="identifier">choose</span><span class="special">(</span>
+        <span class="identifier">when</span><span class="special">(</span>
+            <span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">y</span> <span class="special">&gt;=</span> <span class="number">0.0f</span><span class="special">,</span>
+            <span class="identifier">choose</span><span class="special">(</span><span class="identifier">when</span><span class="special">(</span><span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">x</span> <span class="special">&gt;=</span> <span class="number">0.0f</span><span class="special">,</span> <span class="string">"I"</span><span class="special">),</span> <span class="string">"II"</span><span class="special">)</span>
+        <span class="special">),</span>
+        <span class="identifier">choose</span><span class="special">(</span><span class="identifier">when</span><span class="special">(</span><span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">x</span> <span class="special">&lt;</span> <span class="number">0.0f</span><span class="special">,</span> <span class="string">"III"</span><span class="special">),</span> <span class="string">"IV"</span><span class="special">)</span>
+    <span class="special">)</span>
+<span class="special">);</span>
+</pre>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2014 Michael Shepanski<p>
+        Distributed under the Boost Software License, Version 1.0
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="scalar.html"><img src="../images/prev.png" alt="Prev"></a><a accesskey="u" href="../expressions.html"><img src="../images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../images/home.png" alt="Home"></a><a accesskey="n" href="visibility.html"><img src="../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

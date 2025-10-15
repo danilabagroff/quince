@@ -1,0 +1,261 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Set-Theoretic Operations</title>
+<link rel="stylesheet" href="../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../index.html" title="QUINCE: QUeries IN C++ Expressions">
+<link rel="up" href="../queries.html" title="Chapter&#160;7.&#160;Queries">
+<link rel="prev" href="join/self_joins.html" title="Self Joins">
+<link rel="next" href="skip_and_limit.html" title="skip() and limit()">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<div class="spirit-nav">
+<a accesskey="p" href="join/self_joins.html"><img src="../images/prev.png" alt="Prev"></a><a accesskey="u" href="../queries.html"><img src="../images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../images/home.png" alt="Home"></a><a accesskey="n" href="skip_and_limit.html"><img src="../images/next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="queries.set_theoretic_operations"></a><a class="link" href="set_theoretic_operations.html" title="Set-Theoretic Operations">Set-Theoretic Operations</a>
+</h2></div></div></div>
+<p>
+          
+        </p>
+<p>
+          <code class="computeroutput"><span class="identifier">union_</span><span class="special">()</span></code>,
+          <code class="computeroutput"><span class="identifier">intersect</span><span class="special">()</span></code>,
+          and <code class="computeroutput"><span class="identifier">except</span><span class="special">()</span></code>
+          build queries that produce a set-theoretic combination (union, intersection,
+          or set difference) of the outputs of two other queries. <code class="computeroutput"><span class="identifier">union_all</span><span class="special">()</span></code>, <code class="computeroutput"><span class="identifier">intersect_all</span><span class="special">()</span></code>, and <code class="computeroutput"><span class="identifier">except_all</span><span class="special">()</span></code> are similar, but they preserve repetition
+          of elements. These six methods are wrappers for SQL's <code class="literal">UNION</code>,
+          <code class="literal">INTERSECT</code>, and <code class="literal">EXCEPT</code>, with and without
+          <code class="literal">ALL</code>.
+        </p>
+<p>
+          (<code class="computeroutput"><span class="identifier">union_</span></code> is not a typo.
+          That identifier wears an underscore on purpose, to avoid being mistaken
+          for a C++ keyword.)
+        </p>
+<p>
+          You can call any of:
+        </p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+              <em class="replaceable"><code>l</code></em><code class="computeroutput"><span class="special">.</span><span class="identifier">union_</span><span class="special">(</span></code><em class="replaceable"><code>r</code></em><code class="computeroutput"><span class="special">)</span></code>
+            </li>
+<li class="listitem">
+              <em class="replaceable"><code>l</code></em><code class="computeroutput"><span class="special">.</span><span class="identifier">intersect</span><span class="special">(</span></code><em class="replaceable"><code>r</code></em><code class="computeroutput"><span class="special">)</span></code>
+            </li>
+<li class="listitem">
+              <em class="replaceable"><code>l</code></em><code class="computeroutput"><span class="special">.</span><span class="identifier">except</span><span class="special">(</span></code><em class="replaceable"><code>r</code></em><code class="computeroutput"><span class="special">)</span></code>
+            </li>
+<li class="listitem">
+              <em class="replaceable"><code>l</code></em><code class="computeroutput"><span class="special">.</span><span class="identifier">union_all</span><span class="special">(</span></code><em class="replaceable"><code>r</code></em><code class="computeroutput"><span class="special">)</span></code>
+            </li>
+<li class="listitem">
+              <em class="replaceable"><code>l</code></em><code class="computeroutput"><span class="special">.</span><span class="identifier">intersect_all</span><span class="special">(</span></code><em class="replaceable"><code>r</code></em><code class="computeroutput"><span class="special">)</span></code> (PostgreSQL only)
+            </li>
+<li class="listitem">
+              <em class="replaceable"><code>l</code></em><code class="computeroutput"><span class="special">.</span><span class="identifier">except_all</span><span class="special">(</span></code><em class="replaceable"><code>r</code></em><code class="computeroutput"><span class="special">)</span></code> (PostgreSQL only)
+            </li>
+</ul></div>
+<p>
+          provided that <em class="replaceable"><code>l</code></em> and <em class="replaceable"><code>r</code></em>
+          are queries, and they have the same value type as each other.
+        </p>
+<p>
+          The result is a <code class="computeroutput"><span class="identifier">query</span></code> with
+          the following characteristics:
+        </p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+              Its value type is the same as <em class="replaceable"><code>l</code></em>'s value
+              type (which is the same as <em class="replaceable"><code>r</code></em>'s).
+            </li>
+<li class="listitem">
+              Its value mapper is identical to <em class="replaceable"><code>l</code></em>'s value
+              mapper (which may or may not be identical to <em class="replaceable"><code>r</code></em>'s).
+            </li>
+<li class="listitem">
+              Its outputs consist of an appropriate combination of the outputs of
+              <em class="replaceable"><code>l</code></em> and <em class="replaceable"><code>r</code></em>:
+              <div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: circle; ">
+<li class="listitem">
+                    <em class="replaceable"><code>l</code></em><code class="computeroutput"><span class="special">.</span><span class="identifier">union_</span><span class="special">(</span></code><em class="replaceable"><code>r</code></em><code class="computeroutput"><span class="special">)</span></code> produces exactly one copy of
+                    any output that is produced at least once by <em class="replaceable"><code>l</code></em>
+                    or at least once by <em class="replaceable"><code>r</code></em>.
+                  </li>
+<li class="listitem">
+                    <em class="replaceable"><code>l</code></em><code class="computeroutput"><span class="special">.</span><span class="identifier">intersect</span><span class="special">(</span></code><em class="replaceable"><code>r</code></em><code class="computeroutput"><span class="special">)</span></code> produces exactly one copy of
+                    any output that is produced at least once by <em class="replaceable"><code>l</code></em>
+                    and at least once by <em class="replaceable"><code>r</code></em>.
+                  </li>
+<li class="listitem">
+                    <em class="replaceable"><code>l</code></em><code class="computeroutput"><span class="special">.</span><span class="identifier">except</span><span class="special">(</span></code><em class="replaceable"><code>r</code></em><code class="computeroutput"><span class="special">)</span></code> produces exactly one copy of
+                    any output that is produced at least once by <em class="replaceable"><code>l</code></em>
+                    but not at all by <em class="replaceable"><code>r</code></em>.
+                  </li>
+<li class="listitem">
+                    <em class="replaceable"><code>l</code></em><code class="computeroutput"><span class="special">.</span><span class="identifier">union_all</span><span class="special">(</span></code><em class="replaceable"><code>r</code></em><code class="computeroutput"><span class="special">)</span></code> produces <span class="emphasis"><em>n</em></span>+<span class="emphasis"><em>m</em></span>
+                    copies of any output that is produced <span class="emphasis"><em>n</em></span>
+                    times by <em class="replaceable"><code>l</code></em> and <span class="emphasis"><em>m</em></span>
+                    times by <em class="replaceable"><code>r</code></em>.
+                  </li>
+<li class="listitem">
+                    <em class="replaceable"><code>l</code></em><code class="computeroutput"><span class="special">.</span><span class="identifier">intersect_all</span><span class="special">(</span></code><em class="replaceable"><code>r</code></em><code class="computeroutput"><span class="special">)</span></code> produces min(<span class="emphasis"><em>n</em></span>,
+                    <span class="emphasis"><em>m</em></span>) copies of any output that is produced
+                    <span class="emphasis"><em>n</em></span> times by <em class="replaceable"><code>l</code></em>
+                    and <span class="emphasis"><em>m</em></span> times by <em class="replaceable"><code>r</code></em>.
+                  </li>
+<li class="listitem">
+                    <em class="replaceable"><code>l</code></em><code class="computeroutput"><span class="special">.</span><span class="identifier">except_all</span><span class="special">(</span></code><em class="replaceable"><code>r</code></em><code class="computeroutput"><span class="special">)</span></code> produces max(<span class="emphasis"><em>n</em></span>
+                    - <span class="emphasis"><em>m</em></span>, 0) copies of any output that is produced
+                    <span class="emphasis"><em>n</em></span> times by <em class="replaceable"><code>l</code></em>
+                    and <span class="emphasis"><em>m</em></span> times by <em class="replaceable"><code>r</code></em>.
+                  </li>
+</ul></div>
+            </li>
+</ul></div>
+<h4>
+<a name="queries.set_theoretic_operations.h0"></a>
+          <span class="phrase"><a name="queries.set_theoretic_operations.quince_s_internal_optimizations"></a></span><a class="link" href="set_theoretic_operations.html#queries.set_theoretic_operations.quince_s_internal_optimizations">Quince's
+          internal optimizations</a>
+        </h4>
+<p>
+          This:
+        </p>
+<pre class="programlisting"><span class="identifier">points</span><span class="special">.</span><span class="identifier">where</span><span class="special">(</span><span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">x</span> <span class="special">&gt;</span> <span class="number">4.0f</span><span class="special">)</span>
+<span class="special">.</span><span class="identifier">intersect</span><span class="special">(</span>
+    <span class="identifier">points</span><span class="special">.</span><span class="identifier">where</span><span class="special">(</span><span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">y</span> <span class="special">&lt;</span> <span class="number">3.0f</span><span class="special">)</span>
+<span class="special">)</span>
+</pre>
+<p>
+          is equivalent to this:
+        </p>
+<pre class="programlisting"><span class="identifier">points</span><span class="special">.</span><span class="identifier">where</span><span class="special">(</span><span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">x</span> <span class="special">&gt;</span> <span class="number">4.0f</span> <span class="special">&amp;&amp;</span> <span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">y</span> <span class="special">&lt;</span> <span class="number">3.0f</span><span class="special">)</span>
+</pre>
+<p>
+          Quince knows that it's equivalent, and if you write the former it will
+          replace it internally with the latter, to avoid SQL's <code class="literal">INTERSECT</code>.
+        </p>
+<p>
+          In general, quince replaces set-theoretic operations by logic operations
+          inside a <code class="computeroutput"><span class="identifier">where</span><span class="special">(</span></code>...<code class="computeroutput"><span class="special">)</span></code> clause whenever it can prove that this
+          won't affect the output. It applies a fairly complex set of criteria, and
+          I won't attempt to describe them all, but it's useful to know the following:
+        </p>
+<p>
+          If <em class="replaceable"><code>q</code></em> is a query that cannot produce duplicate
+          outputs (which is the case if <em class="replaceable"><code>q</code></em> is a table,
+          or is formed without any operations that can lead to duplicate outputs,
+          such as <code class="computeroutput"><span class="identifier">union_all</span><span class="special">()</span></code>,
+          or a narrowing <code class="computeroutput"><span class="identifier">select</span><span class="special">()</span></code>),
+          then quince will make the following optimizations to queries involving
+          <em class="replaceable"><code>q</code></em>:
+        </p>
+<div class="informaltable"><table class="table">
+<colgroup>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                  <p>
+                    Before
+                  </p>
+                </th>
+<th>
+                  <p>
+                    After
+                  </p>
+                </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                  <p>
+                    <em class="replaceable"><code>q</code></em><code class="computeroutput"><span class="special">.</span><span class="identifier">where</span><span class="special">(</span></code><em class="replaceable"><code>c1</code></em><code class="computeroutput"><span class="special">).</span><span class="identifier">union_</span><span class="special">(</span></code><em class="replaceable"><code>q</code></em><code class="computeroutput"><span class="special">.</span><span class="identifier">where</span><span class="special">(</span></code><em class="replaceable"><code>c2</code></em><code class="computeroutput"><span class="special">))</span></code>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <em class="replaceable"><code>q</code></em><code class="computeroutput"><span class="special">.</span><span class="identifier">where</span><span class="special">(</span></code><em class="replaceable"><code>c1</code></em>
+                    <code class="computeroutput"><span class="special">||</span></code> <em class="replaceable"><code>c2</code></em><code class="computeroutput"><span class="special">)</span></code>
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    <em class="replaceable"><code>q</code></em><code class="computeroutput"><span class="special">.</span><span class="identifier">where</span><span class="special">(</span></code><em class="replaceable"><code>c1</code></em><code class="computeroutput"><span class="special">).</span><span class="identifier">intersect</span><span class="special">(</span></code><em class="replaceable"><code>q</code></em><code class="computeroutput"><span class="special">.</span><span class="identifier">where</span><span class="special">(</span></code><em class="replaceable"><code>c2</code></em><code class="computeroutput"><span class="special">))</span></code>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <em class="replaceable"><code>q</code></em><code class="computeroutput"><span class="special">.</span><span class="identifier">where</span><span class="special">(</span></code><em class="replaceable"><code>c1</code></em>
+                    <code class="computeroutput"><span class="special">&amp;&amp;</span></code> <em class="replaceable"><code>c2</code></em><code class="computeroutput"><span class="special">)</span></code>
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    <em class="replaceable"><code>q</code></em><code class="computeroutput"><span class="special">.</span><span class="identifier">where</span><span class="special">(</span></code><em class="replaceable"><code>c1</code></em><code class="computeroutput"><span class="special">).</span><span class="identifier">except</span><span class="special">(</span></code><em class="replaceable"><code>q</code></em><code class="computeroutput"><span class="special">.</span><span class="identifier">where</span><span class="special">(</span></code><em class="replaceable"><code>c2</code></em><code class="computeroutput"><span class="special">))</span></code>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <em class="replaceable"><code>q</code></em><code class="computeroutput"><span class="special">.</span><span class="identifier">where</span><span class="special">(</span></code><em class="replaceable"><code>c1</code></em>
+                    <code class="computeroutput"><span class="special">&amp;&amp;</span> <span class="special">!</span></code><em class="replaceable"><code>c2</code></em><code class="computeroutput"><span class="special">)</span></code>
+                  </p>
+                </td>
+</tr>
+</tbody>
+</table></div>
+<h4>
+<a name="queries.set_theoretic_operations.h1"></a>
+          <span class="phrase"><a name="queries.set_theoretic_operations.taking_advantage_of_the_optimiza"></a></span><a class="link" href="set_theoretic_operations.html#queries.set_theoretic_operations.taking_advantage_of_the_optimiza">Taking
+          advantage of the optimizations</a>
+        </h4>
+<p>
+          Suppose you want to filter a query <em class="replaceable"><code>q</code></em> by some
+          complex condition. Suppose that various parts of the condition depend on
+          domain knowledge that belongs to disparate parts of your application. Then
+          the obvious solution is to let the disparate application modules build
+          their own <code class="computeroutput"><span class="identifier">predicate</span></code>s, which
+          you then combine with logic operators in some way, to make one big predicate
+          that you pass to <em class="replaceable"><code>q</code></em><code class="computeroutput"><span class="special">.</span><span class="identifier">where</span><span class="special">(</span></code>...<code class="computeroutput"><span class="special">)</span></code>.
+        </p>
+<p>
+          The trouble with that approach is that it's prone to <a class="link" href="../expressions/visibility.html" title="Visibility">visibility</a>
+          errors. The code that builds the partial predicates is sited far from the
+          context (<em class="replaceable"><code>q</code></em><code class="computeroutput"><span class="special">.</span><span class="identifier">where</span><span class="special">(</span></code>...<code class="computeroutput"><span class="special">)</span></code>) that makes mappers visible, so it's hard
+          to check that those predicates are using the mappers they're supposed to
+          be using.
+        </p>
+<p>
+          Set-theoretic operations provide an alternative. Instead of disparate modules
+          building their own <code class="computeroutput"><span class="identifier">predicate</span></code>s,
+          let them build their own <code class="computeroutput"><span class="identifier">query</span></code>s,
+          of the form <em class="replaceable"><code>q</code></em><code class="computeroutput"><span class="special">.</span><span class="identifier">where</span><span class="special">(</span></code>...<code class="computeroutput"><span class="special">)</span></code>. So, when these modules are being written,
+          the visibility-making context is right there on the spot. Then you can
+          collect those specialized queries and combine them into one big <code class="computeroutput"><span class="identifier">query</span></code>, using the set-theoretic operations.
+        </p>
+<p>
+          Of course you could do that without the optimizations, but the performance
+          impact might make you think twice about it. With the optimizations, there
+          is no need to hesitate.
+        </p>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2014 Michael Shepanski<p>
+        Distributed under the Boost Software License, Version 1.0
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="join/self_joins.html"><img src="../images/prev.png" alt="Prev"></a><a accesskey="u" href="../queries.html"><img src="../images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../images/home.png" alt="Home"></a><a accesskey="n" href="skip_and_limit.html"><img src="../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

@@ -1,0 +1,118 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Opening the Tables</title>
+<link rel="stylesheet" href="../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../index.html" title="QUINCE: QUeries IN C++ Expressions">
+<link rel="up" href="../getting_started.html" title="Chapter&#160;3.&#160;Getting Started">
+<link rel="prev" href="creating_the_table_objects.html" title="Creating the Table Objects">
+<link rel="next" href="clearing_the_tables.html" title="Clearing the Tables">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<div class="spirit-nav">
+<a accesskey="p" href="creating_the_table_objects.html"><img src="../images/prev.png" alt="Prev"></a><a accesskey="u" href="../getting_started.html"><img src="../images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../images/home.png" alt="Home"></a><a accesskey="n" href="clearing_the_tables.html"><img src="../images/next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="getting_started.opening_the_tables"></a><a class="link" href="opening_the_tables.html" title="Opening the Tables">Opening the Tables</a>
+</h2></div></div></div>
+<pre class="programlisting"><span class="keyword">void</span> <span class="identifier">test</span><span class="special">()</span>
+<span class="special">{</span>
+    <span class="identifier">screens</span><span class="special">.</span><span class="identifier">specify_foreign</span><span class="special">(</span><span class="identifier">screens</span><span class="special">-&gt;</span><span class="identifier">cinema_id</span><span class="special">,</span> <span class="identifier">cinemas</span><span class="special">);</span>
+    <span class="identifier">screens</span><span class="special">.</span><span class="identifier">specify_foreign</span><span class="special">(</span><span class="identifier">screens</span><span class="special">-&gt;</span><span class="identifier">current_movie_id</span><span class="special">,</span> <span class="identifier">movies</span><span class="special">);</span>
+
+    <span class="identifier">movies</span><span class="special">.</span><span class="identifier">open</span><span class="special">();</span>
+    <span class="identifier">cinemas</span><span class="special">.</span><span class="identifier">open</span><span class="special">();</span>
+    <span class="identifier">screens</span><span class="special">.</span><span class="identifier">open</span><span class="special">();</span>
+</pre>
+<h4>
+<a name="getting_started.opening_the_tables.h0"></a>
+          <span class="phrase"><a name="getting_started.opening_the_tables.remarks"></a></span><a class="link" href="opening_the_tables.html#getting_started.opening_the_tables.remarks">Remarks</a>
+        </h4>
+<p>
+          Let's start with the <code class="computeroutput"><span class="identifier">open</span><span class="special">()</span></code> calls, and remember that, for each table,
+          quince has already built a value mapper, which tells it how the table's
+          value type should be represented, all the way down to columns. Using that
+          information, each <code class="computeroutput"><span class="identifier">open</span><span class="special">()</span></code> call does one of two things:
+        </p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+              If the SQL table does not already exist, <code class="computeroutput"><span class="identifier">open</span><span class="special">()</span></code> creates it, with the columns that
+              it should have.
+            </li>
+<li class="listitem">
+              If the SQL table already exists, then <code class="computeroutput"><span class="identifier">open</span><span class="special">()</span></code> checks that its columns match those
+              that it should have, and throws if they don't.
+            </li>
+</ul></div>
+<p>
+          So the first run of the program will create the SQL tables, and subsequent
+          runs will check that they're still in good shape.
+        </p>
+<p>
+          The last thing <code class="computeroutput"><span class="identifier">open</span><span class="special">()</span></code>
+          does (assuming it hasn't thrown) is to mark the table object as being in
+          the open state. That is a precondition for all subsequent quince operations
+          that modify or inspect the table's data, i.e. anything that assumes the
+          columns are what they should be.
+        </p>
+<p>
+          Now let's move up the page to the <code class="computeroutput"><span class="identifier">specify_foreign</span><span class="special">()</span></code> calls. These give quince instructions
+          in advance. E.g. the first one says: <span class="quote">&#8220;<span class="quote">If, in a forthcoming invocation
+          of <code class="computeroutput"><span class="identifier">screens</span><span class="special">.</span><span class="identifier">open</span><span class="special">()</span></code>,
+          you find yourself creating the SQL table, then please create it with a
+          foreign key constraint that ties its <code class="computeroutput"><span class="identifier">cinema_id</span></code>
+          to the primary keys in the <code class="computeroutput"><span class="identifier">cinemas</span></code>
+          table.</span>&#8221;</span> Consequently, in the first run of our program, <code class="computeroutput"><span class="identifier">screens</span><span class="special">.</span><span class="identifier">open</span><span class="special">()</span></code>
+          will create foreign key constraints as it creates the table.
+        </p>
+<p>
+          (That is the simplest form of <code class="computeroutput"><span class="identifier">specify_foreign</span><span class="special">()</span></code>, for the common case where the foreign
+          key is tied to some table's primary key. There are variations to cover
+          other cases.)
+        </p>
+<p>
+          Perhaps the most valuable thing to notice about the two <code class="computeroutput"><span class="identifier">specify_foreign</span></code>
+          lines is their use of <code class="computeroutput"><span class="keyword">operator</span><span class="special">-&gt;()</span></code>, with a table on the left-hand side.
+          It returns a pointer to the table's value mapper. In the case of <code class="computeroutput"><span class="identifier">screens</span><span class="special">-&gt;</span></code><em class="replaceable"><code>...</code></em>,
+          that's the mapper that knows how to map a <code class="computeroutput"><span class="identifier">screen</span></code>
+          when it occurs in the <code class="computeroutput"><span class="identifier">screens</span></code>
+          table.
+        </p>
+<p>
+          What, then, is <code class="computeroutput"><span class="identifier">screens</span><span class="special">-&gt;</span><span class="identifier">cinema_id</span></code>?
+          Obviously it's a member of the mapper just described. Now remembering our
+          mantra that <span class="emphasis"><em>the members of the mapper are the mappers of the
+          members</em></span>, it follows that <code class="computeroutput"><span class="identifier">screens</span><span class="special">-&gt;</span><span class="identifier">cinema_id</span></code>
+          is the mapper that tells quince how to map <code class="computeroutput"><span class="identifier">screen</span><span class="special">::</span><span class="identifier">cinema_id</span></code>,
+          when it occurs in the <code class="computeroutput"><span class="identifier">screens</span></code>
+          table; and likewise <code class="computeroutput"><span class="identifier">screens</span><span class="special">-&gt;</span><span class="identifier">current_movie_id</span></code>
+          is the mapper that tells quince how to map <code class="computeroutput"><span class="identifier">screen</span><span class="special">::</span><span class="identifier">current_movie_id</span></code>
+          when it occurs in the <code class="computeroutput"><span class="identifier">screens</span></code>
+          table.
+        </p>
+<p>
+          But wait: why are we talking about mappers? In the context of <code class="computeroutput"><span class="identifier">specify_foreign</span><span class="special">()</span></code>,
+          no data is being converted from C++ types to columns or <span class="emphasis"><em>vice
+          versa</em></span>. What's the mapping angle?
+        </p>
+<p>
+          The truth is that mappers are the all-purpose go-to object whenever we
+          want to talk to quince about metadata. Mappers are to quince what column
+          names are to SQL. This is something we shall see over and over.
+        </p>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2014 Michael Shepanski<p>
+        Distributed under the Boost Software License, Version 1.0
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="creating_the_table_objects.html"><img src="../images/prev.png" alt="Prev"></a><a accesskey="u" href="../getting_started.html"><img src="../images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../images/home.png" alt="Home"></a><a accesskey="n" href="clearing_the_tables.html"><img src="../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

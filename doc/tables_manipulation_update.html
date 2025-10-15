@@ -1,0 +1,148 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>update()</title>
+<link rel="stylesheet" href="../../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../../index.html" title="QUINCE: QUeries IN C++ Expressions">
+<link rel="up" href="../manipulation.html" title="Data Manipulation">
+<link rel="prev" href="../manipulation.html" title="Data Manipulation">
+<link rel="next" href="remove.html" title="remove()">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<div class="spirit-nav">
+<a accesskey="p" href="../manipulation.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../manipulation.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="remove.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="tables.manipulation.update"></a><a class="link" href="update.html" title="update()"><code class="computeroutput"><span class="identifier">update</span><span class="special">()</span></code></a>
+</h3></div></div></div>
+<h5>
+<a name="tables.manipulation.update.h0"></a>
+            <span class="phrase"><a name="tables.manipulation.update.all_of_the_records"></a></span><a class="link" href="update.html#tables.manipulation.update.all_of_the_records">All
+            of the records ...</a>
+          </h5>
+<p>
+            The <code class="computeroutput"><span class="identifier">update</span><span class="special">()</span></code>
+            method wraps SQL's <code class="literal">UPDATE</code>. In its simplest form, it
+            updates some part of every record in a table, e.g.:
+          </p>
+<pre class="programlisting"><span class="identifier">points</span><span class="special">.</span><span class="identifier">update</span><span class="special">(</span><span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">y</span><span class="special">,</span> <span class="number">9.4f</span><span class="special">);</span>
+</pre>
+<p>
+            sets all the <code class="computeroutput"><span class="identifier">y</span></code>s in <code class="computeroutput"><span class="identifier">points</span></code> to 9.4f,
+          </p>
+<pre class="programlisting"><span class="identifier">points</span><span class="special">.</span><span class="identifier">update</span><span class="special">(</span><span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">y</span><span class="special">,</span> <span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">x</span><span class="special">);</span>
+</pre>
+<p>
+            copies the entire <code class="computeroutput"><span class="identifier">x</span></code> column
+            into the <code class="computeroutput"><span class="identifier">y</span></code> column, and:
+          </p>
+<pre class="programlisting"><span class="identifier">points</span><span class="special">.</span><span class="identifier">update</span><span class="special">(</span><span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">y</span><span class="special">,</span> <span class="special">(</span><span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">x</span> <span class="special">+</span> <span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">y</span><span class="special">)</span> <span class="special">*</span> <span class="number">3.0f</span><span class="special">);</span>
+</pre>
+<p>
+            sets each <code class="computeroutput"><span class="identifier">y</span></code> to the result
+            of a server-side computation involving its previous value and the <code class="computeroutput"><span class="identifier">x</span></code> value from the same record.
+          </p>
+<p>
+            For any <code class="computeroutput"><span class="identifier">table</span></code> <em class="replaceable"><code>t</code></em>,
+            the call <em class="replaceable"><code>t</code></em><code class="computeroutput"><span class="special">.</span><span class="identifier">update</span><span class="special">(</span></code><em class="replaceable"><code>m</code></em>,
+            <em class="replaceable"><code>exprn</code></em><code class="computeroutput"><span class="special">)</span></code>
+            is allowed when:
+          </p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+                <em class="replaceable"><code>m</code></em> is a mapper of some mapped type <em class="replaceable"><code>T</code></em>
+                (possibly multi-column), and
+              </li>
+<li class="listitem">
+                <em class="replaceable"><code>exprn</code></em>'s type is either <em class="replaceable"><code>T</code></em>
+                or <code class="computeroutput"><span class="identifier">abstract_mapper</span><span class="special">&lt;</span></code><em class="replaceable"><code>T</code></em><code class="computeroutput"><span class="special">&gt;</span></code>.
+              </li>
+</ul></div>
+<p>
+            <em class="replaceable"><code>t</code></em>'s value mapper will be <a class="link" href="../../expressions/visibility.html" title="Visibility">visible</a>
+            to <em class="replaceable"><code>exprn</code></em>.
+          </p>
+<p>
+            <code class="computeroutput"><span class="identifier">serial_table</span></code> also has
+            an <code class="computeroutput"><span class="identifier">update</span><span class="special">()</span></code>
+            method, which differs in just one respect: it never updates the primary
+            key. If the set of columns that you ask it to update includes the primary
+            key, that is not an error, but <code class="computeroutput"><span class="identifier">serial_table</span><span class="special">::</span><span class="identifier">update</span><span class="special">()</span></code> will ignore the primary key as it updates
+            the other columns.
+          </p>
+<h5>
+<a name="tables.manipulation.update.h1"></a>
+            <span class="phrase"><a name="tables.manipulation.update.or_some_of_the_records"></a></span><a class="link" href="update.html#tables.manipulation.update.or_some_of_the_records">... or some
+            of the records</a>
+          </h5>
+<p>
+            To update only some of the records in the table, we can add a call to
+            <code class="computeroutput"><span class="identifier">where</span><span class="special">()</span></code>
+            before <code class="computeroutput"><span class="identifier">update</span><span class="special">()</span></code>.
+            E.g., to set <code class="computeroutput"><span class="identifier">y</span></code> to 9.4f
+            in the <code class="computeroutput"><span class="identifier">point</span></code>s whose
+            <code class="computeroutput"><span class="identifier">x</span></code> is greater than 5:
+          </p>
+<pre class="programlisting"><span class="identifier">points</span><span class="special">.</span><span class="identifier">where</span><span class="special">(</span><span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">x</span> <span class="special">&gt;</span> <span class="number">5.0f</span><span class="special">).</span><span class="identifier">update</span><span class="special">(</span><span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">y</span><span class="special">,</span> <span class="number">9.4f</span><span class="special">);</span>
+</pre>
+<p>
+            Here is a single-cell update (remembering that <code class="computeroutput"><span class="identifier">x</span></code>
+            is <code class="computeroutput"><span class="identifier">points</span></code>'s primary key):
+          </p>
+<pre class="programlisting"><span class="identifier">points</span><span class="special">.</span><span class="identifier">where</span><span class="special">(</span><span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">x</span> <span class="special">==</span> <span class="number">5.0f</span><span class="special">).</span><span class="identifier">update</span><span class="special">(</span><span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">y</span><span class="special">,</span> <span class="number">9.4f</span><span class="special">);</span>
+</pre>
+<p>
+            And a single-record update:
+          </p>
+<pre class="programlisting"><span class="identifier">points</span><span class="special">.</span><span class="identifier">where</span><span class="special">(</span><span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">x</span> <span class="special">==</span> <span class="number">5.0f</span><span class="special">).</span><span class="identifier">update</span><span class="special">(*</span><span class="identifier">points</span><span class="special">,</span> <span class="identifier">point</span><span class="special">{</span><span class="number">4.2f</span><span class="special">,</span> <span class="number">3.5f</span><span class="special">});</span>
+</pre>
+<p>
+            Or we can pick records to update by means other than <code class="computeroutput"><span class="identifier">where</span><span class="special">()</span></code>. E.g. this:
+          </p>
+<pre class="programlisting"><span class="identifier">points</span><span class="special">.</span><span class="identifier">order</span><span class="special">(</span><span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">x</span><span class="special">).</span><span class="identifier">limit</span><span class="special">(</span><span class="number">3</span><span class="special">).</span><span class="identifier">update</span><span class="special">(</span><span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">y</span><span class="special">,</span> <span class="number">9.4f</span><span class="special">);</span>
+</pre>
+<p>
+            sets <code class="computeroutput"><span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">y</span></code> to 9.4f in the rows with the three
+            lowest <code class="computeroutput"><span class="identifier">x</span></code> values; and
+            this:
+          </p>
+<pre class="programlisting"><span class="identifier">screens</span>
+<span class="special">.</span><span class="identifier">jump</span><span class="special">(</span><span class="identifier">movies</span><span class="special">,</span> <span class="identifier">screens</span><span class="special">-&gt;</span><span class="identifier">current_movie_id</span> <span class="special">==</span> <span class="identifier">movies</span><span class="special">-&gt;</span><span class="identifier">id</span><span class="special">)</span>
+<span class="special">.</span><span class="identifier">update</span><span class="special">(</span><span class="identifier">movies</span><span class="special">-&gt;</span><span class="identifier">title</span><span class="special">,</span> <span class="identifier">movies</span><span class="special">-&gt;</span><span class="identifier">title</span> <span class="special">+</span> <span class="string">"*"</span><span class="special">);</span>
+</pre>
+<p>
+            adds an asterisk to the title of each movie that is currently being screened.
+          </p>
+<p>
+            You can't call <code class="computeroutput"><span class="identifier">update</span><span class="special">()</span></code> on absolutely <span class="emphasis"><em>any</em></span>
+            query, however. The rule is that the query's value mapper must be identical
+            to, or a copy of, some table's value mapper. That lets quince know which
+            table to update (the one whose value mapper matches the query's), and
+            also which records to update (the ones whose current values are equal
+            to one or more of the values that the query would produce <a href="#ftn.tables.manipulation.update.f0" class="footnote" name="tables.manipulation.update.f0"><sup class="footnote">[13]</sup></a> ).
+          </p>
+<div class="footnotes">
+<br><hr style="width:100; text-align:left;margin-left: 0">
+<div id="ftn.tables.manipulation.update.f0" class="footnote"><p><a href="#tables.manipulation.update.f0" class="para"><sup class="para">[13] </sup></a>
+              That is not to say that the generated SQL actually compares whole values
+              for equality. Where possible it's a simple <code class="literal">UPDATE</code>
+              ... <code class="literal">WHERE</code>, and in other cases it compares primary
+              keys. But these are optimizations; they don't affect the result.
+            </p></div>
+</div>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2014 Michael Shepanski<p>
+        Distributed under the Boost Software License, Version 1.0
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="../manipulation.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../manipulation.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="remove.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

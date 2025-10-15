@@ -1,0 +1,135 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Rise of the Monster Query</title>
+<link rel="stylesheet" href="../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../index.html" title="QUINCE: QUeries IN C++ Expressions">
+<link rel="up" href="../queries_in_c_expressions.html" title="Chapter&#160;1.&#160;Queries in C++ Expressions">
+<link rel="prev" href="what_does_it_look_like/or_these.html" title="... or these">
+<link rel="next" href="the_quincessential_dot_points.html" title="The Quincessential Dot Points">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<div class="spirit-nav">
+<a accesskey="p" href="what_does_it_look_like/or_these.html"><img src="../images/prev.png" alt="Prev"></a><a accesskey="u" href="../queries_in_c_expressions.html"><img src="../images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../images/home.png" alt="Home"></a><a accesskey="n" href="the_quincessential_dot_points.html"><img src="../images/next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="queries_in_c_expressions.rise_of_the_monster_query"></a><a class="link" href="rise_of_the_monster_query.html" title="Rise of the Monster Query">Rise
+        of the Monster Query</a>
+</h2></div></div></div>
+<p>
+          Now we are handed a new task: find the <code class="computeroutput"><span class="identifier">n</span></code>
+          most critically acclaimed of the local movies. We assume the following
+          declarations/definitions:
+        </p>
+<pre class="programlisting"><span class="keyword">struct</span> <span class="identifier">critic</span> <span class="special">{</span>
+    <span class="identifier">std</span><span class="special">::</span><span class="identifier">string</span> <span class="identifier">name</span><span class="special">;</span>
+    <span class="identifier">serial</span> <span class="identifier">favorite_movie</span><span class="special">;</span>     <span class="comment">// foreign key to movies table</span>
+<span class="special">};</span>
+
+<span class="keyword">extern</span> <span class="identifier">table</span><span class="special">&lt;</span><span class="identifier">critic</span><span class="special">&gt;</span> <span class="identifier">critics</span><span class="special">;</span>
+
+<span class="keyword">extern</span> <span class="keyword">const</span> <span class="keyword">int</span> <span class="identifier">n</span><span class="special">;</span>
+</pre>
+<p>
+          <a name="scalar_example"></a>First we define a C++ function to build the
+          scoring part of our query: <a name="score"></a>
+        </p>
+<pre class="programlisting"><span class="comment">// Build a server-side expression that counts the critics who like a given movie:</span>
+<span class="comment">//</span>
+<span class="identifier">exprn_mapper</span><span class="special">&lt;</span><span class="identifier">int64_t</span><span class="special">&gt;</span>
+<span class="identifier">score</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">exprn_mapper</span><span class="special">&lt;</span><span class="identifier">serial</span><span class="special">&gt;</span> <span class="special">&amp;</span><span class="identifier">movie_id</span><span class="special">)</span> <span class="special">{</span>
+    <span class="keyword">return</span> <span class="identifier">scalar</span><span class="special">(</span>
+        <span class="identifier">critics</span>
+        <span class="special">.</span><span class="identifier">where</span><span class="special">(</span><span class="identifier">critics</span><span class="special">-&gt;</span><span class="identifier">favorite_movie</span> <span class="special">==</span> <span class="identifier">movie_id</span><span class="special">)</span>
+        <span class="special">.</span><span class="identifier">select</span><span class="special">(</span><span class="identifier">count_all</span><span class="special">)</span>
+    <span class="special">);</span>
+<span class="special">}</span>
+</pre>
+<p>
+          Then we can define our query: <a name="local_hits"></a>
+        </p>
+<pre class="programlisting"><span class="keyword">const</span> <span class="identifier">query</span><span class="special">&lt;</span><span class="identifier">movie</span><span class="special">&gt;</span> <span class="identifier">local_hits</span> <span class="special">=</span>
+    <span class="identifier">local_movies</span>
+    <span class="special">.</span><span class="identifier">distinct</span><span class="special">()</span>
+    <span class="special">.</span><span class="identifier">order</span><span class="special">(-</span> <span class="identifier">score</span><span class="special">(</span><span class="identifier">local_movies</span><span class="special">-&gt;</span><span class="identifier">id</span><span class="special">))</span>
+    <span class="special">.</span><span class="identifier">limit</span><span class="special">(</span><span class="identifier">n</span><span class="special">);</span>
+</pre>
+<p>
+          Problem solved, but now the boss wants something else: generate the titles
+          of these local hits, ordered alphabetically, case-insensitive. Okay: <a name="local_hit_titles"></a>
+        </p>
+<pre class="programlisting"><span class="keyword">const</span> <span class="identifier">query</span><span class="special">&lt;</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">string</span><span class="special">&gt;</span> <span class="identifier">alphabetized_local_hit_titles</span> <span class="special">=</span>
+    <span class="identifier">local_hits</span>
+    <span class="special">.</span><span class="identifier">order</span><span class="special">(</span><span class="identifier">upper</span><span class="special">(</span><span class="identifier">local_hits</span><span class="special">-&gt;</span><span class="identifier">title</span><span class="special">))</span>
+    <span class="special">.</span><span class="identifier">select</span><span class="special">(</span><span class="identifier">local_hits</span><span class="special">-&gt;</span><span class="identifier">title</span><span class="special">);</span>
+</pre>
+<p>
+          The SQL that quince generates for <code class="computeroutput"><span class="identifier">local_hits</span></code>
+          (assuming that we execute it) is more complex than the SQL it generates
+          for <code class="computeroutput"><span class="identifier">local_movies</span></code>; and the
+          SQL for <code class="computeroutput"><span class="identifier">alphabetized_local_hit_titles</span></code>
+          is more complex again. But the C++ code that we are writing, reading and
+          (if this were a real application) maintaining is <span class="emphasis"><em>not</em></span>
+          getting more complex. It's just one little step after another. When we
+          use a query A in the definition of a larger query B, we don't look back
+          at how A was defined; we treat it as though it were a simple table. Then
+          we do the same with B to define C, and then D, and so on. We kind of know
+          that somewhere in a dungeon there is an SQL statement with a thick fur
+          of nested parentheses, and column aliases seeping from its every pore,
+          but that is not something we humans have to confront <a href="#ftn.queries_in_c_expressions.rise_of_the_monster_query.f0" class="footnote" name="queries_in_c_expressions.rise_of_the_monster_query.f0"><sup class="footnote">[1]</sup></a> . As the SQL complexity grows, our cognitive load stays constant.
+          We could keep this up all day.
+        </p>
+<p>
+          Is it wise to build monster queries? Often no, but sometimes yes. If a
+          single monster query replaces a C++ algorithm that issues many small queries,
+          then the monster query might perform better, for several reasons. It might
+          shift load from an application host to a DBMS host, which can be a win,
+          depending on the circumstances; it probably reduces traffic between the
+          application and the DBMS, and it may be advantaged by query optimization
+          strategies within the DBMS.
+        </p>
+<p>
+          How far you go in the direction of monster queries is up to you, the application
+          designer. Quince has no opinion, but whatever you decide, quince allows
+          you to express your choice in manageable C++.
+        </p>
+<div class="footnotes">
+<br><hr style="width:100; text-align:left;margin-left: 0">
+<div id="ftn.queries_in_c_expressions.rise_of_the_monster_query.f0" class="footnote"><p><a href="#queries_in_c_expressions.rise_of_the_monster_query.f0" class="para"><sup class="para">[1] </sup></a>
+            We <span class="emphasis"><em>can</em></span> confront it though. Queries have a <code class="computeroutput"><span class="identifier">to_string</span><span class="special">()</span></code>
+            method, which returns the SQL text, including placeholders for any bound
+            data, in a <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">string</span></code>. E.g., assuming the most recent
+            definition of <code class="computeroutput"><span class="identifier">local_movies</span></code>,
+            and assuming that our tables reside on a PostgreSQL database, <code class="computeroutput"><span class="identifier">alphabetized_local_hit_titles</span><span class="special">.</span><span class="identifier">to_string</span><span class="special">()</span></code>
+            reveals the whole ugly truth: <br> <br> <code class="literal">SELECT r$10 FROM
+            (SELECT r$10 FROM (SELECT DISTINCT r$9, r$10 FROM (SELECT "movies"."id"
+            AS r$9, "movies"."title" AS r$10 FROM (SELECT "screens"."id"
+            AS r$14, "screens"."cinema_id" AS r$15, "screens"."current_movie_id"
+            AS r$16 FROM (SELECT "cinemas"."id" AS r$11, "cinemas"."location.x"
+            AS r$12, "cinemas"."location.y" AS r$13 FROM "test"."cinemas"
+            WHERE ((("cinemas"."location.x")-($1))*(("cinemas"."location.x")-($2)))+((("cinemas"."location.y")-($3))*(("cinemas"."location.y")-($4)))
+            &lt;= ($5)*($6)) AS q$1 INNER JOIN "test"."screens"
+            ON "screens"."cinema_id" = r$11) AS q$2 INNER JOIN
+            "test"."movies" ON "movies"."id"
+            = r$16) AS q$3) AS q$4 ORDER BY (SELECT "count"(*) AS r$20
+            FROM "test"."critics" WHERE "critics"."favorite_movie"
+            = r$9 LIMIT 1) DESC LIMIT 2) AS q$5 ORDER BY "upper"(r$10)
+            </code>
+          </p></div>
+</div>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2014 Michael Shepanski<p>
+        Distributed under the Boost Software License, Version 1.0
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="what_does_it_look_like/or_these.html"><img src="../images/prev.png" alt="Prev"></a><a accesskey="u" href="../queries_in_c_expressions.html"><img src="../images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../images/home.png" alt="Home"></a><a accesskey="n" href="the_quincessential_dot_points.html"><img src="../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

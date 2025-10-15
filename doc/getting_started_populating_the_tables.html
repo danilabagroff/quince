@@ -1,0 +1,98 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Populating the Tables</title>
+<link rel="stylesheet" href="../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../index.html" title="QUINCE: QUeries IN C++ Expressions">
+<link rel="up" href="../getting_started.html" title="Chapter&#160;3.&#160;Getting Started">
+<link rel="prev" href="clearing_the_tables.html" title="Clearing the Tables">
+<link rel="next" href="building_expressions_for_server_.html" title="Building Expressions for Server-Side Evaluation">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<div class="spirit-nav">
+<a accesskey="p" href="clearing_the_tables.html"><img src="../images/prev.png" alt="Prev"></a><a accesskey="u" href="../getting_started.html"><img src="../images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../images/home.png" alt="Home"></a><a accesskey="n" href="building_expressions_for_server_.html"><img src="../images/next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="getting_started.populating_the_tables"></a><a class="link" href="populating_the_tables.html" title="Populating the Tables">Populating the
+        Tables</a>
+</h2></div></div></div>
+<pre class="programlisting">
+    <span class="keyword">const</span> <span class="identifier">serial</span> <span class="identifier">fried_green_quinces_id</span>         <span class="special">=</span> <span class="identifier">movies</span><span class="special">.</span><span class="identifier">insert</span><span class="special">({</span><span class="identifier">serial</span><span class="special">(),</span> <span class="string">"Fried Green Quinces"</span><span class="special">});</span>
+    <span class="keyword">const</span> <span class="identifier">serial</span> <span class="identifier">a_clockwork_quince_id</span>          <span class="special">=</span> <span class="identifier">movies</span><span class="special">.</span><span class="identifier">insert</span><span class="special">({</span><span class="identifier">serial</span><span class="special">(),</span> <span class="string">"A Clockwork Quince"</span><span class="special">});</span>
+    <span class="keyword">const</span> <span class="identifier">serial</span> <span class="identifier">quince_of_tides_id</span>             <span class="special">=</span> <span class="identifier">movies</span><span class="special">.</span><span class="identifier">insert</span><span class="special">({</span><span class="identifier">serial</span><span class="special">(),</span> <span class="string">"Quince of Tides"</span><span class="special">});</span>
+    <span class="keyword">const</span> <span class="identifier">serial</span> <span class="identifier">bridge_on_the_river_quince_id</span>  <span class="special">=</span> <span class="identifier">movies</span><span class="special">.</span><span class="identifier">insert</span><span class="special">({</span><span class="identifier">serial</span><span class="special">(),</span> <span class="string">"Bridge on the River Quince"</span><span class="special">});</span>
+    <span class="keyword">const</span> <span class="identifier">serial</span> <span class="identifier">les_inquincibles_id</span>            <span class="special">=</span> <span class="identifier">movies</span><span class="special">.</span><span class="identifier">insert</span><span class="special">({</span><span class="identifier">serial</span><span class="special">(),</span> <span class="string">"Les Inquincibles"</span><span class="special">});</span>
+    <span class="keyword">const</span> <span class="identifier">serial</span> <span class="identifier">the_quince_and_the_dead_id</span>     <span class="special">=</span> <span class="identifier">movies</span><span class="special">.</span><span class="identifier">insert</span><span class="special">({</span><span class="identifier">serial</span><span class="special">(),</span> <span class="string">"The Quince and the Dead"</span><span class="special">});</span>
+    <span class="keyword">const</span> <span class="identifier">serial</span> <span class="identifier">conquincetador_id</span>              <span class="special">=</span> <span class="identifier">movies</span><span class="special">.</span><span class="identifier">insert</span><span class="special">({</span><span class="identifier">serial</span><span class="special">(),</span> <span class="string">"Conquincetador"</span><span class="special">});</span>
+    <span class="keyword">const</span> <span class="identifier">serial</span> <span class="identifier">queen_quince_id</span>                <span class="special">=</span> <span class="identifier">movies</span><span class="special">.</span><span class="identifier">insert</span><span class="special">({</span><span class="identifier">serial</span><span class="special">(),</span> <span class="string">"Queen Quince"</span><span class="special">});</span>
+    <span class="keyword">const</span> <span class="identifier">serial</span> <span class="identifier">frankfurt_quincidences_id</span>      <span class="special">=</span> <span class="identifier">movies</span><span class="special">.</span><span class="identifier">insert</span><span class="special">({</span><span class="identifier">serial</span><span class="special">(),</span> <span class="string">"Frankfurt Quincidences"</span><span class="special">});</span>
+
+    <span class="keyword">const</span> <span class="identifier">point</span> <span class="identifier">my_place</span><span class="special">{</span><span class="number">10.0f</span><span class="special">,</span> <span class="number">20.0f</span><span class="special">};</span>
+
+    <span class="keyword">const</span> <span class="identifier">serial</span> <span class="identifier">around_the_corner</span>  <span class="special">=</span> <span class="identifier">cinemas</span><span class="special">.</span><span class="identifier">insert</span><span class="special">({</span><span class="identifier">serial</span><span class="special">(),</span> <span class="special">{</span><span class="number">11.0f</span><span class="special">,</span> <span class="number">19.0f</span><span class="special">}});</span>
+    <span class="keyword">const</span> <span class="identifier">serial</span> <span class="identifier">down_the_street</span>    <span class="special">=</span> <span class="identifier">cinemas</span><span class="special">.</span><span class="identifier">insert</span><span class="special">({</span><span class="identifier">serial</span><span class="special">(),</span> <span class="special">{</span><span class="number">2.0f</span><span class="special">,</span> <span class="number">19.0f</span><span class="special">}});</span>
+    <span class="keyword">const</span> <span class="identifier">serial</span> <span class="identifier">out_of_town</span>        <span class="special">=</span> <span class="identifier">cinemas</span><span class="special">.</span><span class="identifier">insert</span><span class="special">({</span><span class="identifier">serial</span><span class="special">(),</span> <span class="special">{</span><span class="number">2.0f</span><span class="special">,</span> <span class="number">1000.0f</span> <span class="special">}});</span>
+
+    <span class="identifier">screens</span><span class="special">.</span><span class="identifier">insert</span><span class="special">({</span><span class="identifier">serial</span><span class="special">(),</span> <span class="identifier">around_the_corner</span><span class="special">,</span> <span class="identifier">les_inquincibles_id</span><span class="special">});</span>
+    <span class="identifier">screens</span><span class="special">.</span><span class="identifier">insert</span><span class="special">({</span><span class="identifier">serial</span><span class="special">(),</span> <span class="identifier">around_the_corner</span><span class="special">,</span> <span class="identifier">quince_of_tides_id</span><span class="special">});</span>
+    <span class="identifier">screens</span><span class="special">.</span><span class="identifier">insert</span><span class="special">({</span><span class="identifier">serial</span><span class="special">(),</span> <span class="identifier">around_the_corner</span><span class="special">,</span> <span class="identifier">quince_of_tides_id</span><span class="special">});</span>
+    <span class="identifier">screens</span><span class="special">.</span><span class="identifier">insert</span><span class="special">({</span><span class="identifier">serial</span><span class="special">(),</span> <span class="identifier">around_the_corner</span><span class="special">,</span> <span class="identifier">queen_quince_id</span><span class="special">});</span>
+    <span class="identifier">screens</span><span class="special">.</span><span class="identifier">insert</span><span class="special">({</span><span class="identifier">serial</span><span class="special">(),</span> <span class="identifier">around_the_corner</span><span class="special">,</span> <span class="identifier">a_clockwork_quince_id</span><span class="special">});</span>
+    <span class="identifier">screens</span><span class="special">.</span><span class="identifier">insert</span><span class="special">({</span><span class="identifier">serial</span><span class="special">(),</span> <span class="identifier">around_the_corner</span><span class="special">,</span> <span class="identifier">frankfurt_quincidences_id</span><span class="special">});</span>
+    <span class="identifier">screens</span><span class="special">.</span><span class="identifier">insert</span><span class="special">({</span><span class="identifier">serial</span><span class="special">(),</span> <span class="identifier">around_the_corner</span><span class="special">,</span> <span class="identifier">frankfurt_quincidences_id</span><span class="special">});</span>
+    <span class="identifier">screens</span><span class="special">.</span><span class="identifier">insert</span><span class="special">({</span><span class="identifier">serial</span><span class="special">(),</span> <span class="identifier">down_the_street</span><span class="special">,</span> <span class="identifier">les_inquincibles_id</span><span class="special">});</span>
+    <span class="identifier">screens</span><span class="special">.</span><span class="identifier">insert</span><span class="special">({</span><span class="identifier">serial</span><span class="special">(),</span> <span class="identifier">down_the_street</span><span class="special">,</span> <span class="identifier">les_inquincibles_id</span><span class="special">});</span>
+    <span class="identifier">screens</span><span class="special">.</span><span class="identifier">insert</span><span class="special">({</span><span class="identifier">serial</span><span class="special">(),</span> <span class="identifier">down_the_street</span><span class="special">,</span> <span class="identifier">conquincetador_id</span><span class="special">});</span>
+    <span class="identifier">screens</span><span class="special">.</span><span class="identifier">insert</span><span class="special">({</span><span class="identifier">serial</span><span class="special">(),</span> <span class="identifier">down_the_street</span><span class="special">,</span> <span class="identifier">quince_of_tides_id</span><span class="special">});</span>
+    <span class="identifier">screens</span><span class="special">.</span><span class="identifier">insert</span><span class="special">({</span><span class="identifier">serial</span><span class="special">(),</span> <span class="identifier">down_the_street</span><span class="special">,</span> <span class="identifier">bridge_on_the_river_quince_id</span><span class="special">});</span>
+    <span class="identifier">screens</span><span class="special">.</span><span class="identifier">insert</span><span class="special">({</span><span class="identifier">serial</span><span class="special">(),</span> <span class="identifier">out_of_town</span><span class="special">,</span> <span class="identifier">les_inquincibles_id</span><span class="special">});</span>
+    <span class="identifier">screens</span><span class="special">.</span><span class="identifier">insert</span><span class="special">({</span><span class="identifier">serial</span><span class="special">(),</span> <span class="identifier">out_of_town</span><span class="special">,</span> <span class="identifier">bridge_on_the_river_quince_id</span><span class="special">});</span>
+    <span class="identifier">screens</span><span class="special">.</span><span class="identifier">insert</span><span class="special">({</span><span class="identifier">serial</span><span class="special">(),</span> <span class="identifier">out_of_town</span><span class="special">,</span> <span class="identifier">fried_green_quinces_id</span><span class="special">});</span>
+    <span class="identifier">screens</span><span class="special">.</span><span class="identifier">insert</span><span class="special">({</span><span class="identifier">serial</span><span class="special">(),</span> <span class="identifier">out_of_town</span><span class="special">,</span> <span class="identifier">fried_green_quinces_id</span><span class="special">});</span>
+    <span class="identifier">screens</span><span class="special">.</span><span class="identifier">insert</span><span class="special">({</span><span class="identifier">serial</span><span class="special">(),</span> <span class="identifier">out_of_town</span><span class="special">,</span> <span class="identifier">the_quince_and_the_dead_id</span><span class="special">});</span>
+</pre>
+<h4>
+<a name="getting_started.populating_the_tables.h0"></a>
+          <span class="phrase"><a name="getting_started.populating_the_tables.remarks"></a></span><a class="link" href="populating_the_tables.html#getting_started.populating_the_tables.remarks">Remarks</a>
+        </h4>
+<p>
+          In each of these calls to <code class="computeroutput"><span class="identifier">insert</span><span class="special">()</span></code> we pass a record, i.e. a <code class="computeroutput"><span class="identifier">movie</span></code>, <code class="computeroutput"><span class="identifier">cinema</span></code>,
+          or <code class="computeroutput"><span class="identifier">screen</span></code>. (In case you
+          haven't seen it before, <code class="computeroutput"><span class="special">{</span></code>...<code class="computeroutput"><span class="special">}</span></code> is C++11 syntax for constructing an object
+          from a sequence of member values.) Then <code class="computeroutput"><span class="identifier">insert</span><span class="special">()</span></code> converts the record into columns, using
+          the table's value mapper, and executes the SQL command to insert it into
+          the table.
+        </p>
+<p>
+          Because these are <code class="computeroutput"><span class="identifier">serial_table</span></code>s,
+          the DBMS automatically assigns values to the key. So that's one part of
+          the record that we don't need to to set -- except that the <code class="computeroutput"><span class="special">{</span></code>...<code class="computeroutput"><span class="special">}</span></code>
+          syntax demands a value for every member, and so we give it a default-constructed
+          <code class="computeroutput"><span class="identifier">serial</span></code>. You could write
+          your own constructors for <code class="computeroutput"><span class="identifier">movie</span></code>
+          etc. and avoid that boilerplate.
+        </p>
+<p>
+          Each <code class="computeroutput"><span class="identifier">insert</span><span class="special">()</span></code>
+          call returns the newly generated key. (It also saves another copy, in its
+          proper place in the record you pass in, if you pass the record via non-const
+          ref; but we aren't doing that here.) In the first twelve cases we capture
+          the returned key in a local variable, which we use lower down the page.
+          In the other cases we don't need the returned key and we throw it away.
+        </p>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2014 Michael Shepanski<p>
+        Distributed under the Boost Software License, Version 1.0
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="clearing_the_tables.html"><img src="../images/prev.png" alt="Prev"></a><a accesskey="u" href="../getting_started.html"><img src="../images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../images/home.png" alt="Home"></a><a accesskey="n" href="building_expressions_for_server_.html"><img src="../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

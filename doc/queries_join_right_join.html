@@ -1,0 +1,107 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>right_join()</title>
+<link rel="stylesheet" href="../../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../../index.html" title="QUINCE: QUeries IN C++ Expressions">
+<link rel="up" href="../join.html" title="The join() Family of Functions">
+<link rel="prev" href="left_join.html" title="left_join()">
+<link rel="next" href="full_join_postgresql_only.html" title="full_join() (PostgreSQL only)">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<div class="spirit-nav">
+<a accesskey="p" href="left_join.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../join.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="full_join_postgresql_only.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="queries.join.right_join"></a><a class="link" href="right_join.html" title="right_join()"><code class="computeroutput"><span class="identifier">right_join</span><span class="special">()</span></code></a>
+</h3></div></div></div>
+<p>
+            The <code class="computeroutput"><span class="identifier">right_join</span><span class="special">()</span></code>
+            method is similar to <code class="computeroutput"><span class="identifier">inner_join</span><span class="special">()</span></code> except that its output includes every
+            output of the right-hand query at least once. On PostgreSQL it's a wrapper
+            for SQL's <code class="literal">RIGHT JOIN</code>. On sqlite it gets the same results
+            by wrapping <code class="literal">LEFT JOIN</code> and swapping things around.
+          </p>
+<p>
+            For any queries <em class="replaceable"><code>l</code></em>, <em class="replaceable"><code>r</code></em>,
+            you can call <em class="replaceable"><code>l</code></em><code class="computeroutput"><span class="special">.</span><span class="identifier">right_join</span><span class="special">(</span></code><em class="replaceable"><code>r</code></em><code class="computeroutput"><span class="special">,</span></code> <em class="replaceable"><code>condition</code></em><code class="computeroutput"><span class="special">)</span></code> provided that:
+          </p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+                <em class="replaceable"><code>condition</code></em> is an <code class="computeroutput"><span class="identifier">abstract_mapper</span><span class="special">&lt;</span><span class="keyword">bool</span><span class="special">&gt;</span></code> (in practice it will be a <code class="computeroutput"><span class="identifier">predicate</span></code>), and
+              </li>
+<li class="listitem">
+                <em class="replaceable"><code>l</code></em>'s value type cannot be represented as
+                all <code class="literal">NULL</code>s (which is unlikely to arise, but see
+                <a class="link" href="../../mapped_data_types/boost_optional.html#optionals_representation">here</a> for a discussion
+                of which types allow all <code class="literal">NULL</code>s).
+              </li>
+</ul></div>
+<p>
+            <em class="replaceable"><code>l</code></em> and <em class="replaceable"><code>r</code></em>'s value
+            mappers will both be <a class="link" href="../../expressions/visibility.html" title="Visibility">visible</a>
+            to <em class="replaceable"><code>condition</code></em>.
+          </p>
+<p>
+            <em class="replaceable"><code>l</code></em><code class="computeroutput"><span class="special">.</span><span class="identifier">right_join</span><span class="special">(</span></code><em class="replaceable"><code>r</code></em><code class="computeroutput"><span class="special">,</span></code> <em class="replaceable"><code>condition</code></em><code class="computeroutput"><span class="special">)</span></code> returns a <code class="computeroutput"><span class="identifier">conditional_junction</span></code>
+            with the following characteristics:
+          </p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+                Its value type is <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">tuple</span><span class="special">&lt;</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">optional</span><span class="special">&lt;</span></code><em class="replaceable"><code>Tl</code></em><code class="computeroutput"><span class="special">&gt;,</span></code> <em class="replaceable"><code>Tr</code></em><code class="computeroutput"><span class="special">&gt;</span></code>, where <em class="replaceable"><code>Tl</code></em>
+                and <em class="replaceable"><code>Tr</code></em> are <em class="replaceable"><code>l</code></em>
+                and <em class="replaceable"><code>r</code></em>'s value types respectively.
+              </li>
+<li class="listitem">
+                Its value mapper is a new <code class="computeroutput"><span class="identifier">tuple_mapper</span><span class="special">&lt;</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">optional</span><span class="special">&lt;</span></code><em class="replaceable"><code>Tl</code></em><code class="computeroutput"><span class="special">&gt;,</span></code> <em class="replaceable"><code>Tr</code></em><code class="computeroutput"><span class="special">&gt;</span></code>, in which:
+                <div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: circle; ">
+<li class="listitem">
+                      member mapper 0 is a new <code class="computeroutput"><span class="identifier">optional_mapper</span><span class="special">&lt;</span></code><em class="replaceable"><code>Tl</code></em><code class="computeroutput"><span class="special">&gt;</span></code> whose content mapper is
+                      identical to <em class="replaceable"><code>l</code></em>'s value mapper, and.
+                    </li>
+<li class="listitem">
+                      member mapper 1 is identical to <em class="replaceable"><code>r</code></em>'s
+                      value mapper.
+                    </li>
+</ul></div>
+              </li>
+<li class="listitem">
+                Its output consists of:
+                <div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: circle; ">
+<li class="listitem">
+                      <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">tuple</span></code>s formed from each combination
+                      of the outputs of <em class="replaceable"><code>l</code></em> and <em class="replaceable"><code>r</code></em>,
+                      for which <em class="replaceable"><code>condition</code></em> evaluates to
+                      <code class="computeroutput"><span class="keyword">true</span></code>, and
+                    </li>
+<li class="listitem">
+                      <code class="computeroutput"><span class="special">{</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">none</span><span class="special">,</span></code> <em class="replaceable"><code>ro</code></em><code class="computeroutput"><span class="special">}</span></code>, for each of <em class="replaceable"><code>r</code></em>'s
+                      outputs <em class="replaceable"><code>ro</code></em> that would not have made
+                      an appearance otherwise.
+                    </li>
+</ul></div>
+              </li>
+</ul></div>
+<h6>
+<a name="queries.join.right_join.h0"></a>
+            <span class="phrase"><a name="queries.join.right_join.example"></a></span><a class="link" href="right_join.html#queries.join.right_join.example">Example</a>
+          </h6>
+<pre class="programlisting"><span class="keyword">const</span> <span class="identifier">query</span><span class="special">&lt;</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">tuple</span><span class="special">&lt;</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">optional</span><span class="special">&lt;</span><span class="identifier">screen</span><span class="special">&gt;,</span> <span class="identifier">movie</span><span class="special">&gt;&gt;</span> <span class="identifier">no_movie_left_behind</span> <span class="special">=</span>
+    <span class="identifier">screens</span><span class="special">.</span><span class="identifier">right_join</span><span class="special">(</span><span class="identifier">movies</span><span class="special">,</span> <span class="identifier">screens</span><span class="special">-&gt;</span><span class="identifier">current_movie_id</span> <span class="special">==</span> <span class="identifier">movies</span><span class="special">-&gt;</span><span class="identifier">id</span><span class="special">);</span>
+</pre>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2014 Michael Shepanski<p>
+        Distributed under the Boost Software License, Version 1.0
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="left_join.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../join.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="full_join_postgresql_only.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

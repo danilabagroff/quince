@@ -1,0 +1,658 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Chapter&#160;4.&#160;Exceptions</title>
+<link rel="stylesheet" href="boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="index.html" title="QUINCE: QUeries IN C++ Expressions">
+<link rel="up" href="depth.html" title="Part&#160;II.&#160;The Quince API in Depth">
+<link rel="prev" href="depth.html" title="Part&#160;II.&#160;The Quince API in Depth">
+<link rel="next" href="mapped_data_types.html" title="Chapter&#160;5.&#160;Mapped Data Types">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<div class="spirit-nav">
+<a accesskey="p" href="depth.html"><img src="images/prev.png" alt="Prev"></a><a accesskey="u" href="depth.html"><img src="images/up.png" alt="Up"></a><a accesskey="h" href="index.html"><img src="images/home.png" alt="Home"></a><a accesskey="n" href="mapped_data_types.html"><img src="images/next.png" alt="Next"></a>
+</div>
+<div class="chapter">
+<div class="titlepage"><div><div><h2 class="title">
+<a name="exceptions"></a>Chapter&#160;4.&#160;Exceptions</h2></div></div></div>
+<p>
+        
+      </p>
+<p>
+        C++ exceptions are quince and the backends' universal response to run-time
+        errors. They are also the response to the following more normal conditions:
+      </p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+            deadlock
+          </li>
+<li class="listitem">
+            failure to connect to a database
+          </li>
+<li class="listitem">
+            lost connection to database
+          </li>
+</ul></div>
+<p>
+        Deadlock is discussed further <a class="link" href="transactions.html#deadlock">here</a>, and connection
+        issues <a class="link" href="connection_management.html#breakage">here</a>.
+      </p>
+<p>
+        Quince and the backends do not log. Instead they pass any diagnostic messages
+        through the exceptions they throw. These all derive from <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">exception</span></code>,
+        and override <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">exception</span><span class="special">::</span><span class="identifier">what</span><span class="special">()</span></code>
+        with a method that returns the message.
+      </p>
+<p>
+        Here is a list of all the classes of exception that quince and the backends
+        throw. They are all in namespace <code class="computeroutput"><span class="identifier">quince</span></code>,
+        and defined in <code class="computeroutput"><span class="special">&lt;</span><span class="identifier">quince</span><span class="special">/</span><span class="identifier">exceptions</span><span class="special">.</span><span class="identifier">h</span><span class="special">&gt;</span></code>.
+      </p>
+<div class="informaltable"><table class="table">
+<colgroup>
+<col>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                <p>
+                  Class
+                </p>
+              </th>
+<th>
+                <p>
+                  Base class
+                </p>
+              </th>
+<th>
+                <p>
+                  Cause
+                </p>
+              </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">exception</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">exception</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Any exceptional condition that quince detects (see subclasses)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">deadlock_exception</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">exception</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  A deadlock was detected. Not an error.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">failed_connection_exception</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">exception</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Could not establish communication with a DBMS
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">broken_connection_exception</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">exception</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  The connection to the DBMS was lost.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">definition_exception</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">exception</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Any error in the definition of a table (see subclasses)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">unmapped_member_exception</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">definition_exception</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Use of an unmapped class member where a mapped member was required.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">column_name_length_exception</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">definition_exception</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Generated column name would exceed a DBMS-imposed limit
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">formation_exception</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">exception</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Any error that prevents quince from forming a valid SQL statement
+                  (see subclasses)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">server_only_exception</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">formation_exception</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Illegal operation on an expression with no corresponding C++ type
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">multi_column_exception</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">formation_exception</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Illegal operation on a multi-column type
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">cross_database_query_exception</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">formation_exception</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Two databases referenced in one query
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">malformed_modification_exception</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">formation_exception</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Table modification based on a query that is not directly tied to
+                  a table
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">outside_table_exception</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">formation_exception</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Used a field from the wrong table
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">ambiguous_nulls_exception</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">formation_exception</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Type that allows all NULLs used in the part of a join that gives
+                  another interpretation to all NULLs
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">execution_attempt_exception</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">exception</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Any error that prevents quince from sending a well-formed SQL statement
+                  to the DBMS (see subclasses)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">unsupported_exception</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">execution_attempt_exception</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Operation attempted on a DBMS that does not support it
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">table_closed_exception</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">execution_attempt_exception</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Illegal operation on a table in the closed state
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">table_open_exception</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">execution_attempt_exception</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Illegal operation on a table in the open state
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">unsupported_exception</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">execution_attempt_exception</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Operation attempted on a DBMS that does not support it
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">non_current_txn_exception</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">execution_attempt_exception</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Use of a transaction that is not the current one
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">no_current_txn_exception</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">execution_attempt_exception</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Operation is illegal outside of a transaction
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">no_primary_key_exception</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">execution_attempt_exception</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Attempt to open a table with no primary key
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">execution_response_exception</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">exception</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Any unexpected response from the DBMS to quince's request to execute
+                  an SQL statement (see subclasses)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">no_row_exception</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">execution_response_exception</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  No output where output was expected
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">multi_row_exception</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">execution_response_exception</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Multi-row output where a sigle row was expected
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">missing_type_exception</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">execution_response_exception</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Column type information was missing from output
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">missing_column_exception</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">execution_response_exception</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Some data was missing from an output row
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">malformed_results_exception</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">execution_response_exception</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Output data was not in the expected format
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">retrieved_unrecognized_type_exception</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">execution_response_exception</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Output indicates a column type that quince does not recognize
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">retrieved_unexpected_type_exception</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">execution_response_exception</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Output data's type was not the expected type
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">retrieved_unexpected_size_exception</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">execution_response_exception</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Output data's size was not the expected size
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">table_mismatch_exception</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">execution_response_exception</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Tried to open a table that already exists on the server, but with
+                  metadata that doesn't match expectations
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">dbms_exception</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">execution_response_exception</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  The DBMS reported an error
+                </p>
+              </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2014 Michael Shepanski<p>
+        Distributed under the Boost Software License, Version 1.0
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="depth.html"><img src="images/prev.png" alt="Prev"></a><a accesskey="u" href="depth.html"><img src="images/up.png" alt="Up"></a><a accesskey="h" href="index.html"><img src="images/home.png" alt="Home"></a><a accesskey="n" href="mapped_data_types.html"><img src="images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

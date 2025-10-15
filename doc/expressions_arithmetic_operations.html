@@ -1,0 +1,86 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Arithmetic Operations</title>
+<link rel="stylesheet" href="../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../index.html" title="QUINCE: QUeries IN C++ Expressions">
+<link rel="up" href="../expressions.html" title="Chapter&#160;6.&#160;Expressions for Server-Side Execution">
+<link rel="prev" href="../expressions.html" title="Chapter&#160;6.&#160;Expressions for Server-Side Execution">
+<link rel="next" href="strcat.html" title="String Concatenation">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<div class="spirit-nav">
+<a accesskey="p" href="../expressions.html"><img src="../images/prev.png" alt="Prev"></a><a accesskey="u" href="../expressions.html"><img src="../images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../images/home.png" alt="Home"></a><a accesskey="n" href="strcat.html"><img src="../images/next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="expressions.arithmetic_operations"></a><a class="link" href="arithmetic_operations.html" title="Arithmetic Operations">Arithmetic Operations
+        </a>
+</h2></div></div></div>
+<p>
+          
+        </p>
+<p>
+          Quince defines overloads of the infix binary operators <code class="computeroutput"><span class="special">+</span></code>,
+          <code class="computeroutput"><span class="special">-</span></code>, <code class="computeroutput"><span class="special">*</span></code>
+          and <code class="computeroutput"><span class="special">/</span></code>, and of the prefix unary
+          operators <code class="computeroutput"><span class="special">+</span></code> and <code class="computeroutput"><span class="special">-</span></code>. All of these overloads build and return
+          <code class="computeroutput"><span class="identifier">exprn_mapper</span></code>s that represent
+          server-side arithmetic operations.
+        </p>
+<p>
+          The overloads of the infix operators apply when there is a mapped type
+          <em class="replaceable"><code>T</code></em>, such that one of the operands is an <code class="computeroutput"><span class="identifier">abstract_mapper</span><span class="special">&lt;</span></code><em class="replaceable"><code>T</code></em><code class="computeroutput"><span class="special">&gt;</span></code>, and the other operand is an <code class="computeroutput"><span class="identifier">abstract_mapper</span><span class="special">&lt;</span></code><em class="replaceable"><code>T</code></em><code class="computeroutput"><span class="special">&gt;</span></code> or a <em class="replaceable"><code>T</code></em>.
+        </p>
+<p>
+          The overloads of the prefix operators apply when there is a mapped type
+          <em class="replaceable"><code>T</code></em>, such that the operand is an <code class="computeroutput"><span class="identifier">abstract_mapper</span><span class="special">&lt;</span></code><em class="replaceable"><code>T</code></em><code class="computeroutput"><span class="special">&gt;</span></code>.
+        </p>
+<p>
+          In all cases, the result is an <code class="computeroutput"><span class="identifier">exprn_mapper</span><span class="special">&lt;</span></code><em class="replaceable"><code>T</code></em><code class="computeroutput"><span class="special">&gt;</span></code>, representing a server-side expression
+          that, when executed, evaluates the subexpression(s) represented by the
+          operand(s), and then applies the appropriate SQL operator (SQL's infix
+          <code class="literal">+</code>, <code class="literal">-</code>, <code class="literal">*</code> or <code class="literal">/</code>;
+          or prefix <code class="literal">+</code> or <code class="literal">-</code>) to the result(s).
+        </p>
+<p>
+          Notice that quince (quince 1.0, anyway) does not restrict the type <em class="replaceable"><code>T</code></em>.
+          It polices type <span class="emphasis"><em>consistency</em></span>, but as long as you are
+          consistent in your efforts to multiply one string by another string to
+          produce a third string, quince will pass your request through to the DBMS
+          and let it detect the error, which your application will see in the form
+          of a <code class="computeroutput"><span class="identifier">dbms_exception</span></code>.
+        </p>
+<p>
+          However:
+        </p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+              Sometimes you will see <code class="computeroutput"><span class="special">+</span></code>
+              applied between a <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">string</span></code>
+              and an <code class="computeroutput"><span class="identifier">abstract_mapper</span><span class="special">&lt;</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">string</span><span class="special">&gt;</span></code>, or between two <code class="computeroutput"><span class="identifier">abstract_mapper</span><span class="special">&lt;</span><span class="identifier">string</span><span class="special">&gt;</span></code>s. That is not a misuse of arithmetic;
+              it is <a class="link" href="strcat.html" title="String Concatenation">string concatenation</a>.
+            </li>
+<li class="listitem">
+              Sometimes you will see the prefix <code class="computeroutput"><span class="special">+</span></code>
+              and <code class="computeroutput"><span class="special">-</span></code> applied to a wide
+              range of types, in the context of <code class="computeroutput"><span class="identifier">order</span><span class="special">(</span></code>...<code class="computeroutput"><span class="special">)</span></code>.
+              That is not a misuse of arithmetic; it is a <a class="link" href="../queries/order.html#ascending_descending">feature
+              of <code class="computeroutput"><span class="identifier">order</span><span class="special">(</span></code>...<code class="computeroutput"><span class="special">)</span></code></a>.
+            </li>
+</ul></div>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2014 Michael Shepanski<p>
+        Distributed under the Boost Software License, Version 1.0
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="../expressions.html"><img src="../images/prev.png" alt="Prev"></a><a accesskey="u" href="../expressions.html"><img src="../images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../images/home.png" alt="Home"></a><a accesskey="n" href="strcat.html"><img src="../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

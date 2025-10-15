@@ -1,0 +1,153 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>select()</title>
+<link rel="stylesheet" href="../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../index.html" title="QUINCE: QUeries IN C++ Expressions">
+<link rel="up" href="../queries.html" title="Chapter&#160;7.&#160;Queries">
+<link rel="prev" href="compositionality.html" title="Compositionality">
+<link rel="next" href="select/with_multiple_arguments.html" title="With Multiple Arguments">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<div class="spirit-nav">
+<a accesskey="p" href="compositionality.html"><img src="../images/prev.png" alt="Prev"></a><a accesskey="u" href="../queries.html"><img src="../images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../images/home.png" alt="Home"></a><a accesskey="n" href="select/with_multiple_arguments.html"><img src="../images/next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="queries.select"></a><a class="link" href="select.html" title="select()"><code class="computeroutput"><span class="identifier">select</span><span class="special">()</span></code></a>
+</h2></div></div></div>
+<div class="toc"><dl class="toc">
+<dt><span class="section"><a href="select.html#queries.select.with_one_argument">With One Argument</a></span></dt>
+<dt><span class="section"><a href="select/with_multiple_arguments.html">With Multiple
+          Arguments</a></span></dt>
+<dt><span class="section"><a href="select/collector.html">With Multiple Arguments
+          and a Collector Class</a></span></dt>
+<dt><span class="section"><a href="select/with_group.html">With <code class="computeroutput"><span class="identifier">group</span><span class="special">(</span></code>...<code class="computeroutput"><span class="special">)</span></code></a></span></dt>
+<dt><span class="section"><a href="select/performance_tip_avoid_repeated_s.html">Performance
+          Tip: Avoid Repeated Subexpressions</a></span></dt>
+</dl></div>
+<p>
+          
+        </p>
+<p>
+          For any query <em class="replaceable"><code>q</code></em>, <em class="replaceable"><code>q</code></em><code class="computeroutput"><span class="special">.</span><span class="identifier">select</span><span class="special">(</span></code>...<code class="computeroutput"><span class="special">)</span></code>
+          builds a query whose values are extracted or computed from the values that
+          <em class="replaceable"><code>q</code></em> would have produced. Roughly speaking, expressions
+          passed as arguments to <code class="computeroutput"><span class="identifier">select</span><span class="special">(</span></code>...<code class="computeroutput"><span class="special">)</span></code>
+          are to quince what expressions in a <span class="quote">&#8220;<span class="quote">select-list</span>&#8221;</span> are to SQL.
+        </p>
+<div class="section">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="queries.select.with_one_argument"></a><a class="link" href="select.html#queries.select.with_one_argument" title="With One Argument">With One Argument</a>
+</h3></div></div></div>
+<p>
+            For any query <em class="replaceable"><code>q</code></em>, you can call <em class="replaceable"><code>q</code></em><code class="computeroutput"><span class="special">.</span><span class="identifier">select</span><span class="special">(</span></code><em class="replaceable"><code>exprn</code></em><code class="computeroutput"><span class="special">)</span></code>, provided that:
+          </p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
+                <em class="replaceable"><code>exprn</code></em> is an <code class="computeroutput"><span class="identifier">abstract_mapper</span><span class="special">&lt;</span></code><em class="replaceable"><code>T</code></em><code class="computeroutput"><span class="special">&gt;</span></code>, for some mapped type <em class="replaceable"><code>T</code></em>
+                (this is checked at compile time).
+              </li></ul></div>
+<p>
+            <em class="replaceable"><code>q</code></em>'s value mapper will be <a class="link" href="../expressions/visibility.html" title="Visibility">visible</a>
+            to <em class="replaceable"><code>exprn</code></em>.
+          </p>
+<p>
+            <em class="replaceable"><code>q</code></em><code class="computeroutput"><span class="special">.</span><span class="identifier">select</span><span class="special">(</span></code><em class="replaceable"><code>exprn</code></em><code class="computeroutput"><span class="special">)</span></code> returns a <code class="computeroutput"><span class="identifier">query</span></code>
+            with the following characteristics:
+          </p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+                Its value type is the same as <em class="replaceable"><code>exprn</code></em>'s
+                result type.
+              </li>
+<li class="listitem">
+                Its value mapper is identical to <em class="replaceable"><code>exprn</code></em>.
+              </li>
+<li class="listitem">
+                If <em class="replaceable"><code>exprn</code></em> does not contain an aggregate
+                function, then <em class="replaceable"><code>q</code></em><code class="computeroutput"><span class="special">.</span><span class="identifier">select</span><span class="special">(</span></code><em class="replaceable"><code>exprn</code></em><code class="computeroutput"><span class="special">)</span></code>'s output consists of successive
+                results of <em class="replaceable"><code>exprn</code></em>, evaluated using each
+                successive record of <em class="replaceable"><code>q</code></em>'s output.
+              </li>
+<li class="listitem">
+                If <em class="replaceable"><code>exprn</code></em> contains an aggregate function,
+                then <em class="replaceable"><code>q</code></em><code class="computeroutput"><span class="special">.</span><span class="identifier">select</span><span class="special">(</span></code><em class="replaceable"><code>exprn</code></em><code class="computeroutput"><span class="special">)</span></code> produces exactly one record, evaluated
+                based on the totality of <em class="replaceable"><code>q</code></em>'s output.
+              </li>
+</ul></div>
+<p>
+            (This treatment of aggregate functions is SQL behaviour; quince just
+            <span class="quote">&#8220;<span class="quote">passes it through</span>&#8221;</span> to the application.)
+          </p>
+<h5>
+<a name="queries.select.with_one_argument.h0"></a>
+            <span class="phrase"><a name="queries.select.with_one_argument.examples"></a></span><a class="link" href="select.html#queries.select.with_one_argument.examples">Examples</a>
+          </h5>
+<pre class="programlisting"><span class="keyword">extern</span> <span class="identifier">table</span><span class="special">&lt;</span><span class="identifier">point</span><span class="special">&gt;</span> <span class="identifier">points</span><span class="special">;</span>
+<span class="keyword">const</span> <span class="identifier">query</span><span class="special">&lt;</span><span class="identifier">point</span><span class="special">&gt;</span> <span class="identifier">some_points</span> <span class="special">=</span> <span class="identifier">points</span><span class="special">.</span><span class="identifier">where</span><span class="special">(</span><span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">y</span> <span class="special">&gt;</span> <span class="number">1.9f</span><span class="special">);</span>
+<span class="keyword">extern</span> <span class="keyword">const</span> <span class="identifier">query</span><span class="special">&lt;</span><span class="keyword">float</span><span class="special">&gt;</span> <span class="identifier">interesting_numbers</span><span class="special">;</span>
+
+<span class="comment">// Most typical cases. Each of these queries produces one float per point in points:</span>
+<span class="comment">//</span>
+<span class="keyword">const</span> <span class="identifier">query</span><span class="special">&lt;</span><span class="keyword">float</span><span class="special">&gt;</span> <span class="identifier">xs</span> <span class="special">=</span> <span class="identifier">points</span><span class="special">.</span><span class="identifier">select</span><span class="special">(</span><span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">x</span><span class="special">);</span>
+<span class="keyword">const</span> <span class="identifier">query</span><span class="special">&lt;</span><span class="keyword">float</span><span class="special">&gt;</span> <span class="identifier">products</span> <span class="special">=</span> <span class="identifier">points</span><span class="special">.</span><span class="identifier">select</span><span class="special">(</span><span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">x</span> <span class="special">*</span> <span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">y</span><span class="special">);</span>
+
+<span class="comment">// The exprn uses an aggregate function, so the query produces one output only:</span>
+<span class="comment">//</span>
+<span class="keyword">const</span> <span class="identifier">query</span><span class="special">&lt;</span><span class="keyword">double</span><span class="special">&gt;</span> <span class="identifier">total</span> <span class="special">=</span> <span class="identifier">points</span><span class="special">.</span><span class="identifier">select</span><span class="special">(</span><span class="identifier">sum</span><span class="special">(</span><span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">x</span><span class="special">));</span>
+
+<span class="comment">// Okay, because points's value mapper is identical to some_points's value mapper.</span>
+<span class="comment">// (Stylistically questionable though.)</span>
+<span class="comment">//</span>
+<span class="keyword">const</span> <span class="identifier">query</span><span class="special">&lt;</span><span class="keyword">float</span><span class="special">&gt;</span> <span class="identifier">some_xs</span> <span class="special">=</span> <span class="identifier">some_points</span><span class="special">.</span><span class="identifier">select</span><span class="special">(</span><span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">x</span><span class="special">);</span>
+
+<span class="comment">// Also okay, because equivalent to the preceding example:</span>
+<span class="comment">//</span>
+<span class="keyword">const</span> <span class="identifier">query</span><span class="special">&lt;</span><span class="keyword">float</span><span class="special">&gt;</span> <span class="identifier">some_xs_again</span> <span class="special">=</span>
+    <span class="identifier">points</span>
+    <span class="special">.</span><span class="identifier">where</span><span class="special">(</span><span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">y</span> <span class="special">&gt;</span> <span class="number">1.9f</span><span class="special">)</span>
+    <span class="special">.</span><span class="identifier">select</span><span class="special">(</span><span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">x</span><span class="special">);</span>
+
+<span class="comment">// Invalid: the exprn is not an abstract_mapper:</span>
+<span class="comment">//</span>
+<span class="keyword">const</span> <span class="identifier">query</span><span class="special">&lt;</span><span class="keyword">float</span><span class="special">&gt;</span> <span class="identifier">threes</span> <span class="special">=</span> <span class="identifier">points</span><span class="special">.</span><span class="identifier">select</span><span class="special">(</span><span class="number">3.0f</span><span class="special">);</span>  <span class="comment">// wrong</span>
+
+<span class="comment">// Okay, although the exprn doesn't mention points's value mapper:</span>
+<span class="comment">//</span>
+<span class="keyword">const</span> <span class="identifier">query</span><span class="special">&lt;</span><span class="keyword">float</span><span class="special">&gt;</span> <span class="identifier">threes</span> <span class="special">=</span> <span class="identifier">points</span><span class="special">.</span><span class="identifier">select</span><span class="special">(</span><span class="identifier">exprn_mapper</span><span class="special">&lt;</span><span class="keyword">float</span><span class="special">&gt;(</span><span class="number">3</span><span class="special">));</span>
+
+<span class="comment">// Invalid: exprn refers to a value mapper that is not visible to it:</span>
+<span class="comment">//</span>
+<span class="keyword">const</span> <span class="identifier">query</span><span class="special">&lt;</span><span class="keyword">bool</span><span class="special">&gt;</span> <span class="identifier">nonsense</span> <span class="special">=</span>
+    <span class="identifier">points</span>
+    <span class="special">.</span><span class="identifier">select</span><span class="special">(</span><span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">x</span> <span class="special">==</span> <span class="special">*</span><span class="identifier">interesting_numbers</span><span class="special">);</span> <span class="comment">// wrong</span>
+<span class="keyword">const</span> <span class="identifier">query</span><span class="special">&lt;</span><span class="identifier">int64_t</span><span class="special">&gt;</span> <span class="identifier">more_nonsense</span> <span class="special">=</span>
+    <span class="identifier">points</span>
+    <span class="special">.</span><span class="identifier">select</span><span class="special">(</span><span class="identifier">count</span><span class="special">(</span><span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">x</span> <span class="special">==</span> <span class="special">*</span><span class="identifier">interesting_numbers</span><span class="special">));</span> <span class="comment">// wrong</span>
+
+<span class="comment">// Okay: scalar() makes *interesting_numbers (aka the value mapper for interesting_numbers)</span>
+<span class="comment">// visible to any expression inside its subquery.</span>
+<span class="comment">//</span>
+<span class="keyword">const</span> <span class="identifier">query</span><span class="special">&lt;</span><span class="identifier">int64_t</span><span class="special">&gt;</span> <span class="identifier">point_counts</span> <span class="special">=</span>
+    <span class="identifier">interesting_numbers</span>
+    <span class="special">.</span><span class="identifier">select</span><span class="special">(</span><span class="identifier">scalar</span><span class="special">(</span>
+        <span class="identifier">points</span>
+        <span class="special">.</span><span class="identifier">select</span><span class="special">(</span><span class="identifier">count</span><span class="special">(</span><span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">x</span> <span class="special">==</span> <span class="special">*</span><span class="identifier">interesting_numbers</span><span class="special">))</span>
+    <span class="special">));</span>
+</pre>
+</div>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2014 Michael Shepanski<p>
+        Distributed under the Boost Software License, Version 1.0
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="compositionality.html"><img src="../images/prev.png" alt="Prev"></a><a accesskey="u" href="../queries.html"><img src="../images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../images/home.png" alt="Home"></a><a accesskey="n" href="select/with_multiple_arguments.html"><img src="../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

@@ -1,0 +1,154 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Chapter&#160;5.&#160;Mapped Data Types</title>
+<link rel="stylesheet" href="boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="index.html" title="QUINCE: QUeries IN C++ Expressions">
+<link rel="up" href="depth.html" title="Part&#160;II.&#160;The Quince API in Depth">
+<link rel="prev" href="exceptions.html" title="Chapter&#160;4.&#160;Exceptions">
+<link rel="next" href="mapped_data_types/polymorphically_mapped_types.html" title="Polymorphically Mapped Types">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<div class="spirit-nav">
+<a accesskey="p" href="exceptions.html"><img src="images/prev.png" alt="Prev"></a><a accesskey="u" href="depth.html"><img src="images/up.png" alt="Up"></a><a accesskey="h" href="index.html"><img src="images/home.png" alt="Home"></a><a accesskey="n" href="mapped_data_types/polymorphically_mapped_types.html"><img src="images/next.png" alt="Next"></a>
+</div>
+<div class="chapter">
+<div class="titlepage"><div><div><h2 class="title">
+<a name="mapped_data_types"></a>Chapter&#160;5.&#160;Mapped Data Types</h2></div></div></div>
+<div class="toc">
+<p><b>Table of Contents</b></p>
+<dl class="toc">
+<dt><span class="section"><a href="mapped_data_types.html#mapped_data_types.definition_taxonomy">Definition,
+        Taxonomy</a></span></dt>
+<dt><span class="section"><a href="mapped_data_types/polymorphically_mapped_types.html">Polymorphically
+        Mapped Types</a></span></dt>
+<dt><span class="section"><a href="mapped_data_types/boost_optional.html"><code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">optional</span><span class="special">&lt;</span></code>...<code class="computeroutput"><span class="special">&gt;</span></code></a></span></dt>
+<dt><span class="section"><a href="mapped_data_types/std_tuple.html"><code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">tuple</span><span class="special">&lt;</span></code>...<code class="computeroutput"><span class="special">&gt;</span></code></a></span></dt>
+<dt><span class="section"><a href="mapped_data_types/user_defined_class_types.html">User-Defined
+        Class Types </a></span></dt>
+</dl>
+</div>
+<p>
+        
+      </p>
+<div class="section">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="mapped_data_types.definition_taxonomy"></a><a class="link" href="mapped_data_types.html#mapped_data_types.definition_taxonomy" title="Definition, Taxonomy">Definition,
+        Taxonomy</a>
+</h2></div></div></div>
+<p>
+          Mapped types are C++ types that quince (with help from the backends) knows
+          how to represent. A mapped type is allowed to be:
+        </p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+              the <em class="replaceable"><code>T</code></em> in <code class="computeroutput"><span class="identifier">table</span><span class="special">&lt;</span></code><em class="replaceable"><code>T</code></em><code class="computeroutput"><span class="special">&gt;</span></code> or <code class="computeroutput"><span class="identifier">query</span><span class="special">&lt;</span></code><em class="replaceable"><code>T</code></em><code class="computeroutput"><span class="special">&gt;</span></code>,
+            </li>
+<li class="listitem">
+              sorted on the server side. using <code class="computeroutput"><span class="identifier">order</span><span class="special">()</span></code>,
+            </li>
+<li class="listitem">
+              a parameter to, or the result of, a <a class="link" href="expressions.html" title="Chapter&#160;6.&#160;Expressions for Server-Side Execution">server-side
+              computation</a>, if its specific type is appropriate to the context.
+            </li>
+</ul></div>
+<p>
+          What makes a C++ type a mapped type is that it has a <span class="emphasis"><em>mapper class</em></span>.
+          We can categorize mapped types according to the way the mapper class is
+          supplied.
+        </p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
+              mapped types
+              <div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: circle; ">
+<li class="listitem">
+                    polymorphically mapped
+                    <div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: square; ">
+<li class="listitem">
+                          default mapper class is suplied by quince
+                          <div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
+                                <code class="computeroutput"><span class="identifier">serial</span></code>
+                              </li></ul></div>
+                        </li>
+<li class="listitem">
+                          default mapper class is supplied by backend
+                          <div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+                                <code class="computeroutput"><span class="keyword">bool</span></code>
+                              </li>
+<li class="listitem">
+                                8-, 16-, 32-, and 64-bit signed integers
+                              </li>
+<li class="listitem">
+                                8-, 16-, 32-, and 64-bit unsigned integers
+                              </li>
+<li class="listitem">
+                                <code class="computeroutput"><span class="keyword">float</span></code>
+                                and <code class="computeroutput"><span class="keyword">double</span></code>
+                              </li>
+<li class="listitem">
+                                <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">string</span></code>
+                              </li>
+<li class="listitem">
+                                <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span><span class="identifier">uint8_t</span><span class="special">&gt;</span></code>
+                              </li>
+<li class="listitem">
+                                <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">posix_time</span><span class="special">::</span><span class="identifier">ptime</span></code>
+                              </li>
+<li class="listitem">
+                                possibly others
+                              </li>
+</ul></div>
+                        </li>
+</ul></div>
+                  </li>
+<li class="listitem">
+                    statically mapped
+                    <div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: square; ">
+<li class="listitem">
+                          mapper class is supplied by quince
+                          <div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+                                <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">optional</span><span class="special">&lt;</span></code><em class="replaceable"><code>T</code></em><code class="computeroutput"><span class="special">&gt;</span></code>, where <em class="replaceable"><code>T</code></em>
+                                is a mapped type
+                              </li>
+<li class="listitem">
+                                <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">tuple</span><span class="special">&lt;</span></code><em class="replaceable"><code>T0,
+                                ~T1 ...</code></em><code class="computeroutput"><span class="special">&gt;</span></code>,
+                                where <em class="replaceable"><code>T0, T1 ...</code></em> are mapped
+                                types.
+                              </li>
+</ul></div>
+                        </li>
+<li class="listitem">
+                          mapper class is supplied by application code (with help
+                          from quince macros)
+                          <div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
+                                user-defined class (whether <code class="computeroutput"><span class="keyword">class</span></code>
+                                or <code class="computeroutput"><span class="keyword">struct</span></code>).
+                              </li></ul></div>
+                        </li>
+</ul></div>
+                  </li>
+</ul></div>
+            </li></ul></div>
+<p>
+          Whatever a type <em class="replaceable"><code>T</code></em>'s mapper class might be, and
+          whoever supplies it, it is always the case that it implements the interface
+          <code class="computeroutput"><span class="identifier">abstract_mapper</span><span class="special">&lt;</span></code><em class="replaceable"><code>T</code></em><code class="computeroutput"><span class="special">&gt;</span></code>.
+        </p>
+</div>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2014 Michael Shepanski<p>
+        Distributed under the Boost Software License, Version 1.0
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="exceptions.html"><img src="images/prev.png" alt="Prev"></a><a accesskey="u" href="depth.html"><img src="images/up.png" alt="Up"></a><a accesskey="h" href="index.html"><img src="images/home.png" alt="Home"></a><a accesskey="n" href="mapped_data_types/polymorphically_mapped_types.html"><img src="images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

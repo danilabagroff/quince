@@ -1,0 +1,178 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>With group(...)</title>
+<link rel="stylesheet" href="../../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../../index.html" title="QUINCE: QUeries IN C++ Expressions">
+<link rel="up" href="../select.html" title="select()">
+<link rel="prev" href="collector.html" title="With Multiple Arguments and a Collector Class">
+<link rel="next" href="performance_tip_avoid_repeated_s.html" title="Performance Tip: Avoid Repeated Subexpressions">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<div class="spirit-nav">
+<a accesskey="p" href="collector.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../select.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="performance_tip_avoid_repeated_s.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="queries.select.with_group"></a><a class="link" href="with_group.html" title="With group(...)">With <code class="computeroutput"><span class="identifier">group</span><span class="special">(</span></code>...<code class="computeroutput"><span class="special">)</span></code></a>
+</h3></div></div></div>
+<p>
+            <code class="computeroutput"><span class="identifier">select</span><span class="special">()</span></code>,
+            in any of the forms already mentioned, can be preceded by a call to
+            <code class="computeroutput"><span class="identifier">group</span><span class="special">(</span></code><em class="replaceable"><code>gexprn0</code></em><code class="computeroutput"><span class="special">,</span></code> <em class="replaceable"><code>gexprn1</code></em><code class="computeroutput"><span class="special">,</span></code> ...<code class="computeroutput"><span class="special">)</span></code>,
+            where each <em class="replaceable"><code>gexprni</code></em> is an <code class="computeroutput"><span class="identifier">abstract_mapper</span><span class="special">&lt;</span></code><em class="replaceable"><code>T</code></em><code class="computeroutput"><span class="special">&gt;</span></code> for some mapped type <em class="replaceable"><code>T</code></em>.
+            E.g.:
+          </p>
+<pre class="programlisting"><span class="keyword">const</span> <span class="identifier">query</span><span class="special">&lt;</span><span class="keyword">double</span><span class="special">&gt;</span> <span class="identifier">sums_per_y</span> <span class="special">=</span>
+    <span class="identifier">points</span>
+    <span class="special">.</span><span class="identifier">group</span><span class="special">(</span><span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">y</span><span class="special">).</span><span class="identifier">select</span><span class="special">(</span><span class="identifier">sum</span><span class="special">(</span><span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">x</span><span class="special">));</span>
+</pre>
+<p>
+            <code class="computeroutput"><span class="identifier">group</span><span class="special">(</span></code>...<code class="computeroutput"><span class="special">)</span></code> is quince's counterpart of SQL's <code class="literal">GROUP
+            BY</code> clause.
+          </p>
+<h5>
+<a name="queries.select.with_group.h0"></a>
+            <span class="phrase"><a name="queries.select.with_group.how_it_affects_visibility"></a></span><a class="link" href="with_group.html#queries.select.with_group.how_it_affects_visibility">How it
+            affects visibility</a>
+          </h5>
+<p>
+            If <em class="replaceable"><code>q</code></em> is the query to which the <code class="computeroutput"><span class="identifier">group</span></code>/<code class="computeroutput"><span class="identifier">select</span></code>
+            operation is applied, then:
+          </p>
+<div class="orderedlist"><ol class="orderedlist" type="1">
+<li class="listitem">
+                <em class="replaceable"><code>q</code></em>'s value mapper is <a class="link" href="../../expressions/visibility.html" title="Visibility">visible</a>
+                to each of the expressions <em class="replaceable"><code>gexprni</code></em> that
+                are passed to <code class="computeroutput"><span class="identifier">group</span><span class="special">(</span></code>...<code class="computeroutput"><span class="special">)</span></code>.
+              </li>
+<li class="listitem">
+                <em class="replaceable"><code>q</code></em>'s value mapper is <span class="emphasis"><em>not</em></span>
+                visible to each of the expressions <em class="replaceable"><code>exprni</code></em>
+                that are passed to <code class="computeroutput"><span class="identifier">select</span><span class="special">(</span></code>...<code class="computeroutput"><span class="special">)</span></code>.
+                However:
+              </li>
+<li class="listitem">
+                <em class="replaceable"><code>q</code></em>'s value mapper is visible to any expression,
+                within an <em class="replaceable"><code>exprni</code></em>, that is a call of an
+                aggregate function, and
+              </li>
+<li class="listitem">
+                The <em class="replaceable"><code>gexprni</code></em> are visible to each <em class="replaceable"><code>exprni</code></em>.
+              </li>
+</ol></div>
+<p>
+            The example above demonstrates 3. The following demonstrates 4:
+          </p>
+<pre class="programlisting"><span class="keyword">const</span> <span class="identifier">query</span><span class="special">&lt;</span><span class="keyword">float</span><span class="special">&gt;</span> <span class="identifier">unique_ys</span> <span class="special">=</span>
+    <span class="identifier">points</span>
+    <span class="special">.</span><span class="identifier">group</span><span class="special">(</span><span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">y</span><span class="special">).</span><span class="identifier">select</span><span class="special">(</span><span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">y</span><span class="special">);</span>
+</pre>
+<p>
+            And the next demonstrates 2, i.e. something that <code class="computeroutput"><span class="identifier">group</span><span class="special">(</span></code>...<code class="computeroutput"><span class="special">)</span></code>
+            prevents you from doing:
+          </p>
+<pre class="programlisting"><span class="keyword">const</span> <span class="identifier">query</span><span class="special">&lt;</span><span class="keyword">float</span><span class="special">&gt;</span> <span class="identifier">nonsense</span> <span class="special">=</span>
+    <span class="identifier">points</span>
+    <span class="special">.</span><span class="identifier">group</span><span class="special">(</span><span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">y</span><span class="special">).</span><span class="identifier">select</span><span class="special">(</span><span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">x</span><span class="special">);</span>  <span class="comment">// Wrong</span>
+</pre>
+<p>
+            On the other hand, here is something <code class="computeroutput"><span class="identifier">group</span><span class="special">(</span></code>...<code class="computeroutput"><span class="special">)</span></code>
+            allows you to do, which would have been illegal without <code class="computeroutput"><span class="identifier">group</span><span class="special">(</span></code>...<code class="computeroutput"><span class="special">)</span></code> (because one argument to <code class="computeroutput"><span class="identifier">select</span><span class="special">(</span></code>..<code class="computeroutput"><span class="special">)</span></code> uses an aggregate function and the other
+            doesn't):
+          </p>
+<pre class="programlisting"><span class="keyword">const</span> <span class="identifier">query</span><span class="special">&lt;</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">tuple</span><span class="special">&lt;</span><span class="keyword">float</span><span class="special">,</span> <span class="keyword">double</span><span class="special">&gt;&gt;</span> <span class="identifier">histogram</span> <span class="special">=</span>
+    <span class="identifier">points</span>
+    <span class="special">.</span><span class="identifier">group</span><span class="special">(</span><span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">y</span><span class="special">).</span><span class="identifier">select</span><span class="special">(</span><span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">y</span><span class="special">,</span> <span class="identifier">sum</span><span class="special">(</span><span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">x</span><span class="special">));</span>
+</pre>
+<h5>
+<a name="queries.select.with_group.h1"></a>
+            <span class="phrase"><a name="queries.select.with_group.how_it_affects_the_query_type_va"></a></span><a class="link" href="with_group.html#queries.select.with_group.how_it_affects_the_query_type_va">How
+            it affects the query type, value type, and value mapper</a>
+          </h5>
+<p>
+            It doesn't.
+          </p>
+<p>
+            <em class="replaceable"><code>q</code></em><code class="computeroutput"><span class="special">.</span><span class="identifier">group</span><span class="special">(</span></code><em class="replaceable"><code>gexprn0</code></em><code class="computeroutput"><span class="special">,</span></code> <em class="replaceable"><code>gexpr1</code></em><code class="computeroutput"><span class="special">,</span></code> ...<code class="computeroutput"><span class="special">).</span><span class="identifier">select</span><span class="special">(</span></code><em class="replaceable"><code>exprn0</code></em><code class="computeroutput"><span class="special">,</span></code> <em class="replaceable"><code>exprn1</code></em><code class="computeroutput"><span class="special">,</span></code> ...<code class="computeroutput"><span class="special">)</span></code>
+            or <em class="replaceable"><code>q</code></em><code class="computeroutput"><span class="special">.</span><span class="identifier">group</span><span class="special">(</span></code><em class="replaceable"><code>gexprn0</code></em><code class="computeroutput"><span class="special">,</span></code> <em class="replaceable"><code>gexpr1</code></em><code class="computeroutput"><span class="special">,</span></code> ...<code class="computeroutput"><span class="special">).</span><span class="identifier">select</span><span class="special">&lt;</span></code><em class="replaceable"><code>C</code></em><code class="computeroutput"><span class="special">&gt;(</span></code><em class="replaceable"><code>exprn0</code></em><code class="computeroutput"><span class="special">,</span></code> <em class="replaceable"><code>exprn1</code></em><code class="computeroutput"><span class="special">,</span></code> ...<code class="computeroutput"><span class="special">)</span></code>
+            returns a query of the same type, and with the same value type and value
+            mapper, as it would if you deleted <code class="computeroutput"><span class="special">.</span><span class="identifier">group</span><span class="special">(</span></code><em class="replaceable"><code>gexprn0</code></em><code class="computeroutput"><span class="special">,</span></code> <em class="replaceable"><code>gexpr1</code></em><code class="computeroutput"><span class="special">,</span></code> ...<code class="computeroutput"><span class="special">)</span></code>.
+            (See the range of cases in the preceding sections.)
+          </p>
+<h5>
+<a name="queries.select.with_group.h2"></a>
+            <span class="phrase"><a name="queries.select.with_group.how_it_affects_output"></a></span><a class="link" href="with_group.html#queries.select.with_group.how_it_affects_output">How
+            it affects output</a>
+          </h5>
+<p>
+            Imagine that we executed <em class="replaceable"><code>q</code></em>, and divided the
+            output records into sets, such that two records are in the same set if
+            and only if each <em class="replaceable"><code>gexprni</code></em> evaluates to equal
+            values for both records.
+          </p>
+<p>
+            Then, when <em class="replaceable"><code>q</code></em><code class="computeroutput"><span class="special">.</span><span class="identifier">group</span><span class="special">(</span></code><em class="replaceable"><code>gexprn0</code></em><code class="computeroutput"><span class="special">,</span></code> <em class="replaceable"><code>gexpr1</code></em><code class="computeroutput"><span class="special">,</span></code> ...<code class="computeroutput"><span class="special">).</span><span class="identifier">select</span><span class="special">(</span></code><em class="replaceable"><code>exprn0</code></em><code class="computeroutput"><span class="special">,</span></code> <em class="replaceable"><code>exprn1</code></em><code class="computeroutput"><span class="special">,</span></code> ...<code class="computeroutput"><span class="special">)</span></code>
+            (or <em class="replaceable"><code>q</code></em><code class="computeroutput"><span class="special">.</span><span class="identifier">group</span><span class="special">(</span></code><em class="replaceable"><code>gexprn0</code></em><code class="computeroutput"><span class="special">,</span></code> <em class="replaceable"><code>gexpr1</code></em><code class="computeroutput"><span class="special">,</span></code> ...<code class="computeroutput"><span class="special">).</span><span class="identifier">select</span><span class="special">&lt;</span></code><em class="replaceable"><code>C</code></em><code class="computeroutput"><span class="special">&gt;(</span></code><em class="replaceable"><code>exprn0</code></em><code class="computeroutput"><span class="special">,</span></code> <em class="replaceable"><code>exprn1</code></em><code class="computeroutput"><span class="special">,</span></code> ...<code class="computeroutput"><span class="special">)</span></code>)
+            is executed, the process differs from the execution of an ungrouped
+            <code class="computeroutput"><span class="identifier">select</span><span class="special">(</span></code>...<code class="computeroutput"><span class="special">)</span></code> in two ways:
+          </p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+                There is one output for each of the sets.
+              </li>
+<li class="listitem">
+                When generating the output for set <span class="emphasis"><em>s</em></span>, the <em class="replaceable"><code>exprni</code></em>s
+                are evaluated as follows:
+                <div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: circle; ">
+<li class="listitem">
+                      if <em class="replaceable"><code>exprni</code></em> does not use an aggregate
+                      function, it is evaluated using an arbitrary record from <span class="emphasis"><em>s</em></span>,
+                      and
+                    </li>
+<li class="listitem">
+                      if <em class="replaceable"><code>exprni</code></em> uses an aggregate function,
+                      it is evaluated based on the totality of records in <span class="emphasis"><em>s</em></span>.
+                    </li>
+</ul></div>
+              </li>
+</ul></div>
+<h5>
+<a name="queries.select.with_group.h3"></a>
+            <span class="phrase"><a name="queries.select.with_group.what_about_compositionality"></a></span><a class="link" href="with_group.html#queries.select.with_group.what_about_compositionality">What
+            about compositionality?</a>
+          </h5>
+<p>
+            Often, when we chain together quince calls, we are building queries from
+            queries in pipeline fashion, e.g. <code class="computeroutput"><span class="identifier">points</span><span class="special">.</span><span class="identifier">where</span><span class="special">(</span><span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">x</span> <span class="special">&gt;</span> <span class="number">0</span><span class="special">).</span><span class="identifier">order</span><span class="special">(</span><span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">y</span><span class="special">).</span><span class="identifier">limit</span><span class="special">(</span><span class="number">2</span><span class="special">).</span><span class="identifier">select</span><span class="special">(</span><span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">y</span><span class="special">)</span></code>.
+            Then each period (<code class="computeroutput"><span class="special">.</span></code>) marks
+            a point of loose coupling. On its left we build a query; on its right
+            we use that query; but the code on the right won't mind if we replace
+            the code on the left with something else that makes the same output.
+          </p>
+<p>
+            The period in the middle of <code class="computeroutput"><span class="identifier">group</span><span class="special">(</span></code>...<code class="computeroutput"><span class="special">).</span><span class="identifier">select</span><span class="special">(</span></code>...<code class="computeroutput"><span class="special">)</span></code> is not like that. The <code class="computeroutput"><span class="identifier">group</span><span class="special">(</span></code>...<code class="computeroutput"><span class="special">)</span></code> call on its left does <span class="emphasis"><em>not</em></span>
+            build a query. Its return type is an obscure class, which has no output,
+            and no methods other than <code class="computeroutput"><span class="identifier">select</span><span class="special">(</span></code>...<code class="computeroutput"><span class="special">)</span></code>.
+            My advice is: treat <code class="computeroutput"><span class="identifier">group</span><span class="special">(</span></code>...<code class="computeroutput"><span class="special">).</span><span class="identifier">select</span><span class="special">(</span></code>...<code class="computeroutput"><span class="special">)</span></code> as indivisible.
+          </p>
+<p>
+            The pipeline metaphor is still valid; we just need to stipulate that
+            each section of pipe stretches from the creation of one query to the
+            creation of another. So <code class="computeroutput"><span class="identifier">group</span><span class="special">(</span></code>...<code class="computeroutput"><span class="special">).</span><span class="identifier">select</span><span class="special">(</span></code>...<code class="computeroutput"><span class="special">)</span></code> counts as one pipe-section, not two.
+          </p>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2014 Michael Shepanski<p>
+        Distributed under the Boost Software License, Version 1.0
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="collector.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../select.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="performance_tip_avoid_repeated_s.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

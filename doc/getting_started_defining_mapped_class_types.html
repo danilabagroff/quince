@@ -1,0 +1,145 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Defining Mapped Class Types</title>
+<link rel="stylesheet" href="../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../index.html" title="QUINCE: QUeries IN C++ Expressions">
+<link rel="up" href="../getting_started.html" title="Chapter&#160;3.&#160;Getting Started">
+<link rel="prev" href="../getting_started.html" title="Chapter&#160;3.&#160;Getting Started">
+<link rel="next" href="creating_the_database_object.html" title="Creating the Database Object">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<div class="spirit-nav">
+<a accesskey="p" href="../getting_started.html"><img src="../images/prev.png" alt="Prev"></a><a accesskey="u" href="../getting_started.html"><img src="../images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../images/home.png" alt="Home"></a><a accesskey="n" href="creating_the_database_object.html"><img src="../images/next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="getting_started.defining_mapped_class_types"></a><a class="link" href="defining_mapped_class_types.html" title="Defining Mapped Class Types">Defining
+        Mapped Class Types</a>
+</h2></div></div></div>
+<pre class="programlisting"><span class="keyword">struct</span> <span class="identifier">point</span> <span class="special">{</span>
+    <span class="keyword">float</span> <span class="identifier">x</span><span class="special">;</span>
+    <span class="keyword">float</span> <span class="identifier">y</span><span class="special">;</span>
+<span class="special">};</span>
+<span class="identifier">QUINCE_MAP_CLASS</span><span class="special">(</span><span class="identifier">point</span><span class="special">,</span> <span class="special">(</span><span class="identifier">x</span><span class="special">)(</span><span class="identifier">y</span><span class="special">))</span>
+
+<span class="keyword">struct</span> <span class="identifier">movie</span> <span class="special">{</span>
+    <span class="identifier">serial</span> <span class="identifier">id</span><span class="special">;</span>                  <span class="comment">// primary key with automatically assigned values</span>
+    <span class="identifier">std</span><span class="special">::</span><span class="identifier">string</span> <span class="identifier">title</span><span class="special">;</span>
+<span class="special">};</span>
+<span class="identifier">QUINCE_MAP_CLASS</span><span class="special">(</span><span class="identifier">movie</span><span class="special">,</span> <span class="special">(</span><span class="identifier">id</span><span class="special">)(</span><span class="identifier">title</span><span class="special">))</span>
+
+<span class="keyword">struct</span> <span class="identifier">cinema</span> <span class="special">{</span>
+    <span class="identifier">serial</span> <span class="identifier">id</span><span class="special">;</span>                  <span class="comment">// primary key with automatically assigned values</span>
+    <span class="identifier">point</span> <span class="identifier">location</span><span class="special">;</span>
+<span class="special">};</span>
+<span class="identifier">QUINCE_MAP_CLASS</span><span class="special">(</span><span class="identifier">cinema</span><span class="special">,</span> <span class="special">(</span><span class="identifier">id</span><span class="special">)(</span><span class="identifier">location</span><span class="special">))</span>
+
+<span class="keyword">struct</span> <span class="identifier">screen</span> <span class="special">{</span>
+    <span class="identifier">serial</span> <span class="identifier">id</span><span class="special">;</span>                  <span class="comment">// primary key with automatically assigned values</span>
+    <span class="identifier">serial</span> <span class="identifier">cinema_id</span><span class="special">;</span>           <span class="comment">// foreign key to cinemas table</span>
+    <span class="identifier">serial</span> <span class="identifier">current_movie_id</span><span class="special">;</span>    <span class="comment">// foreign key to movies table</span>
+<span class="special">};</span>
+<span class="identifier">QUINCE_MAP_CLASS</span><span class="special">(</span><span class="identifier">screen</span><span class="special">,</span> <span class="special">(</span><span class="identifier">id</span><span class="special">)(</span><span class="identifier">cinema_id</span><span class="special">)(</span><span class="identifier">current_movie_id</span><span class="special">))</span>
+</pre>
+<h4>
+<a name="getting_started.defining_mapped_class_types.h0"></a>
+          <span class="phrase"><a name="getting_started.defining_mapped_class_types.remarks"></a></span><a class="link" href="defining_mapped_class_types.html#getting_started.defining_mapped_class_types.remarks">Remarks</a>
+        </h4>
+<p>
+          Each invocation of the macro <code class="computeroutput"><span class="identifier">QUINCE_MAP_CLASS</span></code>
+          generates all the meta-information quince will need, regarding one of our
+          class types. (We've declared them with the keyword <code class="computeroutput"><span class="keyword">struct</span></code>,
+          but structs are classes as far as quince is concerned.) This meta-information
+          is packaged into a class, known as the <span class="emphasis"><em>mapper class</em></span>
+          for our class. So the first invocation of <code class="computeroutput"><span class="identifier">QUINCE_MAP_CLASS</span></code>
+          generates the definition of <code class="computeroutput"><span class="identifier">point</span></code>'s
+          mapper class, aka <code class="computeroutput"><span class="identifier">class_mapper</span><span class="special">&lt;</span><span class="identifier">point</span><span class="special">&gt;</span></code>.
+        </p>
+<p>
+          It's called a mapper class because it tells quince how to <span class="emphasis"><em>map</em></span>
+          a <code class="computeroutput"><span class="identifier">point</span></code> to its representation
+          as columns (to accompany an SQL statement), and how to map columns back
+          to a <code class="computeroutput"><span class="identifier">point</span></code> (when retrieving
+          results from an SQL statement). In particular, it tells quince that, in
+          order to map a <code class="computeroutput"><span class="identifier">point</span></code> <em class="replaceable"><code>p</code></em>
+          in any way, it must map the two floats <em class="replaceable"><code>p</code></em><code class="computeroutput"><span class="special">.</span><span class="identifier">x</span></code> and
+          <em class="replaceable"><code>p</code></em><code class="computeroutput"><span class="special">.</span><span class="identifier">y</span></code>.
+        </p>
+<p>
+          As we shall see, there are variations in the way <code class="computeroutput"><span class="identifier">point</span></code>s
+          are represented in different contexts: the SQL column names can vary, the
+          encoding of <code class="computeroutput"><span class="keyword">float</span></code>s can vary.
+          So different situations will call for different <span class="emphasis"><em>mapper objects</em></span>
+          for <code class="computeroutput"><span class="identifier">point</span></code>. But they will
+          all be instances of the mapper class that we have just defined.
+        </p>
+<p>
+          We rarely mention mapper classes by name in application code, but there
+          is something about them that we need to understand. <code class="computeroutput"><span class="identifier">class_mapper</span><span class="special">&lt;</span><span class="identifier">point</span><span class="special">&gt;</span></code> has two public members <span class="emphasis"><em>also
+          called <code class="computeroutput"><span class="identifier">x</span></code> and <code class="computeroutput"><span class="identifier">y</span></code></em></span>. If <em class="replaceable"><code>cmp</code></em>
+          is any <code class="computeroutput"><span class="identifier">class_mapper</span><span class="special">&lt;</span><span class="identifier">point</span><span class="special">&gt;</span></code>,
+          then, <em class="replaceable"><code>cmp</code></em><code class="computeroutput"><span class="special">.</span><span class="identifier">x</span></code> and <em class="replaceable"><code>cmp</code></em><code class="computeroutput"><span class="special">.</span><span class="identifier">y</span></code> refer
+          to <code class="computeroutput"><span class="keyword">float</span></code> mappers, which tell
+          quince how to map a <code class="computeroutput"><span class="identifier">point</span></code>'s
+          <code class="computeroutput"><span class="identifier">x</span></code> and <code class="computeroutput"><span class="identifier">y</span></code>
+          members respectively. So it's nearly true to say <span class="emphasis"><em>the members
+          of the mapper are the mappers of the members</em></span> <a href="#ftn.getting_started.defining_mapped_class_types.f0" class="footnote" name="getting_started.defining_mapped_class_types.f0"><sup class="footnote">[3]</sup></a> .
+        </p>
+<p>
+          Following the same pattern, if <em class="replaceable"><code>cmc</code></em> is a <code class="computeroutput"><span class="identifier">class_mapper</span><span class="special">&lt;</span><span class="identifier">cinema</span><span class="special">&gt;</span></code>,
+          then <em class="replaceable"><code>cmc</code></em><code class="computeroutput"><span class="special">.</span><span class="identifier">id</span></code> and <em class="replaceable"><code>cmc</code></em><code class="computeroutput"><span class="special">.</span><span class="identifier">location</span></code>
+          refer to a <code class="computeroutput"><span class="identifier">serial</span></code> mapper
+          and a <code class="computeroutput"><span class="identifier">point</span></code> mapper respectively.
+          <a href="#ftn.getting_started.defining_mapped_class_types.f1" class="footnote" name="getting_started.defining_mapped_class_types.f1"><sup class="footnote">[4]</sup></a> .
+        </p>
+<p>
+          Which brings us to <code class="computeroutput"><span class="identifier">serial</span></code>.
+          This is a C++ type, defined by quince, and it corresponds to whatever SQL
+          type a database uses for primary keys with automatically assigned values.
+          We use <code class="computeroutput"><span class="identifier">serial</span></code> for items
+          that are DBMS-generated (such as <code class="computeroutput"><span class="identifier">movie</span><span class="special">::</span><span class="identifier">id</span></code>),
+          and for items that will hold copies of those (such as <code class="computeroutput"><span class="identifier">screen</span><span class="special">::</span><span class="identifier">current_movie_id</span></code>).
+        </p>
+<div class="footnotes">
+<br><hr style="width:100; text-align:left;margin-left: 0">
+<div id="ftn.getting_started.defining_mapped_class_types.f0" class="footnote"><p><a href="#getting_started.defining_mapped_class_types.f0" class="para"><sup class="para">[3] </sup></a>
+            Nearly true but not 100% true. In fact, the members of the mapper are
+            <span class="emphasis"><em>const references</em></span> to the mappers of the members.
+            This is for the sake of polymorphism. At this stage, nobody knows exactly
+            what type the mappers of the members should be: there are different mapper
+            classes for <code class="computeroutput"><span class="keyword">float</span></code> on different
+            backends, and we haven't yet said which backend we're using. Also there
+            is the possibility of custom mappings. At run time, when quince constructs
+            <em class="replaceable"><code>cmp</code></em>, it will have that information, and it
+            will build the appropriate mapper objects for <em class="replaceable"><code>cmp</code></em><code class="computeroutput"><span class="special">.</span><span class="identifier">x</span></code>
+            and <em class="replaceable"><code>cmp</code></em><code class="computeroutput"><span class="special">.</span><span class="identifier">y</span></code> to refer to. But at compile time,
+            all that is known is that they refer to <span class="emphasis"><em>some mapper of <code class="computeroutput"><span class="keyword">float</span></code></em></span> -- which is an abstract
+            type (<code class="computeroutput"><span class="identifier">abstract_mapper</span><span class="special">&lt;</span><span class="keyword">float</span><span class="special">&gt;</span></code>, in fact).
+          </p></div>
+<div id="ftn.getting_started.defining_mapped_class_types.f1" class="footnote"><p><a href="#getting_started.defining_mapped_class_types.f1" class="para"><sup class="para">[4] </sup></a>
+            Readers of the previous footnote will be sensitive to a subtle difference
+            in this case. We <span class="emphasis"><em>do</em></span> know, at compile-time, the exact
+            type of <em class="replaceable"><code>cmc</code></em><code class="computeroutput"><span class="special">.</span><span class="identifier">location</span></code>: it's a <code class="computeroutput"><span class="identifier">class_mapper</span><span class="special">&lt;</span><span class="identifier">point</span><span class="special">&gt;</span></code>, and that type is already fully defined.
+            So quince does not need to use polymorphism in this case, and in fact
+            it chooses not to. This subtlety affects what you can write in application
+            code. E.g. if your code gets hold of a reference to <em class="replaceable"><code>cmc</code></em>
+            (and we shall soon see how that can happen), then the expression <em class="replaceable"><code>cmc</code></em><code class="computeroutput"><span class="special">.</span><span class="identifier">location</span><span class="special">.</span><span class="identifier">x</span></code>
+            is well-formed, because the compiler can see the type of <em class="replaceable"><code>cmc</code></em><code class="computeroutput"><span class="special">.</span><span class="identifier">location</span></code>.
+          </p></div>
+</div>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2014 Michael Shepanski<p>
+        Distributed under the Boost Software License, Version 1.0
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="../getting_started.html"><img src="../images/prev.png" alt="Prev"></a><a accesskey="u" href="../getting_started.html"><img src="../images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../images/home.png" alt="Home"></a><a accesskey="n" href="creating_the_database_object.html"><img src="../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

@@ -1,0 +1,176 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Chapter&#160;6.&#160;Expressions for Server-Side Execution</title>
+<link rel="stylesheet" href="boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="index.html" title="QUINCE: QUeries IN C++ Expressions">
+<link rel="up" href="depth.html" title="Part&#160;II.&#160;The Quince API in Depth">
+<link rel="prev" href="mapped_data_types/user_defined_class_types.html" title="User-Defined Class Types">
+<link rel="next" href="expressions/arithmetic_operations.html" title="Arithmetic Operations">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<div class="spirit-nav">
+<a accesskey="p" href="mapped_data_types/user_defined_class_types.html"><img src="images/prev.png" alt="Prev"></a><a accesskey="u" href="depth.html"><img src="images/up.png" alt="Up"></a><a accesskey="h" href="index.html"><img src="images/home.png" alt="Home"></a><a accesskey="n" href="expressions/arithmetic_operations.html"><img src="images/next.png" alt="Next"></a>
+</div>
+<div class="chapter">
+<div class="titlepage"><div><div><h2 class="title">
+<a name="expressions"></a>Chapter&#160;6.&#160;Expressions for Server-Side Execution</h2></div></div></div>
+<div class="toc">
+<p><b>Table of Contents</b></p>
+<dl class="toc">
+<dt><span class="section"><a href="expressions.html#expressions.server_side_expressions_in_gener">Server-Side
+        Expressions in General</a></span></dt>
+<dt><span class="section"><a href="expressions/arithmetic_operations.html">Arithmetic Operations
+        </a></span></dt>
+<dt><span class="section"><a href="expressions/strcat.html">String Concatenation</a></span></dt>
+<dt><span class="section"><a href="expressions/cast.html"><code class="computeroutput"><span class="identifier">cast</span><span class="special">&lt;</span></code>...<code class="computeroutput"><span class="special">&gt;()</span></code></a></span></dt>
+<dt><span class="section"><a href="expressions/function_calls.html">Function Calls</a></span></dt>
+<dd><dl>
+<dt><span class="section"><a href="expressions/function_calls.html#expressions.function_calls.pre_wrapped_functions">Pre-wrapped
+          functions</a></span></dt>
+<dt><span class="section"><a href="expressions/function_calls/scalar_and_aggregate_functions.html"><span class="quote">&#8220;<span class="quote">Scalar</span>&#8221;</span>
+          and <span class="quote">&#8220;<span class="quote">Aggregate</span>&#8221;</span> Functions</a></span></dt>
+<dt><span class="section"><a href="expressions/function_calls/writing_your_own_function_wrappe.html">Writing
+          Your Own Function Wrappers</a></span></dt>
+</dl></dd>
+<dt><span class="section"><a href="expressions/relational.html">Relational Operations </a></span></dt>
+<dt><span class="section"><a href="expressions/predicate_s_and_logical_operatio.html"><code class="computeroutput"><span class="identifier">predicate</span></code>s and Logical Operations</a></span></dt>
+<dt><span class="section"><a href="expressions/exists.html"><code class="computeroutput"><span class="identifier">exists</span><span class="special">()</span></code></a></span></dt>
+<dt><span class="section"><a href="expressions/in.html"><code class="computeroutput"><span class="identifier">in</span><span class="special">()</span></code></a></span></dt>
+<dt><span class="section"><a href="expressions/collective.html">Collective Comparisons (PostgreSQL
+        only)</a></span></dt>
+<dt><span class="section"><a href="expressions/scalar.html">Scalar Subqueries</a></span></dt>
+<dt><span class="section"><a href="expressions/choose.html"><code class="computeroutput"><span class="identifier">choose</span><span class="special">()</span></code></a></span></dt>
+<dt><span class="section"><a href="expressions/visibility.html">Visibility</a></span></dt>
+</dl>
+</div>
+<p>
+        
+      </p>
+<div class="section">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="expressions.server_side_expressions_in_gener"></a><a class="link" href="expressions.html#expressions.server_side_expressions_in_gener" title="Server-Side Expressions in General">Server-Side
+        Expressions in General</a>
+</h2></div></div></div>
+<p>
+          This chapter deals with one component of queries: the part that represents
+          a <span class="emphasis"><em>server-side expression</em></span>, i.e. an expression to be
+          evaluated by the DBMS.
+        </p>
+<p>
+          The simplest of these components are either a value of some mapped type,
+          e.g. 3.14f, or one of the mapper objects that were described in the previous
+          chapter, e.g. <code class="computeroutput"><span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">x</span></code>.
+        </p>
+<p>
+          The features described in this chapter let us build up from there. E.g.
+          there is an infix <code class="computeroutput"><span class="special">+</span></code>, which
+          lets us build <code class="computeroutput"><span class="number">3.14f</span> <span class="special">+</span>
+          <span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">x</span></code>. Then we can build on what we have
+          built, and so on.
+        </p>
+<p>
+          The simplest components come in a variety of C++ types, e.g. <code class="computeroutput"><span class="number">3.14f</span></code> is of type <code class="computeroutput"><span class="keyword">float</span></code>,
+          <code class="computeroutput"><span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">x</span></code> is of type <code class="computeroutput"><span class="identifier">abstract_mapper</span><span class="special">&lt;</span><span class="keyword">float</span><span class="special">&gt;</span></code>; but the components we build will always
+          have the type <code class="computeroutput"><span class="identifier">exprn_mapper</span><span class="special">&lt;</span></code><em class="replaceable"><code>T</code></em><code class="computeroutput"><span class="special">&gt;</span></code>, where <em class="replaceable"><code>T</code></em>
+          is the expression's <span class="emphasis"><em>result type</em></span> -- i.e. the C++ equivalent
+          of the SQL type to which the expression actually evaluates. So <code class="computeroutput"><span class="number">3.14f</span> <span class="special">+</span> <span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">x</span></code> has the type <code class="computeroutput"><span class="identifier">exprn_mapper</span><span class="special">&lt;</span><span class="keyword">float</span><span class="special">&gt;</span></code>.
+        </p>
+<p>
+          It would seem that, for any mapped type <em class="replaceable"><code>T</code></em>, a
+          wide range of C++ types can represent server-side expressions with result
+          type <em class="replaceable"><code>T</code></em>:
+        </p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+              There is <em class="replaceable"><code>T</code></em> itself.
+            </li>
+<li class="listitem">
+              If <em class="replaceable"><code>T</code></em> is a polymorphically mapped type (like
+              <code class="computeroutput"><span class="keyword">float</span></code>), then there is
+              <code class="computeroutput"><span class="identifier">abstract_mapper</span><span class="special">&lt;</span></code><em class="replaceable"><code>T</code></em><code class="computeroutput"><span class="special">&gt;</span></code>.
+            </li>
+<li class="listitem">
+              If <em class="replaceable"><code>T</code></em> is a statically mapped type, then there
+              is some <code class="computeroutput"><span class="identifier">optional_mapper</span></code>,
+              <code class="computeroutput"><span class="identifier">tuple_mapper</span></code> or <code class="computeroutput"><span class="identifier">class_mapper</span></code> class.
+            </li>
+<li class="listitem">
+              There is <code class="computeroutput"><span class="identifier">exprn_mapper</span><span class="special">&lt;</span></code><em class="replaceable"><code>T</code></em><code class="computeroutput"><span class="special">&gt;</span></code>.
+            </li>
+</ul></div>
+<p>
+          Will this make our lives difficult (or at least repetitive) when we try
+          to write code that deals with <span class="quote">&#8220;<span class="quote">any server-side expression with result
+          type <em class="replaceable"><code>T</code></em></span>&#8221;</span>?
+        </p>
+<p>
+          Fortunately we can shorten the list, by folding some of the cases into
+          others. In the statically mapped case, the mapper class is always a subclass
+          of <code class="computeroutput"><span class="identifier">abstract_mapper</span><span class="special">&lt;</span></code><em class="replaceable"><code>T</code></em><code class="computeroutput"><span class="special">&gt;</span></code>. And, for the sake of shortening the
+          list further, quince defines <code class="computeroutput"><span class="identifier">exprn_mapper</span><span class="special">&lt;</span></code><em class="replaceable"><code>T</code></em><code class="computeroutput"><span class="special">&gt;</span></code> as a subclass of <code class="computeroutput"><span class="identifier">abstract_mapper</span><span class="special">&lt;</span></code><em class="replaceable"><code>T</code></em><code class="computeroutput"><span class="special">&gt;</span></code>. So the types we need to consider separately
+          are two:
+        </p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+              <em class="replaceable"><code>T</code></em>
+            </li>
+<li class="listitem">
+              <code class="computeroutput"><span class="identifier">abstract_mapper</span><span class="special">&lt;</span></code><em class="replaceable"><code>T</code></em><code class="computeroutput"><span class="special">&gt;</span></code>
+            </li>
+</ul></div>
+<p>
+          For example, if we want to write a function that takes as an argument
+          <span class="quote">&#8220;<span class="quote">any server-side expression with result type <code class="computeroutput"><span class="identifier">uint16_t</span></code></span>&#8221;</span>,
+          we need just two overloads:
+        </p>
+<pre class="programlisting"><span class="identifier">query</span><span class="special">&lt;</span><span class="identifier">oscar</span><span class="special">&gt;</span>
+<span class="identifier">oscars_before</span><span class="special">(</span><span class="identifier">uint16_t</span> <span class="identifier">cutoff</span><span class="special">)</span> <span class="special">{</span>
+    <span class="keyword">return</span> <span class="identifier">oscars</span><span class="special">.</span><span class="identifier">where</span><span class="special">(</span><span class="identifier">oscars</span><span class="special">-&gt;</span><span class="identifier">year</span> <span class="special">&lt;</span> <span class="identifier">cutoff</span><span class="special">);</span>
+<span class="special">}</span>
+
+<span class="identifier">query</span><span class="special">&lt;</span><span class="identifier">oscar</span><span class="special">&gt;</span>
+<span class="identifier">oscars_before</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">abstract_mapper</span><span class="special">&lt;</span><span class="identifier">uint16_t</span><span class="special">&gt;</span> <span class="special">&amp;</span><span class="identifier">cutoff</span><span class="special">)</span> <span class="special">{</span>
+    <span class="keyword">return</span> <span class="identifier">oscars</span><span class="special">.</span><span class="identifier">where</span><span class="special">(</span><span class="identifier">oscars</span><span class="special">-&gt;</span><span class="identifier">year</span> <span class="special">&lt;</span> <span class="identifier">cutoff</span><span class="special">);</span>
+<span class="special">}</span>
+</pre>
+<p>
+          But maybe we don't want even that much repeated code. Then we have alternatives.
+        </p>
+<p>
+          <code class="computeroutput"><span class="identifier">exprn_mapper</span><span class="special">&lt;</span></code><em class="replaceable"><code>T</code></em><code class="computeroutput"><span class="special">&gt;</span></code> supports implicit conversions from
+          <em class="replaceable"><code>T</code></em> and from <code class="computeroutput"><span class="identifier">abstract_mapper</span><span class="special">&lt;</span></code><em class="replaceable"><code>T</code></em><code class="computeroutput"><span class="special">&gt;</span></code>. So we can take advantage of those:
+        </p>
+<pre class="programlisting"><span class="identifier">query</span><span class="special">&lt;</span><span class="identifier">oscar</span><span class="special">&gt;</span>
+<span class="identifier">oscars_before</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">exprn_mapper</span><span class="special">&lt;</span><span class="identifier">uint16_t</span><span class="special">&gt;</span> <span class="special">&amp;</span><span class="identifier">cutoff</span><span class="special">)</span> <span class="special">{</span>
+    <span class="keyword">return</span> <span class="identifier">oscars</span><span class="special">.</span><span class="identifier">where</span><span class="special">(</span><span class="identifier">oscars</span><span class="special">-&gt;</span><span class="identifier">year</span> <span class="special">&lt;</span> <span class="identifier">cutoff</span><span class="special">);</span>
+<span class="special">}</span>
+</pre>
+<p>
+          Or we can use a template:
+        </p>
+<pre class="programlisting"><span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">typename</span> <span class="identifier">Arg</span><span class="special">&gt;</span>
+<span class="identifier">query</span><span class="special">&lt;</span><span class="identifier">oscar</span><span class="special">&gt;</span>
+<span class="identifier">oscars_before</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">Arg</span> <span class="special">&amp;</span><span class="identifier">cutoff</span><span class="special">)</span> <span class="special">{</span>
+    <span class="keyword">return</span> <span class="identifier">oscars</span><span class="special">.</span><span class="identifier">where</span><span class="special">(</span><span class="identifier">oscars</span><span class="special">-&gt;</span><span class="identifier">year</span> <span class="special">&lt;</span> <span class="identifier">cutoff</span><span class="special">);</span>
+<span class="special">}</span>
+</pre>
+<p>
+          which leaves the type checking in the hands of quince's <code class="computeroutput"><span class="special">&lt;</span></code>.
+        </p>
+</div>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2014 Michael Shepanski<p>
+        Distributed under the Boost Software License, Version 1.0
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="mapped_data_types/user_defined_class_types.html"><img src="images/prev.png" alt="Prev"></a><a accesskey="u" href="depth.html"><img src="images/up.png" alt="Up"></a><a accesskey="h" href="index.html"><img src="images/home.png" alt="Home"></a><a accesskey="n" href="expressions/arithmetic_operations.html"><img src="images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

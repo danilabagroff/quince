@@ -1,0 +1,157 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Executing Queries</title>
+<link rel="stylesheet" href="../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../index.html" title="QUINCE: QUeries IN C++ Expressions">
+<link rel="up" href="../queries.html" title="Chapter&#160;7.&#160;Queries">
+<link rel="prev" href="skip_and_limit.html" title="skip() and limit()">
+<link rel="next" href="executing/with_at_most_single_record_outpu.html" title="With (at most) Single-Record Output: get()">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<div class="spirit-nav">
+<a accesskey="p" href="skip_and_limit.html"><img src="../images/prev.png" alt="Prev"></a><a accesskey="u" href="../queries.html"><img src="../images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../images/home.png" alt="Home"></a><a accesskey="n" href="executing/with_at_most_single_record_outpu.html"><img src="../images/next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="queries.executing"></a><a class="link" href="executing.html" title="Executing Queries">Executing Queries</a>
+</h2></div></div></div>
+<div class="toc"><dl class="toc">
+<dt><span class="section"><a href="executing.html#queries.executing.with_multi_record_output_begin_a">With
+          Multi-Record Output: <code class="computeroutput"><span class="identifier">begin</span><span class="special">()</span></code> and <code class="computeroutput"><span class="identifier">const_iterator</span></code></a></span></dt>
+<dt><span class="section"><a href="executing/with_at_most_single_record_outpu.html">With
+          (at most) Single-Record Output: <code class="computeroutput"><span class="identifier">get</span><span class="special">()</span></code></a></span></dt>
+<dt><span class="section"><a href="executing/evaluate.html">With Single-Value Output:
+          <code class="computeroutput"><span class="identifier">evaluate</span><span class="special">()</span></code></a></span></dt>
+</dl></div>
+<p>
+          
+        </p>
+<div class="section">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="queries.executing.with_multi_record_output_begin_a"></a><a class="link" href="executing.html#queries.executing.with_multi_record_output_begin_a" title="With Multi-Record Output: begin() and const_iterator">With
+          Multi-Record Output: <code class="computeroutput"><span class="identifier">begin</span><span class="special">()</span></code> and <code class="computeroutput"><span class="identifier">const_iterator</span></code></a>
+</h3></div></div></div>
+<p>
+            The most general way to execute a query is by calling its <code class="computeroutput"><span class="identifier">begin</span><span class="special">()</span></code>
+            method. That returns an <span class="emphasis"><em>iterator</em></span>, and the iterator
+            provides access to all of the query's output, whether it be nothing,
+            a single record, or so much that it can't fit in memory all at once.
+            On PostgreSQL, the iterator wraps an SQL <code class="literal">CURSOR</code>.
+          </p>
+<p>
+            <em class="replaceable"><code>q</code></em><code class="computeroutput"><span class="special">.</span><span class="identifier">begin</span><span class="special">()</span></code>
+            starts the query <em class="replaceable"><code>q</code></em>'s execution but does not
+            wait for it to finish. It waits for output to start flowing, and when
+            it receives the first row, or it learns that there will be no rows, it
+            returns. Its return type is <em class="replaceable"><code>Q</code></em><code class="computeroutput"><span class="special">::</span><span class="identifier">const_iterator</span></code>.
+            Thereafter the application may call <em class="replaceable"><code>Q</code></em><code class="computeroutput"><span class="special">::</span><span class="identifier">const_iterator</span><span class="special">::</span><span class="keyword">operator</span><span class="special">++()</span></code> to indicate readiness for more output,
+            and the DBMS's production of data is flow-controlled accordingly.
+          </p>
+<p>
+            When the end of data is reached (either by <code class="computeroutput"><span class="identifier">begin</span><span class="special">()</span></code> or by <code class="computeroutput"><span class="special">++</span></code>),
+            the iterator enters an <span class="emphasis"><em>end state</em></span>, and then <code class="computeroutput"><span class="special">++</span></code> may not be used on it again. The end
+            state can be tested using the iterator's <code class="computeroutput"><span class="identifier">is_end</span><span class="special">()</span></code> method, or by comparing it with a past-the-end
+            iterator. If <em class="replaceable"><code>q</code></em><code class="computeroutput"><span class="special">.</span><span class="identifier">begin</span><span class="special">()</span></code>
+            created the iterator, then <em class="replaceable"><code>q</code></em><code class="computeroutput"><span class="special">.</span><span class="identifier">end</span><span class="special">()</span></code> returns a past-the-end iterator to
+            compare it with.
+          </p>
+<p>
+            If the iterator is destroyed before it enters the end state, then the
+            query's execution is terminated.
+          </p>
+<p>
+            An iterator may (depending on the DBMS) buffer some rows of raw DBMS
+            output. It also keeps a C++ representation of the current row, and its
+            <code class="computeroutput"><span class="keyword">operator</span><span class="special">*()</span></code>
+            and <code class="computeroutput"><span class="keyword">operator</span><span class="special">-&gt;()</span></code>
+            return a const reference and a const pointer, respectively, to that.
+          </p>
+<p>
+            These iterators conform to the STL <span class="emphasis"><em>InputIterator</em></span>
+            concept, so for deeper treatment I refer to the documentation <a href="http://en.cppreference.com/w/cpp/concept/InputIterator" target="_top">here</a>,
+            and the linked pages, especially <a href="http://en.cppreference.com/w/cpp/concept/Iterator" target="_top">here</a>
+            and <a href="http://en.cppreference.com/w/cpp/iterator/iterator_traits" target="_top">here</a>.
+          </p>
+<p>
+            Those pages leave some terms for iterator implementations to define,
+            and our query iterators define them as follows:
+          </p>
+<p>
+            For any query type <em class="replaceable"><code>Q</code></em>, if <em class="replaceable"><code>I</code></em>
+            is the type <em class="replaceable"><code>Q</code></em><code class="computeroutput"><span class="special">::</span><span class="identifier">const_iterator</span></code>, then:
+          </p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+                <em class="replaceable"><code>I</code></em><code class="computeroutput"><span class="special">::</span><span class="identifier">difference_type</span></code> is <code class="computeroutput"><span class="identifier">size_t</span></code>.
+              </li>
+<li class="listitem">
+                <em class="replaceable"><code>I</code></em><code class="computeroutput"><span class="special">::</span><span class="identifier">value_type</span></code> is <em class="replaceable"><code>Q</code></em>'s
+                value type.
+              </li>
+<li class="listitem">
+                <em class="replaceable"><code>I</code></em><code class="computeroutput"><span class="special">::</span><span class="identifier">pointer</span></code> is <code class="computeroutput"><span class="keyword">const</span>
+                </code><em class="replaceable"><code>I</code></em><code class="computeroutput"><span class="special">::</span><span class="identifier">value_type</span> <span class="special">*</span></code>.
+              </li>
+<li class="listitem">
+                <em class="replaceable"><code>I</code></em><code class="computeroutput"><span class="special">::</span><span class="identifier">reference</span></code> is <code class="computeroutput"><span class="keyword">const</span>
+                </code><em class="replaceable"><code>I</code></em><code class="computeroutput"><span class="special">::</span><span class="identifier">value_type</span> <span class="special">&amp;</span></code>.
+              </li>
+<li class="listitem">
+                <em class="replaceable"><code>I</code></em><code class="computeroutput"><span class="special">::</span><span class="identifier">iterator_category</span></code> is <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">input_iterator_tag</span></code>.
+              </li>
+</ul></div>
+<p>
+            The iterator returned by <em class="replaceable"><code>Q</code></em><code class="computeroutput"><span class="special">::</span><span class="identifier">end</span><span class="special">()</span></code>
+            is a <span class="quote">&#8220;<span class="quote">past-the-end</span>&#8221;</span> iterator and also a <span class="quote">&#8220;<span class="quote">singular</span>&#8221;</span>
+            iterator.
+          </p>
+<h5>
+<a name="queries.executing.with_multi_record_output_begin_a.h0"></a>
+            <span class="phrase"><a name="queries.executing.with_multi_record_output_begin_a.fetch_size"></a></span><a class="link" href="executing.html#queries.executing.with_multi_record_output_begin_a.fetch_size"><code class="computeroutput"><span class="identifier">fetch_size</span><span class="special">()</span></code></a>
+          </h5>
+<p>
+            If <em class="replaceable"><code>q</code></em> is a query on a PostgreSQL database,
+            then its iterator will buffer raw DBMS output. The buffer holds 100 rows
+            by default, but <code class="computeroutput"><span class="identifier">fetch_size</span><span class="special">()</span></code> lets you control that number. For any
+            value <em class="replaceable"><code>n</code></em> of type <code class="computeroutput"><span class="identifier">uint32_t</span></code>,
+            <em class="replaceable"><code>q</code></em><code class="computeroutput"><span class="special">.</span><span class="identifier">fetch_size</span><span class="special">(</span></code><em class="replaceable"><code>n</code></em><code class="computeroutput"><span class="special">)</span></code> returns a query that is like <em class="replaceable"><code>q</code></em>
+            in every way, except that its <code class="computeroutput"><span class="identifier">begin</span><span class="special">()</span></code> method returns an iterator that buffers
+            <em class="replaceable"><code>n</code></em> rows at a time.
+          </p>
+<p>
+            If <em class="replaceable"><code>q</code></em> belongs to an sqlite database, then
+            <em class="replaceable"><code>q</code></em><code class="computeroutput"><span class="special">.</span><span class="identifier">fetch_size</span><span class="special">(</span></code><em class="replaceable"><code>n</code></em><code class="computeroutput"><span class="special">)</span></code> is ignored, and harmless.
+          </p>
+<p>
+            If you build a query using <code class="computeroutput"><span class="identifier">fetch_size</span><span class="special">()</span></code> and then build further with <code class="computeroutput"><span class="identifier">where</span><span class="special">()</span></code>,
+            <code class="computeroutput"><span class="identifier">select</span><span class="special">()</span></code>,
+            <code class="computeroutput"><span class="identifier">order</span><span class="special">()</span></code>
+            etc., the resulting query will be valid but its fetch size on PostgreSQL
+            will be unpredictable, so I don't recommend doing that. Only call <code class="computeroutput"><span class="identifier">fetch_size</span><span class="special">()</span></code>
+            immediately before <code class="computeroutput"><span class="identifier">begin</span><span class="special">()</span></code>.
+          </p>
+<p>
+            The C++11 <code class="computeroutput"><span class="keyword">for</span></code> loop calls
+            <code class="computeroutput"><span class="identifier">begin</span><span class="special">()</span></code>
+            on the query you give it, so this works:
+          </p>
+<pre class="programlisting"><span class="keyword">for</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">point</span> <span class="special">&amp;</span><span class="identifier">p</span><span class="special">:</span> <span class="identifier">points</span><span class="special">.</span><span class="identifier">where</span><span class="special">(</span><span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">x</span> <span class="special">&gt;</span> <span class="number">4</span><span class="special">).</span><span class="identifier">fetch_size</span><span class="special">(</span><span class="number">50</span><span class="special">))</span>
+    <span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="identifier">p</span><span class="special">.</span><span class="identifier">y</span> <span class="special">&lt;&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">endl</span><span class="special">;</span>
+</pre>
+</div>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2014 Michael Shepanski<p>
+        Distributed under the Boost Software License, Version 1.0
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="skip_and_limit.html"><img src="../images/prev.png" alt="Prev"></a><a accesskey="u" href="../queries.html"><img src="../images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../images/home.png" alt="Home"></a><a accesskey="n" href="executing/with_at_most_single_record_outpu.html"><img src="../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

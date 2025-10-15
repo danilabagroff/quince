@@ -1,0 +1,223 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Predefined Concrete Mapper Class Templates</title>
+<link rel="stylesheet" href="../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../index.html" title="QUINCE: QUeries IN C++ Expressions">
+<link rel="up" href="../custom.html" title="Chapter&#160;9.&#160;Custom Mappings">
+<link rel="prev" href="../custom.html" title="Chapter&#160;9.&#160;Custom Mappings">
+<link rel="next" href="deployment.html" title="Deployment">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<div class="spirit-nav">
+<a accesskey="p" href="../custom.html"><img src="../images/prev.png" alt="Prev"></a><a accesskey="u" href="../custom.html"><img src="../images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../images/home.png" alt="Home"></a><a accesskey="n" href="deployment.html"><img src="../images/next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="custom.predefined"></a><a class="link" href="predefined.html" title="Predefined Concrete Mapper Class Templates">Predefined Concrete Mapper Class
+        Templates</a>
+</h2></div></div></div>
+<p>
+          
+        </p>
+<a name="direct_mapper"></a><h4>
+<a name="custom.predefined.h0"></a>
+          <span class="phrase"><a name="custom.predefined.direct_mapper_t"></a></span><a class="link" href="predefined.html#custom.predefined.direct_mapper_t"><code class="computeroutput"><span class="identifier">direct_mapper</span><span class="special">&lt;</span></code><em class="replaceable"><code>T</code></em><code class="computeroutput"><span class="special">&gt;</span></code></a>
+        </h4>
+<p>
+          <code class="computeroutput"><span class="identifier">direct_mapper</span><span class="special">&lt;</span></code><em class="replaceable"><code>T</code></em><code class="computeroutput"><span class="special">&gt;</span></code> is an implementation of <code class="computeroutput"><span class="identifier">abstract_mapper</span><span class="special">&lt;</span></code><em class="replaceable"><code>T</code></em><code class="computeroutput"><span class="special">&gt;</span></code> that represents <em class="replaceable"><code>T</code></em>
+          by calling the backend library's <a name="basic_conversions"></a><span class="emphasis"><em>basic
+          conversions</em></span> for <em class="replaceable"><code>T</code></em>, and nothing else:
+          it does not add any data transformation of its own.
+        </p>
+<p>
+          Each backend library provides a fixed set of basic conversions, which convert
+          in both directions between C++ data types and the DBMS's column-oriented
+          formats. They do not use mappers because they are at a level below mappers.
+          They are only available for a few C++ types, and it is a different few
+          for each backend. The details are <a class="link" href="../quince_postgresql/basic.html" title="Basic conversions">here</a>
+          and <a class="link" href="../quince_sqlite/basic.html" title="Basic conversions">here</a>, but I can tell you
+          two things now:
+        </p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+              They are always types that can be represented in single columns.
+            </li>
+<li class="listitem">
+              Among numeric types, they are ones whose conversion requires nothing
+              more than byte ordering.
+            </li>
+</ul></div>
+<p>
+          <code class="computeroutput"><span class="identifier">direct_mapper</span><span class="special">&lt;</span></code><em class="replaceable"><code>T</code></em><code class="computeroutput"><span class="special">&gt;</span></code> does not suffer from any of the same
+          tradeoffs as other mapper classes for numeric types, so it is the mapper
+          of choice in cases where it is available, i.e. on a database whose backend
+          library provides basic conversions for <em class="replaceable"><code>T</code></em>.
+        </p>
+<h4>
+<a name="custom.predefined.h1"></a>
+          <span class="phrase"><a name="custom.predefined.numeric_cast_mapper_t_othermappe"></a></span><a class="link" href="predefined.html#custom.predefined.numeric_cast_mapper_t_othermappe"><code class="computeroutput"><span class="identifier">numeric_cast_mapper</span><span class="special">&lt;</span></code><em class="replaceable"><code>T</code></em><code class="computeroutput"><span class="special">,</span></code> <em class="replaceable"><code>OtherMapper</code></em><code class="computeroutput"><span class="special">&gt;</span></code></a>
+        </h4>
+<p>
+          <code class="computeroutput"><span class="identifier">numeric_cast_mapper</span><span class="special">&lt;</span></code><em class="replaceable"><code>T</code></em><code class="computeroutput"><span class="special">,</span></code> <em class="replaceable"><code>OtherMapper</code></em><code class="computeroutput"><span class="special">&gt;</span></code> is an implementation of <code class="computeroutput"><span class="identifier">abstract_mapper</span><span class="special">&lt;</span></code><em class="replaceable"><code>T</code></em><code class="computeroutput"><span class="special">&gt;</span></code> that represents <em class="replaceable"><code>T</code></em>
+          by:
+        </p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+              delegating to <em class="replaceable"><code>OtherMapper</code></em>, and
+            </li>
+<li class="listitem">
+              using <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">numeric_cast</span></code>s to transform the data
+              to or from <em class="replaceable"><code>OtherMapper</code></em>'s mapped type.
+            </li>
+</ul></div>
+<p>
+          E.g. the following mapper class is one possible implementation of <code class="computeroutput"><span class="identifier">abstract_mapper</span><span class="special">&lt;</span><span class="identifier">uint16_t</span><span class="special">&gt;</span></code>
+          <a href="#ftn.custom.predefined.f0" class="footnote" name="custom.predefined.f0"><sup class="footnote">[16]</sup></a> (assuming that <code class="computeroutput"><span class="identifier">direct_mapper</span><span class="special">&lt;</span><span class="identifier">int32_t</span><span class="special">&gt;</span></code> is available <a href="#ftn.custom.predefined.f1" class="footnote" name="custom.predefined.f1"><sup class="footnote">[17]</sup></a> ):
+        </p>
+<pre class="programlisting"><span class="identifier">numeric_cast_mapper</span><span class="special">&lt;</span><span class="identifier">uint16_t</span><span class="special">,</span> <span class="identifier">direct_mapper</span><span class="special">&lt;</span><span class="identifier">int32_t</span><span class="special">&gt;&gt;</span>
+</pre>
+<p>
+          To convert a <code class="computeroutput"><span class="identifier">uint16_t</span></code> to
+          a column, this mapper calls <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">numeric_cast</span><span class="special">&lt;</span><span class="identifier">int32_t</span><span class="special">&gt;()</span></code> and then delegates to <code class="computeroutput"><span class="identifier">direct_mapper</span><span class="special">&lt;</span><span class="identifier">int32_t</span><span class="special">&gt;</span></code>.
+          To convert a column to <code class="computeroutput"><span class="identifier">uint16_t</span></code>,
+          it delegates to <code class="computeroutput"><span class="identifier">direct_mapper</span><span class="special">&lt;</span><span class="identifier">int32_t</span><span class="special">&gt;</span></code> and then calls <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">numeric_cast</span><span class="special">&lt;</span><span class="identifier">uint16_t</span><span class="special">&gt;()</span></code>.
+        </p>
+<p>
+          When <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">numeric_cast</span></code> fails, it throws a <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">bad_numeric_conversion</span></code>, which quince
+          does not catch.
+        </p>
+<p>
+          An <code class="computeroutput"><span class="identifier">int32_t</span></code> can absorb any
+          value from a <code class="computeroutput"><span class="identifier">uint16_t</span></code>,
+          so the cast that this mapper makes during outbound conversions will always
+          succeed. Inbound conversions, on the other hand, can go less well. If a
+          certain record had a <code class="computeroutput"><span class="identifier">uint16_t</span></code>
+          field that was near its maximum value, and you used <code class="computeroutput"><span class="identifier">update</span><span class="special">()</span></code> with a server-side expression to triple
+          it, then the next attempt to read it back would throw a <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">bad_numeric_conversion</span></code>.
+        </p>
+<p>
+          I'm not sure whether to count that as a disadvantage of <code class="computeroutput"><span class="identifier">numeric_cast_mapper</span></code>.
+          Perhaps <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">bad_numeric_conversion</span></code> is as good a way
+          as any to respond to arithmetic overflow.
+        </p>
+<p>
+          The clear disadvantage of <code class="computeroutput"><span class="identifier">numeric_cast_mapper</span></code>
+          is that, in all the cases where it is useful, it has a cost in space; e.g.
+          using 32 bits to hold 16 bits' worth of information.
+        </p>
+<h4>
+<a name="custom.predefined.h2"></a>
+          <span class="phrase"><a name="custom.predefined.reinterpret_cast_mapper_t_otherm"></a></span><a class="link" href="predefined.html#custom.predefined.reinterpret_cast_mapper_t_otherm"><code class="computeroutput"><span class="identifier">reinterpret_cast_mapper</span><span class="special">&lt;</span></code><em class="replaceable"><code>T</code></em><code class="computeroutput"><span class="special">,</span></code> <em class="replaceable"><code>OtherMapper</code></em><code class="computeroutput"><span class="special">&gt;</span></code></a>
+        </h4>
+<p>
+          <code class="computeroutput"><span class="identifier">reinterpret_cast_mapper</span><span class="special">&lt;</span></code><em class="replaceable"><code>T</code></em><code class="computeroutput"><span class="special">,</span></code> <em class="replaceable"><code>OtherMapper</code></em><code class="computeroutput"><span class="special">&gt;</span></code> is an implementation of <code class="computeroutput"><span class="identifier">abstract_mapper</span><span class="special">&lt;</span></code><em class="replaceable"><code>T</code></em><code class="computeroutput"><span class="special">&gt;</span></code> that represents <em class="replaceable"><code>T</code></em>
+          by:
+        </p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+              delegating to <em class="replaceable"><code>OtherMapper</code></em>, and
+            </li>
+<li class="listitem">
+              using <code class="computeroutput"><span class="keyword">reinterpret_cast</span></code>s
+              to transform the data to/from <em class="replaceable"><code>OtherMapper</code></em>'s
+              mapped type.
+            </li>
+</ul></div>
+<p>
+          E.g. here is another possible implementation of <code class="computeroutput"><span class="identifier">abstract_mapper</span><span class="special">&lt;</span><span class="identifier">uint16_t</span><span class="special">&gt;</span></code> (this time assuming that <code class="computeroutput"><span class="identifier">direct_mapper</span><span class="special">&lt;</span><span class="identifier">int16_t</span><span class="special">&gt;</span></code>
+          is available <a href="#ftn.custom.predefined.f2" class="footnote" name="custom.predefined.f2"><sup class="footnote">[18]</sup></a> ):
+        </p>
+<pre class="programlisting"><span class="identifier">reinterpret_cast_mapper</span><span class="special">&lt;</span><span class="identifier">uint16_t</span><span class="special">,</span> <span class="identifier">direct_mapper</span><span class="special">&lt;</span><span class="identifier">int16_t</span><span class="special">&gt;&gt;</span>
+</pre>
+<p>
+          To convert a <code class="computeroutput"><span class="identifier">uint16_t</span></code> to
+          a column, this mapper invokes <code class="computeroutput"><span class="keyword">reinterpret_cast</span><span class="special">&lt;</span><span class="identifier">int16_t</span><span class="special">&gt;()</span></code> and then delegates to <code class="computeroutput"><span class="identifier">direct_mapper</span><span class="special">&lt;</span><span class="identifier">int16_t</span><span class="special">&gt;</span></code>.
+          To convert a column to <code class="computeroutput"><span class="identifier">uint16_t</span></code>,
+          it delegates to <code class="computeroutput"><span class="identifier">direct_mapper</span><span class="special">&lt;</span><span class="identifier">int16_t</span><span class="special">&gt;</span></code> and then calls <code class="computeroutput"><span class="keyword">reinterpret_cast</span><span class="special">&lt;</span><span class="identifier">uint16_t</span><span class="special">&gt;()</span></code>.
+        </p>
+<p>
+          <code class="computeroutput"><span class="identifier">reinterpret_cast_mapper</span></code>
+          doesn't waste any space. It has the following disadvantages instead:
+        </p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+              Server-side comparisons and sorts produce results that are inconsistent
+              with client-side comparisons and sorts. E.g. 32767 &lt; 32769; but
+              the server-side representation of 32767 (i.e. 32767) is <span class="emphasis"><em>greater</em></span>
+              than the server-side representation of 32769 (i.e. -32767).
+            </li>
+<li class="listitem">
+              Server-side arithmetic produces results that are inconsistent with
+              client-side arithmetic. E.g. 32767 * 2 = 65534, but the server-side
+              representation of 32767 (i.e. 32767), multiplied by the server-side
+              representative of 2 (i.e. 2), equals -4, which is <span class="emphasis"><em>not</em></span>
+              the server-side representation of 65534 (i.e. -2).
+            </li>
+<li class="listitem">
+              Negative client-side values are mapped to server-side values that look
+              wrong, if you view them with non-quince tools that don't use the mapping.
+            </li>
+</ul></div>
+<h4>
+<a name="custom.predefined.h3"></a>
+          <span class="phrase"><a name="custom.predefined.reinterpret_cast_mapper_t_other0"></a></span><a class="link" href="predefined.html#custom.predefined.reinterpret_cast_mapper_t_other0"><code class="computeroutput"><span class="identifier">reinterpret_cast_mapper</span><span class="special">&lt;</span></code><em class="replaceable"><code>T</code></em><code class="computeroutput"><span class="special">,</span></code> <em class="replaceable"><code>OtherMapper</code></em><code class="computeroutput"><span class="special">,</span></code> <em class="replaceable"><code>Offset</code></em><code class="computeroutput"><span class="special">&gt;</span></code></a>
+        </h4>
+<p>
+          This variant of <code class="computeroutput"><span class="identifier">reinterpret_cast_mapper</span></code>
+          takes a constant offset of type <em class="replaceable"><code>T</code></em> as a third
+          template parameter. It behaves like the other form of <code class="computeroutput"><span class="identifier">reinterpret_cast_mapper</span></code>
+          except that:
+        </p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+              In outbound conversions, it adds the offset to the C++ value before
+              it does anything else.
+            </li>
+<li class="listitem">
+              In inbound conversions, it subtracts the offset from the C++ value
+              after it has done everything else.
+            </li>
+</ul></div>
+<p>
+          E.g. here is another possible implementation of <code class="computeroutput"><span class="identifier">abstract_mapper</span><span class="special">&lt;</span><span class="identifier">uint16_t</span><span class="special">&gt;</span></code> (again assuming that <code class="computeroutput"><span class="identifier">direct_mapper</span><span class="special">&lt;</span><span class="identifier">int16_t</span><span class="special">&gt;</span></code>
+          is available):
+        </p>
+<pre class="programlisting"><span class="identifier">reinterpret_cast_mapper</span><span class="special">&lt;</span><span class="identifier">uint16_t</span><span class="special">,</span> <span class="identifier">direct_mapper</span><span class="special">&lt;</span><span class="identifier">in16_t</span><span class="special">&gt;,</span> <span class="number">0x8000</span><span class="special">&gt;</span>
+</pre>
+<p>
+          By choosing the offset carefully, we solve the problem of comparisons and
+          sorts.
+        </p>
+<p>
+          On the other hand we still have the problem of server-side arithmetic producing
+          wrong results. And the problem of server-side values looking wrong just
+          got extended to all values, not just negative ones.
+        </p>
+<div class="footnotes">
+<br><hr style="width:100; text-align:left;margin-left: 0">
+<div id="ftn.custom.predefined.f0" class="footnote"><p><a href="#custom.predefined.f0" class="para"><sup class="para">[16] </sup></a>
+            It happens to be quince_postgresql's default implementation.
+          </p></div>
+<div id="ftn.custom.predefined.f1" class="footnote"><p><a href="#custom.predefined.f1" class="para"><sup class="para">[17] </sup></a>
+            It is, on quince_postgresql.
+          </p></div>
+<div id="ftn.custom.predefined.f2" class="footnote"><p><a href="#custom.predefined.f2" class="para"><sup class="para">[18] </sup></a>
+            It is, on quince_postgresql.
+          </p></div>
+</div>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2014 Michael Shepanski<p>
+        Distributed under the Boost Software License, Version 1.0
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="../custom.html"><img src="../images/prev.png" alt="Prev"></a><a accesskey="u" href="../custom.html"><img src="../images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../images/home.png" alt="Home"></a><a accesskey="n" href="deployment.html"><img src="../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

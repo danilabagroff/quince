@@ -1,0 +1,208 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Construction and Primary Key</title>
+<link rel="stylesheet" href="../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../index.html" title="QUINCE: QUeries IN C++ Expressions">
+<link rel="up" href="../tables.html" title="Chapter&#160;8.&#160;Tables">
+<link rel="prev" href="life_cycle_of_a_table_object.html" title="Life Cycle of a Table Object">
+<link rel="next" href="indexes_and_foreign_key_constrai.html" title="Indexes and Foreign Key Constraints">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<div class="spirit-nav">
+<a accesskey="p" href="life_cycle_of_a_table_object.html"><img src="../images/prev.png" alt="Prev"></a><a accesskey="u" href="../tables.html"><img src="../images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../images/home.png" alt="Home"></a><a accesskey="n" href="indexes_and_foreign_key_constrai.html"><img src="../images/next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="tables.construction"></a><a class="link" href="construction.html" title="Construction and Primary Key">Construction and Primary Key</a>
+</h2></div></div></div>
+<p>
+          
+        </p>
+<p>
+          To get started, we will need a database object. Its type is backend-specific:
+          either <code class="computeroutput"><span class="identifier">quince_postgresql</span><span class="special">::</span><span class="identifier">database</span></code>
+          or <code class="computeroutput"><span class="identifier">quince_sqlite</span><span class="special">::</span><span class="identifier">database</span></code>. <a class="link" href="../quince_postgresql.html#quince_postgresql.constructor" title="The quince_postgresql::database constructor">Later</a>
+          <a class="link" href="../quince_sqlite.html#quince_sqlite.constructor" title="The quince_sqlite::database constructor">sections</a> describe how
+          to construct these, so for now I'll assume that you have either:
+        </p>
+<pre class="programlisting"><span class="keyword">extern</span> <span class="identifier">quince_postgresql</span><span class="special">::</span><span class="identifier">database</span> <span class="identifier">db</span><span class="special">;</span>
+</pre>
+<p>
+          or:
+        </p>
+<pre class="programlisting"><span class="keyword">extern</span> <span class="identifier">quince_sqlite</span><span class="special">::</span><span class="identifier">database</span> <span class="identifier">db</span><span class="special">;</span>
+</pre>
+<p>
+          Either way, <code class="computeroutput"><span class="identifier">db</span></code> implements
+          the interface <code class="computeroutput"><span class="identifier">quince</span><span class="special">::</span><span class="identifier">database</span></code>, which is all we need here.
+        </p>
+<p>
+          Now we can construct a <code class="computeroutput"><span class="identifier">table</span></code>:
+        </p>
+<pre class="programlisting"><span class="identifier">table</span><span class="special">&lt;</span><span class="identifier">point</span><span class="special">&gt;</span> <span class="identifier">points</span><span class="special">(</span><span class="identifier">db</span><span class="special">,</span> <span class="string">"points"</span><span class="special">);</span>
+</pre>
+<p>
+          The constructor arguments give the site of the <a class="link" href="terminology.html#target">target</a>.
+          So <code class="computeroutput"><span class="identifier">points</span></code> represents an
+          SQL table named <code class="literal">points</code>, within <code class="computeroutput"><span class="identifier">db</span></code>'s
+          default schema (PostgreSQL) or main database (sqlite).
+        </p>
+<h4>
+<a name="tables.construction.h0"></a>
+          <span class="phrase"><a name="tables.construction.schemas_attached_databases_and_t"></a></span><a class="link" href="construction.html#tables.construction.schemas_attached_databases_and_t">Schemas,
+          attached databases, and two-part table names</a>
+        </h4>
+<p>
+          <a name="binomen"></a>The name can have two parts, separated by a period:
+        </p>
+<pre class="programlisting"><span class="identifier">table</span><span class="special">&lt;</span><span class="identifier">point</span><span class="special">&gt;</span> <span class="identifier">geom_points</span><span class="special">(</span><span class="identifier">db</span><span class="special">,</span> <span class="string">"geometry.points"</span><span class="special">);</span>
+</pre>
+<p>
+          The second part (<code class="computeroutput"><span class="identifier">points</span></code>)
+          is the target's SQL table name. The first part (<code class="computeroutput"><span class="identifier">geometry</span></code>)
+          means different things depending on the kind of database:
+        </p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+              For a PostgreSQL database, it is the target's schema name. If a subsequent
+              call to <code class="computeroutput"><span class="identifier">geom_points</span><span class="special">.</span><span class="identifier">open</span><span class="special">()</span></code> creates the target, it will do so
+              in the schema <code class="literal">geometry</code>, creating the schema first
+              if necessary.
+            </li>
+<li class="listitem">
+              For an sqlite database, it is the target's attached database name.
+              If a subsequent call to <code class="computeroutput"><span class="identifier">geom_points</span><span class="special">.</span><span class="identifier">open</span><span class="special">()</span></code> creates the target, it will do so
+              in the attached database <code class="literal">geometry</code>, attaching the
+              database first if necessary. (The attached database's <span class="emphasis"><em>filename</em></span>
+              may be something else, however; it depends on <code class="computeroutput"><span class="identifier">db</span></code>'s
+              <a class="link" href="../quince_sqlite.html#filename_map">filename_map</a>.)
+            </li>
+</ul></div>
+<h4>
+<a name="tables.construction.h1"></a>
+          <span class="phrase"><a name="tables.construction.specifying_a_primary_key"></a></span><a class="link" href="construction.html#tables.construction.specifying_a_primary_key">Specifying
+          a primary key</a>
+        </h4>
+<h5>
+<a name="tables.construction.h2"></a>
+          <span class="phrase"><a name="tables.construction.via_member_mapper_s"></a></span><a class="link" href="construction.html#tables.construction.via_member_mapper_s">Via
+          member mapper(s) ...</a>
+        </h5>
+<p>
+          The most general way to specify a <code class="computeroutput"><span class="identifier">table</span></code>'s
+          primary key is to construct the <code class="computeroutput"><span class="identifier">table</span></code>
+          first, and then call its <code class="computeroutput"><span class="identifier">specify_key</span><span class="special">()</span></code> method:
+        </p>
+<pre class="programlisting"><span class="identifier">points</span><span class="special">.</span><span class="identifier">specify_key</span><span class="special">(</span><span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">x</span><span class="special">);</span>
+</pre>
+<p>
+          So, if a subsequent call to <code class="computeroutput"><span class="identifier">points</span><span class="special">.</span><span class="identifier">open</span><span class="special">()</span></code> creates the target, the column that represents
+          member <code class="computeroutput"><span class="identifier">x</span></code> will become the
+          primary key. In this example it's a simple <code class="computeroutput"><span class="keyword">float</span></code>,
+          but it can be any mapped type, with any number of columns. Also you can
+          pass multiple mappers as arguments to <code class="computeroutput"><span class="identifier">specify_key</span><span class="special">()</span></code>.
+        </p>
+<p>
+          So the general case is <em class="replaceable"><code>table</code></em><code class="computeroutput"><span class="special">.</span><span class="identifier">specify_key</span><span class="special">(</span></code><em class="replaceable"><code>mapper0</code></em><code class="computeroutput"><span class="special">,</span></code> <em class="replaceable"><code>mapper1</code></em><code class="computeroutput"><span class="special">,</span></code> ...<code class="computeroutput"><span class="special">)</span></code>.
+        </p>
+<p>
+          <em class="replaceable"><code>table</code></em>'s value mapper will be <a class="link" href="../expressions/visibility.html" title="Visibility">visible</a>
+          to each of the <em class="replaceable"><code>mapperi</code></em>s.
+        </p>
+<p>
+          Then the primary key will be one that orders the elements of <em class="replaceable"><code>table</code></em>
+          by all the <em class="replaceable"><code>mapperi</code></em>s, with <em class="replaceable"><code>mapper0</code></em>
+          the most significant, <em class="replaceable"><code>mapper1</code></em> the next most
+          significant, and so on. The ordering for each <em class="replaceable"><code>mapperi</code></em>
+          will be:
+        </p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+              the ordering described <a class="link" href="../mapped_data_types/boost_optional.html#optional_order">here</a>,
+              <a class="link" href="../mapped_data_types/std_tuple.html#tuple_order">here</a>, or <a class="link" href="../mapped_data_types/user_defined_class_types.html#class_order">here</a>
+              if it's an <code class="computeroutput"><span class="identifier">optional_mapper</span></code>,
+              <code class="computeroutput"><span class="identifier">tuple_mapper</span></code> or <code class="computeroutput"><span class="identifier">class_mapper</span></code>; and
+            </li>
+<li class="listitem">
+              the DBMS's ordering otherwise.
+            </li>
+</ul></div>
+<h5>
+<a name="tables.construction.h3"></a>
+          <span class="phrase"><a name="tables.construction.or_via_a_pointer_to_key_member"></a></span><a class="link" href="construction.html#tables.construction.or_via_a_pointer_to_key_member">... or via
+          a pointer-to-key-member ...</a>
+        </h5>
+<p>
+          Very often a table's value type is some class, and its primary key is a
+          member of that class. The method <code class="computeroutput"><span class="identifier">specify_key_from_ptkm</span><span class="special">()</span></code> caters to that common case, by using
+          a C++ pointer-to-member to identify the primary key:
+        </p>
+<pre class="programlisting"><span class="identifier">points</span><span class="special">.</span><span class="identifier">specify_key_from_ptkm</span><span class="special">(&amp;</span><span class="identifier">point</span><span class="special">::</span><span class="identifier">x</span><span class="special">);</span>
+</pre>
+<h5>
+<a name="tables.construction.h4"></a>
+          <span class="phrase"><a name="tables.construction.or_at_construction"></a></span><a class="link" href="construction.html#tables.construction.or_at_construction">...
+          or at construction</a>
+        </h5>
+<p>
+          For brevity, <code class="computeroutput"><span class="identifier">table</span></code> has
+          a constructor that incorporates the work of <code class="computeroutput"><span class="identifier">specify_key_from_ptkm</span></code>.
+          Just pass the member pointer as a third constructor argument. So this:
+        </p>
+<pre class="programlisting"><span class="identifier">table</span><span class="special">&lt;</span><span class="identifier">point</span><span class="special">&gt;</span> <span class="identifier">points</span><span class="special">(</span><span class="identifier">db</span><span class="special">,</span> <span class="string">"points"</span><span class="special">,</span> <span class="special">&amp;</span><span class="identifier">point</span><span class="special">::</span><span class="identifier">x</span><span class="special">);</span>
+</pre>
+<p>
+          is equivalent to this:
+        </p>
+<pre class="programlisting"><span class="identifier">table</span><span class="special">&lt;</span><span class="identifier">point</span><span class="special">&gt;</span> <span class="identifier">points</span><span class="special">(</span><span class="identifier">db</span><span class="special">,</span> <span class="string">"points"</span><span class="special">);</span>
+<span class="identifier">points</span><span class="special">.</span><span class="identifier">specify_key_from_ptkm</span><span class="special">(&amp;</span><span class="identifier">point</span><span class="special">::</span><span class="identifier">x</span><span class="special">);</span>
+</pre>
+<h4>
+<a name="tables.construction.h5"></a>
+          <span class="phrase"><a name="tables.construction.table_versus_serial_table"></a></span><a class="link" href="construction.html#tables.construction.table_versus_serial_table"><code class="computeroutput"><span class="identifier">table</span></code> versus <code class="computeroutput"><span class="identifier">serial_table</span></code></a>
+        </h4>
+<p>
+          A <code class="computeroutput"><span class="identifier">serial_table</span></code> is a table
+          where the primary key's values are automatically created and assigned by
+          the DBMS. We'll see how that works when we discuss <a class="link" href="manipulation.html" title="Data Manipulation">data
+          manipulation</a>, but here's what we need to know for present purposes.
+        </p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+              A <code class="computeroutput"><span class="identifier">serial_table</span></code>'s primary
+              key must be of type <code class="computeroutput"><span class="identifier">serial</span></code>.
+            </li>
+<li class="listitem">
+              The primary key must be supplied by pointer-to-key-member, so <code class="computeroutput"><span class="identifier">serial_table</span></code> has no <code class="computeroutput"><span class="identifier">specify_key</span><span class="special">()</span></code>
+              method.
+            </li>
+<li class="listitem">
+              Aside from those two differences, the calls to construct a <code class="computeroutput"><span class="identifier">serial_table</span></code> and specify its primary
+              key are the same as for a <code class="computeroutput"><span class="identifier">table</span></code>.
+            </li>
+</ul></div>
+<p>
+          Note that <code class="computeroutput"><span class="identifier">serial_table</span></code>
+          does not simply mean <span class="quote">&#8220;<span class="quote">any table with a <code class="computeroutput"><span class="identifier">serial</span></code>
+          as its primary key</span>&#8221;</span>. The defining characteristic of a <code class="computeroutput"><span class="identifier">serial_table</span></code> is that it automatically
+          assigns values to its primary keys. You can have a table whose primary
+          keys are <code class="computeroutput"><span class="identifier">serial</span></code>s that it
+          does not auto-assign, and that would be a <code class="computeroutput"><span class="identifier">table</span></code>,
+          not a <code class="computeroutput"><span class="identifier">serial_table</span></code>.
+        </p>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2014 Michael Shepanski<p>
+        Distributed under the Boost Software License, Version 1.0
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="life_cycle_of_a_table_object.html"><img src="../images/prev.png" alt="Prev"></a><a accesskey="u" href="../tables.html"><img src="../images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../images/home.png" alt="Home"></a><a accesskey="n" href="indexes_and_foreign_key_constrai.html"><img src="../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

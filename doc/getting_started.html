@@ -1,0 +1,109 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Chapter&#160;3.&#160;Getting Started</title>
+<link rel="stylesheet" href="boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="index.html" title="QUINCE: QUeries IN C++ Expressions">
+<link rel="up" href="introduction.html" title="Part&#160;I.&#160;Introduction">
+<link rel="prev" href="preparation/building_an_application.html" title="Building an Application">
+<link rel="next" href="getting_started/defining_mapped_class_types.html" title="Defining Mapped Class Types">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<div class="spirit-nav">
+<a accesskey="p" href="preparation/building_an_application.html"><img src="images/prev.png" alt="Prev"></a><a accesskey="u" href="introduction.html"><img src="images/up.png" alt="Up"></a><a accesskey="h" href="index.html"><img src="images/home.png" alt="Home"></a><a accesskey="n" href="getting_started/defining_mapped_class_types.html"><img src="images/next.png" alt="Next"></a>
+</div>
+<div class="chapter">
+<div class="titlepage"><div><div><h2 class="title">
+<a name="getting_started"></a>Chapter&#160;3.&#160;Getting Started</h2></div></div></div>
+<div class="toc">
+<p><b>Table of Contents</b></p>
+<dl class="toc">
+<dt><span class="section"><a href="getting_started.html#getting_started.ahem">Ahem</a></span></dt>
+<dt><span class="section"><a href="getting_started/defining_mapped_class_types.html">Defining
+        Mapped Class Types</a></span></dt>
+<dt><span class="section"><a href="getting_started/creating_the_database_object.html">Creating
+        the Database Object</a></span></dt>
+<dt><span class="section"><a href="getting_started/creating_the_table_objects.html">Creating
+        the Table Objects</a></span></dt>
+<dt><span class="section"><a href="getting_started/opening_the_tables.html">Opening the Tables</a></span></dt>
+<dt><span class="section"><a href="getting_started/clearing_the_tables.html">Clearing the Tables</a></span></dt>
+<dt><span class="section"><a href="getting_started/populating_the_tables.html">Populating the
+        Tables</a></span></dt>
+<dt><span class="section"><a href="getting_started/building_expressions_for_server_.html">Building
+        Expressions for Server-Side Evaluation</a></span></dt>
+<dt><span class="section"><a href="getting_started/buliding_a_query.html">Buliding a Query</a></span></dt>
+<dt><span class="section"><a href="getting_started/building_further.html">Building Further</a></span></dt>
+<dt><span class="section"><a href="getting_started/ceci_n_est_pas_une_pipe.html"><span class="emphasis"><em>Ceci
+        n'est pas une pipe</em></span></a></span></dt>
+<dt><span class="section"><a href="getting_started/executing_the_query.html">Executing the
+        Query</a></span></dt>
+<dt><span class="section"><a href="getting_started/the_end.html">The End</a></span></dt>
+</dl>
+</div>
+<p>
+        
+      </p>
+<p>
+        In this chapter I shall guide you through the writing of a small but complete
+        quince application. We'll do it all in one source file. So create <code class="literal">gettingstarted.cpp</code>
+        in your text editor, and let's begin.
+      </p>
+<div class="section">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="getting_started.ahem"></a><a class="link" href="getting_started.html#getting_started.ahem" title="Ahem">Ahem</a>
+</h2></div></div></div>
+<pre class="programlisting"><span class="preprocessor">#include</span> <span class="special">&lt;</span><span class="identifier">stdint</span><span class="special">.</span><span class="identifier">h</span><span class="special">&gt;</span>
+<span class="preprocessor">#include</span> <span class="special">&lt;</span><span class="identifier">iostream</span><span class="special">&gt;</span>
+<span class="preprocessor">#include</span> <span class="special">&lt;</span><span class="identifier">quince</span><span class="special">/</span><span class="identifier">quince</span><span class="special">.</span><span class="identifier">h</span><span class="special">&gt;</span>
+<span class="preprocessor">#include</span> <span class="special">&lt;</span><span class="identifier">quince_postgresql</span><span class="special">/</span><span class="identifier">database</span><span class="special">.</span><span class="identifier">h</span><span class="special">&gt;</span>     <span class="comment">// Delete this line if you don't use PostgreSQL</span>
+<span class="preprocessor">#include</span> <span class="special">&lt;</span><span class="identifier">quince_sqlite</span><span class="special">/</span><span class="identifier">database</span><span class="special">.</span><span class="identifier">h</span><span class="special">&gt;</span>         <span class="comment">// Delete this line if you don't use sqlite</span>
+
+<span class="keyword">using</span> <span class="keyword">namespace</span> <span class="identifier">quince</span><span class="special">;</span>
+
+<span class="keyword">namespace</span> <span class="identifier">cinemascope</span> <span class="special">{</span>
+</pre>
+<h4>
+<a name="getting_started.ahem.h0"></a>
+          <span class="phrase"><a name="getting_started.ahem.remarks"></a></span><a class="link" href="getting_started.html#getting_started.ahem.remarks">Remarks</a>
+        </h4>
+<p>
+          <code class="computeroutput"><span class="identifier">quince</span><span class="special">/</span><span class="identifier">quince</span><span class="special">.</span><span class="identifier">h</span></code> is an umbrella header that collects
+          all the headers you'll ever need from the quince library.
+        </p>
+<p>
+          All the identifiers that quince defines are in namespace <code class="computeroutput"><span class="identifier">quince</span></code> <a href="#ftn.getting_started.ahem.f0" class="footnote" name="getting_started.ahem.f0"><sup class="footnote">[2]</sup></a> , so the <code class="computeroutput"><span class="keyword">using</span></code>
+          directive brings them all into scope. I acknowledge that <code class="computeroutput"><span class="keyword">using</span></code> directives are dubious style, and
+          in a real application it's better to have a specific <code class="computeroutput"><span class="keyword">using</span></code>
+          declaration for each quince identifier that you use a lot. I'm just keeping
+          it brief for the tour.
+        </p>
+<p>
+          Namespaces for application code (e.g. <code class="computeroutput"><span class="identifier">cinemascope</span></code>)
+          are always in style, but when you use quince they become a necessity. Definitions
+          of mapped classes (such as we're about to write) do not work unless they
+          are in some named namespace.
+        </p>
+</div>
+<div class="footnotes">
+<br><hr style="width:100; text-align:left;margin-left: 0">
+<div id="ftn.getting_started.ahem.f0" class="footnote"><p><a href="#getting_started.ahem.f0" class="para"><sup class="para">[2] </sup></a>
+            The <a class="link" href="mapped_data_types/user_defined_class_types.html#class_mapper_detail">exceptions to this rule</a>
+            are, quite literally, not worth mentioning. They are identifiers that
+            you never use in your code and I shall not use any of them in this document.
+          </p></div>
+</div>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2014 Michael Shepanski<p>
+        Distributed under the Boost Software License, Version 1.0
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="preparation/building_an_application.html"><img src="images/prev.png" alt="Prev"></a><a accesskey="u" href="introduction.html"><img src="images/up.png" alt="Up"></a><a accesskey="h" href="index.html"><img src="images/home.png" alt="Home"></a><a accesskey="n" href="getting_started/defining_mapped_class_types.html"><img src="images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

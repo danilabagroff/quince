@@ -1,0 +1,199 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Compositionality</title>
+<link rel="stylesheet" href="../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../index.html" title="QUINCE: QUeries IN C++ Expressions">
+<link rel="up" href="../queries.html" title="Chapter&#160;7.&#160;Queries">
+<link rel="prev" href="../queries.html" title="Chapter&#160;7.&#160;Queries">
+<link rel="next" href="select.html" title="select()">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<div class="spirit-nav">
+<a accesskey="p" href="../queries.html"><img src="../images/prev.png" alt="Prev"></a><a accesskey="u" href="../queries.html"><img src="../images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../images/home.png" alt="Home"></a><a accesskey="n" href="select.html"><img src="../images/next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="queries.compositionality"></a><a class="link" href="compositionality.html" title="Compositionality">Compositionality</a>
+</h2></div></div></div>
+<p>
+          
+        </p>
+<h3>
+<a name="queries.compositionality.h0"></a>
+          <span class="phrase"><a name="queries.compositionality.or_where_all_this_is_coming_from"></a></span><a class="link" href="compositionality.html#queries.compositionality.or_where_all_this_is_coming_from"><span class="emphasis"><em>or:</em></span>
+          Where All This is Coming From</a>
+        </h3>
+<h3>
+<a name="queries.compositionality.h1"></a>
+          <span class="phrase"><a name="queries.compositionality.or_the_thing_about_sql_i_don_t_l"></a></span><a class="link" href="compositionality.html#queries.compositionality.or_the_thing_about_sql_i_don_t_l"><span class="emphasis"><em>or:</em></span>
+          The Thing About SQL I Don't Like</a>
+        </h3>
+<p>
+          Quince has a couple of jobs. One is to bridge gulfs between SQL and C++
+          --gulfs of syntax, data typing, and data representation-- not because I
+          dislike either language, but because I dislike gulfs.
+        </p>
+<p>
+          Quince's other job, and it is time I made this explicit, is to improve
+          on something that I do see as a flaw in SQL. <span class="emphasis"><em>SQL makes some tasks
+          difficult that should be easy</em></span>. Consider:
+        </p>
+<div class="variablelist">
+<p class="title"><b></b></p>
+<dl class="variablelist">
+<dt><span class="term">Problem 1</span></dt>
+<dd><p>
+                Given an SQL query <em class="replaceable"><code>Q</code></em>, write an SQL query
+                that produces all but the first five lines of <em class="replaceable"><code>Q</code></em>'s
+                output.
+              </p></dd>
+<dt><span class="term">Problem 2</span></dt>
+<dd><p>
+                Given an SQL query <em class="replaceable"><code>Q</code></em>, write an SQL query
+                that produces the same output as <em class="replaceable"><code>Q</code></em>, but
+                ordered on the column <code class="literal">SALARY</code>.
+              </p></dd>
+<dt><span class="term">Problem 3</span></dt>
+<dd><p>
+                Given an SQL query <em class="replaceable"><code>Q</code></em>, write an SQL query
+                that produces those rows of <em class="replaceable"><code>Q</code></em>'s output
+                for which the condition <code class="literal">AGE &gt; 30</code> is true.
+              </p></dd>
+</dl>
+</div>
+<p>
+          When you write SQL by hand, you probably apply solutions similar to these:
+        </p>
+<div class="variablelist">
+<p class="title"><b></b></p>
+<dl class="variablelist">
+<dt><span class="term">Solution 1</span></dt>
+<dd><p>
+                Add <code class="literal">OFFSET 5</code> at the appropriate point in <em class="replaceable"><code>Q</code></em>,
+                unless <em class="replaceable"><code>Q</code></em> already had an <code class="literal">OFFSET</code>
+                clause, in which case increase the offset value by 5; and in any
+                event, it there was a <code class="literal">LIMIT</code> clause, change it
+                to be five less than it was, or zero, whichever is greater.
+              </p></dd>
+<dt><span class="term">Solution 2</span></dt>
+<dd><p>
+                Add <code class="literal">ORDER BY SALARY</code> at the appropriate point in
+                <em class="replaceable"><code>Q</code></em> (unless <em class="replaceable"><code>Q</code></em>
+                already had an <code class="literal">ORDERED BY</code> clause, in which case
+                insert <code class="literal">SALARY</code> and a comma immediately after "ORDER
+                BY") <span class="emphasis"><em>unless</em></span> there was a <code class="literal">LIMIT</code>,
+                <code class="literal">OFFSET</code>, <code class="literal">DISTINCT</code>, <code class="literal">GROUP
+                BY</code>, <code class="literal">UNION</code>, <code class="literal">INTERSECT</code>
+                or <code class="literal">EXCEPT</code> clause, in which case forget everything
+                I've just said and sink <em class="replaceable"><code>Q</code></em> into a <code class="literal">FROM</code>,
+                like so: <code class="literal">SELECT * FROM (</code><em class="replaceable"><code>Q</code></em><code class="literal">)
+                AS Q_ALIAS ORDER BY Q_ALIAS.SALARY</code>.
+              </p></dd>
+<dt><span class="term">Solution 3</span></dt>
+<dd><p>
+                Add <code class="literal">WHERE AGE &gt; 30</code> at the appropriate point
+                in <em class="replaceable"><code>Q</code></em> (unless <em class="replaceable"><code>Q</code></em>
+                already had a <code class="literal">WHERE</code> clause, in which case insert
+                "AGE &gt; 30 AND" immediately after <code class="literal">WHERE</code>,
+                and parenthesize the rest of the clause if necessary) <span class="emphasis"><em>unless</em></span>
+                <em class="replaceable"><code>Q</code></em> used <code class="literal">GROUP BY</code>, in
+                which case follow the previous instruction but with <code class="literal">HAVING</code>
+                substituted for <code class="literal">WHERE</code>, <span class="emphasis"><em>unless</em></span>
+                there was a <code class="literal">LIMIT</code>, <code class="literal">OFFSET</code>,
+                <code class="literal">DISTINCT</code>, <code class="literal">UNION</code>, <code class="literal">INTERSECT</code>
+                or <code class="literal">EXCEPT</code> clause, in which case forget everything
+                I've just said and sink <em class="replaceable"><code>Q</code></em> into a <code class="literal">FROM</code>,
+                like so: <code class="literal">SELECT * FROM (</code><em class="replaceable"><code>Q</code></em><code class="literal">)
+                AS Q_ALIAS WHERE Q_ALIAS.AGE &gt; 30</code>.
+              </p></dd>
+</dl>
+</div>
+<p>
+          (If you were writing algorithms to solve these problems mechanically, for
+          any input string <em class="replaceable"><code>Q</code></em> containing an SQL query,
+          you might skip the case analyses and always sink <em class="replaceable"><code>Q</code></em>
+          into a <code class="literal">FROM</code>.; but my point here is about the experience
+          of writing queries by hand.)
+        </p>
+<p>
+          In order to understand the structure of <span class="emphasis"><em>QU</em></span>eries <span class="emphasis"><em>IN</em></span>
+          <span class="emphasis"><em>C</em></span>++ <span class="emphasis"><em>E</em></span>xpressions, it is important
+          to understand this negative motivation: I don't want the experience of
+          writing queries to be as complex and case-driven as the experience of writing
+          SQL. In particular, when you're writing one part of a quince expression
+          you should not need to know so much about the other parts.
+        </p>
+<p>
+          So the quince analogs of problems 1-3:
+        </p>
+<div class="variablelist">
+<p class="title"><b></b></p>
+<dl class="variablelist">
+<dt><span class="term">Problem 1'</span></dt>
+<dd><p>
+                Given a query <em class="replaceable"><code>q</code></em>, build a <code class="computeroutput"><span class="identifier">query</span></code> that produces all but the
+                first five lines of <em class="replaceable"><code>q</code></em>'s output.
+              </p></dd>
+<dt><span class="term">Problem 2'</span></dt>
+<dd><p>
+                Given a query <em class="replaceable"><code>q</code></em> with value type <code class="computeroutput"><span class="identifier">employee</span></code>, build a <code class="computeroutput"><span class="identifier">query</span><span class="special">&lt;</span><span class="identifier">employee</span><span class="special">&gt;</span></code>
+                that produces the same output as <em class="replaceable"><code>q</code></em>, but
+                ordered on <code class="computeroutput"><span class="identifier">q</span><span class="special">-&gt;</span><span class="identifier">salary</span></code>.
+              </p></dd>
+<dt><span class="term">Problem 3'</span></dt>
+<dd><p>
+                Given a query <em class="replaceable"><code>q</code></em> with value type <code class="computeroutput"><span class="identifier">animal</span></code>, build a <code class="computeroutput"><span class="identifier">query</span><span class="special">&lt;</span><span class="identifier">animal</span><span class="special">&gt;</span></code> that produces those records of
+                <em class="replaceable"><code>q</code></em>'s output for which the condition <code class="computeroutput"><span class="identifier">q</span><span class="special">-&gt;</span><span class="identifier">age</span> <span class="special">&gt;</span>
+                <span class="number">30</span></code> is true.
+              </p></dd>
+</dl>
+</div>
+<p>
+          all have easy solutions (<code class="computeroutput"><span class="identifier">q</span><span class="special">.</span><span class="identifier">skip</span><span class="special">(</span><span class="number">5</span><span class="special">)</span></code>,
+          <code class="computeroutput"><span class="identifier">q</span><span class="special">.</span><span class="identifier">order</span><span class="special">(</span><span class="identifier">q</span><span class="special">-&gt;</span><span class="identifier">salary</span><span class="special">)</span></code>,
+          and <code class="computeroutput"><span class="identifier">q</span><span class="special">.</span><span class="identifier">where</span><span class="special">(</span><span class="identifier">q</span><span class="special">-&gt;</span><span class="identifier">age</span> <span class="special">&gt;</span> <span class="number">30</span><span class="special">)</span></code> respectively),
+          which work regardless of whether <code class="computeroutput"><span class="identifier">limit</span><span class="special">()</span></code>, <code class="computeroutput"><span class="identifier">group</span><span class="special">()</span></code> etc. were used in the building of <em class="replaceable"><code>q</code></em>.
+        </p>
+<p>
+          This is a more-than-skin-deep difference between quince expressions and
+          SQL, and it implies that quince's process for turning queries into SQL
+          is not entirely direct: the series of clauses quince decides to generate
+          do not correspond 1-1 with the quince function calls that were used to
+          build the query.
+        </p>
+<p>
+          What, you thought you were in charge? Well you are, up to a point. You
+          are free to nest <code class="computeroutput"><span class="identifier">join</span><span class="special">()</span></code>s
+          inside <code class="computeroutput"><span class="identifier">intersect</span><span class="special">()</span></code>s
+          inside <code class="computeroutput"><span class="identifier">scalar</span><span class="special">()</span></code>s
+          inside <code class="computeroutput"><span class="identifier">select</span><span class="special">()</span></code>s
+          and so on, and quince will generate SQL that faithfully reflects your architecture.
+          But beneath the level of quince's public functions, there are decisions
+          to be made about how to compose the SQL on a more detailed level. Quince
+          considers those micro-decisions to be implementation matters, and it takes
+          them off your hands <a href="#ftn.queries.compositionality.f0" class="footnote" name="queries.compositionality.f0"><sup class="footnote">[10]</sup></a> .
+        </p>
+<div class="footnotes">
+<br><hr style="width:100; text-align:left;margin-left: 0">
+<div id="ftn.queries.compositionality.f0" class="footnote"><p><a href="#queries.compositionality.f0" class="para"><sup class="para">[10] </sup></a>
+            It probably doesn't matter, but FYI: quince's strategy is to distinguish
+            cases in the manner of Solutions 1-3 above, only sinking a query into
+            a <code class="literal">FROM</code> if it sees no alternative.
+          </p></div>
+</div>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2014 Michael Shepanski<p>
+        Distributed under the Boost Software License, Version 1.0
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="../queries.html"><img src="../images/prev.png" alt="Prev"></a><a accesskey="u" href="../queries.html"><img src="../images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../images/home.png" alt="Home"></a><a accesskey="n" href="select.html"><img src="../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

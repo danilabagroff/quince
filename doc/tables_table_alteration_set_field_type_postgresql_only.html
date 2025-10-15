@@ -1,0 +1,123 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>set_field_type() (PostgreSQL only)</title>
+<link rel="stylesheet" href="../../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../../index.html" title="QUINCE: QUeries IN C++ Expressions">
+<link rel="up" href="../table_alteration.html" title="Table Alteration">
+<link rel="prev" href="rename_field_postgresql_only.html" title="rename_field() (PostgreSQL only)">
+<link rel="next" href="../../custom.html" title="Chapter&#160;9.&#160;Custom Mappings">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<div class="spirit-nav">
+<a accesskey="p" href="rename_field_postgresql_only.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../table_alteration.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="../../custom.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="tables.table_alteration.set_field_type_postgresql_only"></a><a class="link" href="set_field_type_postgresql_only.html" title="set_field_type() (PostgreSQL only)"><code class="computeroutput"><span class="identifier">set_field_type</span><span class="special">()</span></code>
+          (PostgreSQL only)</a>
+</h3></div></div></div>
+<p>
+            All tables have a <code class="computeroutput"><span class="identifier">set_field_type</span><span class="special">()</span></code> method, which changes the types and/or
+            the <code class="literal">NOT NULL</code> settings of one or more columns in the
+            <a class="link" href="../terminology.html#target">target</a>. It's a wrapper for the following
+            SQL constructs:
+          </p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+                <code class="literal">ALTER TABLE</code> ... <code class="literal">ALTER COLUMN</code>
+                ... <code class="literal">SET TYPE</code>
+              </li>
+<li class="listitem">
+                <code class="literal">ALTER TABLE</code> ... <code class="literal">ALTER COLUMN</code>
+                ... <code class="literal">SET NOT NULL</code>
+              </li>
+<li class="listitem">
+                <code class="literal">ALTER TABLE</code> ... <code class="literal">ALTER COLUMN</code>
+                ... <code class="literal">DROP NOT NULL</code>
+              </li>
+</ul></div>
+<p>
+            But back to our story. As we left it in the previous section, the SQL
+            table <code class="literal">points</code> <a class="link" href="../terminology.html#conforms_to">conformed
+            to</a> the table object <code class="computeroutput"><span class="identifier">newer_point</span></code>.
+            In particular, it had a <code class="literal">REAL</code> column corresponding
+            to a member declared <code class="computeroutput"><span class="keyword">float</span> <span class="identifier">height</span></code>.
+          </p>
+<p>
+            But now we decide that heights will require double precision. In PostgreSQL
+            terms, that's a change from <code class="literal">REAL</code> to <code class="literal">DOUBLE
+            PRECISION</code>. But we work in C++, so for us it's a change from
+            <code class="computeroutput"><span class="keyword">float</span></code> to <code class="computeroutput"><span class="keyword">double</span></code>.
+            So our table is going to need a new value type (again). Let's define
+            it:
+          </p>
+<pre class="programlisting"><span class="keyword">struct</span> <span class="identifier">point_xhd</span> <span class="special">{</span>
+    <span class="keyword">float</span> <span class="identifier">x</span><span class="special">;</span>
+    <span class="keyword">double</span> <span class="identifier">height</span><span class="special">;</span>
+<span class="special">};</span>
+<span class="identifier">QUINCE_MAP_CLASS</span><span class="special">(</span><span class="identifier">point_xhd</span><span class="special">,</span> <span class="special">(</span><span class="identifier">x</span><span class="special">)(</span><span class="identifier">height</span><span class="special">))</span>
+</pre>
+<p>
+            and let's construct the latest table object:
+          </p>
+<pre class="programlisting"><span class="identifier">table</span><span class="special">&lt;</span><span class="identifier">point_xhd</span><span class="special">&gt;</span> <span class="identifier">newest_points</span><span class="special">(</span><span class="identifier">db</span><span class="special">,</span> <span class="string">"points"</span><span class="special">,</span> <span class="special">&amp;</span><span class="identifier">point_xhd</span><span class="special">::</span><span class="identifier">x</span><span class="special">);</span>
+</pre>
+<p>
+            Now, to make the target conform to <code class="computeroutput"><span class="identifier">newest_points</span></code>,
+            we change the column type:
+          </p>
+<pre class="programlisting"><span class="identifier">newest_points</span><span class="special">.</span><span class="identifier">set_field_type</span><span class="special">(</span><span class="identifier">newest_points</span><span class="special">-&gt;</span><span class="identifier">height</span><span class="special">);</span>
+</pre>
+<p>
+            which says:
+          </p>
+<div class="blockquote"><blockquote class="blockquote"><p>
+              In <code class="computeroutput"><span class="identifier">newest_points</span></code>'s
+              target, change the type of the column that <code class="computeroutput"><span class="identifier">newest_points</span><span class="special">-&gt;</span><span class="identifier">height</span></code>
+              represents, from whatever it might be now, to the SQL type that <code class="computeroutput"><span class="identifier">newest_points</span><span class="special">-&gt;</span><span class="identifier">height</span></code> uses.
+            </p></blockquote></div>
+<p>
+            The existing values in the affected column are converted from the old
+            type to the new type, as if by a <a class="link" href="../../expressions/cast.html" title="cast&lt;...&gt;()">server-side
+            cast</a>.
+          </p>
+<p>
+            Here we passed a <code class="computeroutput"><span class="keyword">double</span></code>
+            mapper, so one column changed type; but we can pass a mapper for any
+            mapped type. If it is a multi-column type, then <code class="computeroutput"><span class="identifier">set_field_type</span><span class="special">()</span></code> will set the types of all the columns,
+            <span class="emphasis"><em>provided that</em></span> columns already exist with the names
+            that the mapper expects.
+          </p>
+<p>
+            We can use <code class="computeroutput"><span class="identifier">set_field_type</span><span class="special">()</span></code> to change optionals to non-optionals
+            or <span class="emphasis"><em>vice versa</em></span>, again with the proviso that columns
+            already exist with the names that the mapper expects <a href="#ftn.tables.table_alteration.set_field_type_postgresql_only.f0" class="footnote" name="tables.table_alteration.set_field_type_postgresql_only.f0"><sup class="footnote">[14]</sup></a> . Then <code class="computeroutput"><span class="identifier">set_field_type</span><span class="special">()</span></code> will change the <code class="literal">NOT NULL</code>
+            settings, from whatever they might be now, to the settings that the mapper
+            expects (described <a class="link" href="../../mapped_data_types/boost_optional.html#optionals_representation">here</a>).
+          </p>
+<div class="footnotes">
+<br><hr style="width:100; text-align:left;margin-left: 0">
+<div id="ftn.tables.table_alteration.set_field_type_postgresql_only.f0" class="footnote"><p><a href="#tables.table_alteration.set_field_type_postgresql_only.f0" class="para"><sup class="para">[14] </sup></a>
+              The only effect of the proviso is that we can't change a <em class="replaceable"><code>T</code></em>
+              to a <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">optional</span><span class="special">&lt;</span></code><em class="replaceable"><code>T</code></em><code class="computeroutput"><span class="special">&gt;</span></code> when <em class="replaceable"><code>T</code></em>
+              is a type that can be represented by all <code class="literal">NULL</code>s.
+              E.g. you can't change a <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">optional</span><span class="special">&lt;</span><span class="keyword">float</span><span class="special">&gt;</span></code> to a <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">optional</span><span class="special">&lt;</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">optional</span><span class="special">&lt;</span><span class="keyword">float</span><span class="special">&gt;&gt;</span></code>. It's not a restriction you're
+              likely to run into.
+            </p></div>
+</div>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2014 Michael Shepanski<p>
+        Distributed under the Boost Software License, Version 1.0
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="rename_field_postgresql_only.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../table_alteration.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="../../custom.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

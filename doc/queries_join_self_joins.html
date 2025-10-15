@@ -1,0 +1,150 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Self Joins</title>
+<link rel="stylesheet" href="../../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../../index.html" title="QUINCE: QUeries IN C++ Expressions">
+<link rel="up" href="../join.html" title="The join() Family of Functions">
+<link rel="prev" href="collector.html" title="With a Collector Class">
+<link rel="next" href="../set_theoretic_operations.html" title="Set-Theoretic Operations">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<div class="spirit-nav">
+<a accesskey="p" href="collector.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../join.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="../set_theoretic_operations.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="queries.join.self_joins"></a><a class="link" href="self_joins.html" title="Self Joins">Self Joins</a>
+</h3></div></div></div>
+<h5>
+<a name="queries.join.self_joins.h0"></a>
+            <span class="phrase"><a name="queries.join.self_joins.the_problem"></a></span><a class="link" href="self_joins.html#queries.join.self_joins.the_problem">The
+            problem ...</a>
+          </h5>
+<p>
+            Suppose we want to generate all possible double features. We might try
+            this:
+          </p>
+<pre class="programlisting"><span class="keyword">const</span> <span class="identifier">query</span><span class="special">&lt;</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">tuple</span><span class="special">&lt;</span><span class="identifier">movie</span><span class="special">,</span> <span class="identifier">movie</span><span class="special">&gt;&gt;</span> <span class="identifier">double_features</span> <span class="special">=</span> <span class="identifier">join</span><span class="special">(</span><span class="identifier">movies</span><span class="special">,</span> <span class="identifier">movies</span><span class="special">);</span>  <span class="comment">// wrong</span>
+</pre>
+<p>
+            But let's recall one of the characteristics of the <code class="computeroutput"><span class="identifier">join</span><span class="special">()</span></code> free function:
+          </p>
+<div class="blockquote"><blockquote class="blockquote"><p>
+              Its value mapper is a new <code class="computeroutput"><span class="identifier">tuple_mapper</span><span class="special">&lt;</span></code><em class="replaceable"><code>T0</code></em><code class="computeroutput"><span class="special">,</span></code> <em class="replaceable"><code>T1</code></em><code class="computeroutput"><span class="special">,</span></code> ...<code class="computeroutput"><span class="special">)</span></code>,
+              in which each member mapper is identical to the respective <em class="replaceable"><code>qi</code></em>'s
+              value mapper.
+            </p></blockquote></div>
+<p>
+            In our case, then, both member mappers are identical to <code class="computeroutput"><span class="identifier">movies</span></code>'s member mapper -- and hence
+            identical to each other. That's disappointing, because we need two <span class="emphasis"><em>different</em></span>
+            member mappers: one for the first <code class="computeroutput"><span class="identifier">movie</span></code>
+            in each pair and one for the second, so that code like:
+          </p>
+<pre class="programlisting"><span class="keyword">for</span> <span class="special">(</span><span class="keyword">const</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">tuple</span><span class="special">&lt;</span><span class="identifier">movie</span><span class="special">,</span> <span class="identifier">movie</span><span class="special">&gt;</span> <span class="special">&amp;</span><span class="identifier">df</span><span class="special">:</span> <span class="identifier">double_features</span><span class="special">)</span>
+    <span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">get</span><span class="special">&lt;</span><span class="number">0</span><span class="special">&gt;(</span><span class="identifier">df</span><span class="special">).</span><span class="identifier">title</span> <span class="special">&lt;&lt;</span> <span class="string">" with "</span> <span class="special">&lt;&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">get</span><span class="special">&lt;</span><span class="number">1</span><span class="special">&gt;(</span><span class="identifier">df</span><span class="special">).</span><span class="identifier">title</span> <span class="special">&lt;&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">endl</span><span class="special">;</span>
+</pre>
+<p>
+            can extract one <code class="computeroutput"><span class="identifier">movie</span></code>
+            into element 0 of <code class="computeroutput"><span class="identifier">df</span></code>
+            and another <code class="computeroutput"><span class="identifier">movie</span></code> into
+            element 1.
+          </p>
+<p>
+            Here's another way to see the problem. Suppose we want to find all double
+            features that are worth watching, i.e. we want to exclude those that
+            consist of the same movie twice over. Then we might try building the
+            query this way:
+          </p>
+<pre class="programlisting"><span class="keyword">const</span> <span class="identifier">query</span><span class="special">&lt;</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">tuple</span><span class="special">&lt;</span><span class="identifier">movie</span><span class="special">,</span> <span class="identifier">movie</span><span class="special">&gt;&gt;</span> <span class="identifier">heterogeneous_double_features</span> <span class="special">=</span>
+    <span class="identifier">movies</span><span class="special">.</span><span class="identifier">inner_join</span><span class="special">(</span><span class="identifier">movies</span><span class="special">,</span> <span class="identifier">movies</span><span class="special">-&gt;</span><span class="identifier">id</span> <span class="special">!=</span> <span class="identifier">movies</span><span class="special">-&gt;</span><span class="identifier">id</span><span class="special">);</span>  <span class="comment">// wrong</span>
+</pre>
+<p>
+            but it's clear that <code class="computeroutput"><span class="identifier">heterogeneous_double_features</span></code>,
+            if it could run at all, would not produce any output, since the condition
+            <code class="computeroutput"><span class="identifier">movies</span><span class="special">-&gt;</span><span class="identifier">id</span> <span class="special">!=</span> <span class="identifier">movies</span><span class="special">-&gt;</span><span class="identifier">id</span></code> is always patently false.
+          </p>
+<h5>
+<a name="queries.join.self_joins.h1"></a>
+            <span class="phrase"><a name="queries.join.self_joins.and_the_solution_table_alias"></a></span><a class="link" href="self_joins.html#queries.join.self_joins.and_the_solution_table_alias">... and
+            the solution: <code class="computeroutput"><span class="identifier">table_alias</span></code></a>
+          </h5>
+<p>
+            Every table has an <code class="computeroutput"><span class="identifier">alias</span><span class="special">()</span></code> method, which creates and returns a
+            <code class="computeroutput"><span class="identifier">table_alias</span></code> object. Let's
+            start with that:
+          </p>
+<pre class="programlisting"><span class="identifier">table_alias</span><span class="special">&lt;</span><span class="identifier">movie</span><span class="special">&gt;</span> <span class="identifier">movies_alias</span> <span class="special">=</span> <span class="identifier">movies</span><span class="special">.</span><span class="identifier">alias</span><span class="special">();</span>
+</pre>
+<p>
+            A <code class="computeroutput"><span class="identifier">table_alias</span></code> is very
+            much like the table that made it. <code class="computeroutput"><span class="identifier">movies_alias</span></code>
+            represents the same SQL table that <code class="computeroutput"><span class="identifier">movies</span></code>
+            represents, and, like <code class="computeroutput"><span class="identifier">movies</span></code>,
+            it is a kind of query. So it can be executed, or used to build more complex
+            queries. It has a value type (the same as <code class="computeroutput"><span class="identifier">movies</span></code>'s),
+            and it has a value mapper.
+          </p>
+<p>
+            And its value mapper is very much like <code class="computeroutput"><span class="identifier">movies</span></code>'s
+            value mapper: it has the same type (<code class="computeroutput"><span class="identifier">class_mapper</span><span class="special">&lt;</span><span class="identifier">movie</span><span class="special">&gt;</span></code>), and it knows how to map between
+            <code class="computeroutput"><span class="identifier">movie</span></code> objects and columns
+            in the target SQL table. But the two mappers are not identical: when
+            <code class="computeroutput"><span class="identifier">movies_alias</span></code> and <code class="computeroutput"><span class="identifier">movies</span></code> are used in the same query,
+            their mappers behave <span class="emphasis"><em>as if</em></span> two distinct SQL tables
+            were involved, and each mapper belonged to a different one.
+          </p>
+<p>
+            This lets us solve the first problem case:
+          </p>
+<pre class="programlisting"><span class="keyword">const</span> <span class="identifier">query</span><span class="special">&lt;</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">tuple</span><span class="special">&lt;</span><span class="identifier">movie</span><span class="special">,</span> <span class="identifier">movie</span><span class="special">&gt;&gt;</span> <span class="identifier">double_features</span> <span class="special">=</span> <span class="identifier">join</span><span class="special">(</span><span class="identifier">movies</span><span class="special">,</span> <span class="identifier">movies_alias</span><span class="special">);</span>
+
+<span class="keyword">for</span> <span class="special">(</span><span class="keyword">const</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">tuple</span><span class="special">&lt;</span><span class="identifier">movie</span><span class="special">,</span> <span class="identifier">movie</span><span class="special">&gt;</span> <span class="special">&amp;</span><span class="identifier">df</span><span class="special">:</span> <span class="identifier">double_features</span><span class="special">)</span>
+    <span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">get</span><span class="special">&lt;</span><span class="number">0</span><span class="special">&gt;(</span><span class="identifier">df</span><span class="special">).</span><span class="identifier">title</span> <span class="special">&lt;&lt;</span> <span class="string">" with "</span> <span class="special">&lt;&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">get</span><span class="special">&lt;</span><span class="number">1</span><span class="special">&gt;(</span><span class="identifier">df</span><span class="special">).</span><span class="identifier">title</span> <span class="special">&lt;&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">endl</span><span class="special">;</span>
+</pre>
+<p>
+            And the second:
+          </p>
+<pre class="programlisting"><span class="keyword">const</span> <span class="identifier">query</span><span class="special">&lt;</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">tuple</span><span class="special">&lt;</span><span class="identifier">movie</span><span class="special">,</span> <span class="identifier">movie</span><span class="special">&gt;&gt;</span> <span class="identifier">heterogeneous_double_features</span> <span class="special">=</span>
+    <span class="identifier">movies</span><span class="special">.</span><span class="identifier">inner_join</span><span class="special">(</span><span class="identifier">movies_alias</span><span class="special">,</span> <span class="identifier">movies</span><span class="special">-&gt;</span><span class="identifier">id</span> <span class="special">!=</span> <span class="identifier">movies_alias</span><span class="special">-&gt;</span><span class="identifier">id</span><span class="special">);</span>
+</pre>
+<p>
+            We can have as many aliases of a table as we want: each call to <code class="computeroutput"><span class="identifier">alias</span><span class="special">()</span></code>
+            creates a new one:
+          </p>
+<pre class="programlisting"><span class="identifier">table_alias</span><span class="special">&lt;</span><span class="identifier">movie</span><span class="special">&gt;</span> <span class="identifier">movies_alias2</span> <span class="special">=</span> <span class="identifier">movies</span><span class="special">.</span><span class="identifier">alias</span><span class="special">();</span>
+
+<span class="keyword">const</span> <span class="identifier">query</span><span class="special">&lt;</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">tuple</span><span class="special">&lt;</span><span class="identifier">movie</span><span class="special">,</span> <span class="identifier">movie</span><span class="special">,</span> <span class="identifier">movie</span><span class="special">&gt;&gt;</span> <span class="identifier">triple_features</span> <span class="special">=</span>
+    <span class="identifier">join</span><span class="special">(</span><span class="identifier">movies</span><span class="special">,</span> <span class="identifier">movies_alias</span><span class="special">,</span> <span class="identifier">movies_alias2</span><span class="special">);</span>
+</pre>
+<p>
+            What we cannot do, however, is make aliases of arbitrary <span class="emphasis"><em>queries</em></span>.
+            Only tables have aliases. So if we wanted to generate all possible double
+            features of local hit movies, using the query <a class="link" href="../../queries_in_c_expressions/rise_of_the_monster_query.html#local_hits"><code class="computeroutput"><span class="identifier">local_hits</span></code></a>, we could not do
+            so directly. The solution would be to build a query <code class="computeroutput"><span class="identifier">local_hits2</span></code>,
+            exactly like <code class="computeroutput"><span class="identifier">local_hits</span></code>
+            except built using <code class="computeroutput"><span class="identifier">movies_alias</span></code>
+            instead of <code class="computeroutput"><span class="identifier">movies</span></code>. Then
+            we would call <code class="computeroutput"><span class="identifier">join</span><span class="special">(</span><span class="identifier">local_hits</span><span class="special">,</span>
+            <span class="identifier">local_hits2</span><span class="special">)</span></code>.
+          </p>
+<p>
+            I like to think that a future version of quince will provide <code class="computeroutput"><span class="identifier">alias</span><span class="special">()</span></code>
+            on arbitrary queries, but until then, I concede that this is a lapse
+            of <a class="link" href="../compositionality.html" title="Compositionality">compositionality</a>.
+          </p>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2014 Michael Shepanski<p>
+        Distributed under the Boost Software License, Version 1.0
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="collector.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../join.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="../set_theoretic_operations.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

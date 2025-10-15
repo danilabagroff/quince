@@ -1,0 +1,98 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>With Single-Value Output: evaluate()</title>
+<link rel="stylesheet" href="../../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../../index.html" title="QUINCE: QUeries IN C++ Expressions">
+<link rel="up" href="../executing.html" title="Executing Queries">
+<link rel="prev" href="with_at_most_single_record_outpu.html" title="With (at most) Single-Record Output: get()">
+<link rel="next" href="../../tables.html" title="Chapter&#160;8.&#160;Tables">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<div class="spirit-nav">
+<a accesskey="p" href="with_at_most_single_record_outpu.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../executing.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="../../tables.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="queries.executing.evaluate"></a><a class="link" href="evaluate.html" title="With Single-Value Output: evaluate()">With Single-Value Output:
+          <code class="computeroutput"><span class="identifier">evaluate</span><span class="special">()</span></code></a>
+</h3></div></div></div>
+<p>
+            The <code class="computeroutput"><span class="identifier">evaluate</span><span class="special">()</span></code>
+            method evaluates one server-side expression over the output of a query,
+            expecting exactly one result, and it returns that result. Inevitably
+            the expression will be a call to an aggregate function.
+          </p>
+<p>
+            For any query <em class="replaceable"><code>q</code></em>, you can call <em class="replaceable"><code>q</code></em><code class="computeroutput"><span class="special">.</span><span class="identifier">evaluate</span><span class="special">(</span></code><em class="replaceable"><code>exprn</code></em><code class="computeroutput"><span class="special">)</span></code>, provided that <em class="replaceable"><code>exprn</code></em>
+            is an <code class="computeroutput"><span class="identifier">exprn_mapper</span><span class="special">&lt;</span></code><em class="replaceable"><code>T</code></em><code class="computeroutput"><span class="special">&gt;</span></code> for some mapped type <em class="replaceable"><code>T</code></em>.
+            <em class="replaceable"><code>q</code></em>'s value mapper will be <a class="link" href="../../expressions/visibility.html" title="Visibility">visible</a>
+            to <em class="replaceable"><code>exprn</code></em>.
+          </p>
+<p>
+            <em class="replaceable"><code>q</code></em><code class="computeroutput"><span class="special">.</span><span class="identifier">evaluate</span><span class="special">(</span></code><em class="replaceable"><code>exprn</code></em><code class="computeroutput"><span class="special">)</span></code> returns a <em class="replaceable"><code>T</code></em>
+            (i.e. <em class="replaceable"><code>exprn</code></em>'s result type).
+          </p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+                If <em class="replaceable"><code>q</code></em> produces no records, then <em class="replaceable"><code>q</code></em><code class="computeroutput"><span class="special">.</span><span class="identifier">evaluate</span><span class="special">(</span></code><em class="replaceable"><code>exprn</code></em><code class="computeroutput"><span class="special">)</span></code> throws <code class="computeroutput"><span class="identifier">no_row_exception</span></code>.
+              </li>
+<li class="listitem">
+                If <em class="replaceable"><code>exprn</code></em> produces a single value, when
+                evaluated over the totality of <em class="replaceable"><code>q</code></em>'s output,
+                then <em class="replaceable"><code>q</code></em><code class="computeroutput"><span class="special">.</span><span class="identifier">evaluate</span><span class="special">(</span></code><em class="replaceable"><code>exprn</code></em><code class="computeroutput"><span class="special">)</span></code> returns that value.
+              </li>
+<li class="listitem">
+                If <em class="replaceable"><code>exprn</code></em> produces multiple values, when
+                evaluated over the totality of <em class="replaceable"><code>q</code></em>'s output,
+                then <em class="replaceable"><code>q</code></em><code class="computeroutput"><span class="special">.</span><span class="identifier">evaluate</span><span class="special">(</span></code><em class="replaceable"><code>exprn</code></em><code class="computeroutput"><span class="special">)</span></code> throws <code class="computeroutput"><span class="identifier">multi_row_exception</span></code>.
+              </li>
+</ul></div>
+<p>
+            So, to print the sum of the lengths of all movie titles:
+          </p>
+<pre class="programlisting"><span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="identifier">movies</span><span class="special">.</span><span class="identifier">evaluate</span><span class="special">(</span><span class="identifier">sum</span><span class="special">(</span><span class="identifier">length</span><span class="special">(</span><span class="identifier">movies</span><span class="special">-&gt;</span><span class="identifier">title</span><span class="special">)))</span> <span class="special">&lt;&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">endl</span><span class="special">;</span>
+</pre>
+<a name="standard_evaluations"></a><h5>
+<a name="queries.executing.evaluate.h0"></a>
+            <span class="phrase"><a name="queries.executing.evaluate.standard_evaluations_size_empty"></a></span><a class="link" href="evaluate.html#queries.executing.evaluate.standard_evaluations_size_empty">Standard
+            Evaluations: <code class="computeroutput"><span class="identifier">size</span><span class="special">()</span></code>,
+            <code class="computeroutput"><span class="identifier">empty</span><span class="special">()</span></code></a>
+          </h5>
+<p>
+            The functions <code class="computeroutput"><span class="identifier">size</span><span class="special">()</span></code>
+            and <code class="computeroutput"><span class="identifier">empty</span><span class="special">()</span></code>
+            perform two of the most common uses of <code class="computeroutput"><span class="identifier">evaluate</span><span class="special">()</span></code>.
+          </p>
+<p>
+            For any query <em class="replaceable"><code>q</code></em>:
+          </p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+                <em class="replaceable"><code>q</code></em><code class="computeroutput"><span class="special">.</span><span class="identifier">size</span><span class="special">()</span></code>
+                returns a <code class="computeroutput"><span class="identifier">uint64_t</span></code>,
+                equal to the number of records that <em class="replaceable"><code>q</code></em>
+                would produce.
+              </li>
+<li class="listitem">
+                <em class="replaceable"><code>q</code></em><code class="computeroutput"><span class="special">.</span><span class="identifier">empty</span><span class="special">()</span></code>
+                returns a <code class="computeroutput"><span class="keyword">bool</span></code>, which
+                is true if and only if <em class="replaceable"><code>q</code></em> would produce
+                no records.
+              </li>
+</ul></div>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2014 Michael Shepanski<p>
+        Distributed under the Boost Software License, Version 1.0
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="with_at_most_single_record_outpu.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../executing.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="../../tables.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

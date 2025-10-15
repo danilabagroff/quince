@@ -1,0 +1,118 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>The join() Family of Functions</title>
+<link rel="stylesheet" href="../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../index.html" title="QUINCE: QUeries IN C++ Expressions">
+<link rel="up" href="../queries.html" title="Chapter&#160;7.&#160;Queries">
+<link rel="prev" href="distinct_and_distinct_on.html" title="distinct() and distinct_on()">
+<link rel="next" href="join/inner_join.html" title="inner_join()">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<div class="spirit-nav">
+<a accesskey="p" href="distinct_and_distinct_on.html"><img src="../images/prev.png" alt="Prev"></a><a accesskey="u" href="../queries.html"><img src="../images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../images/home.png" alt="Home"></a><a accesskey="n" href="join/inner_join.html"><img src="../images/next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="queries.join"></a><a class="link" href="join.html" title="The join() Family of Functions">The <code class="computeroutput"><span class="identifier">join</span><span class="special">()</span></code> Family of Functions</a>
+</h2></div></div></div>
+<div class="toc"><dl class="toc">
+<dt><span class="section"><a href="join.html#queries.join.join"><code class="computeroutput"><span class="identifier">join</span><span class="special">()</span></code></a></span></dt>
+<dt><span class="section"><a href="join/inner_join.html"><code class="computeroutput"><span class="identifier">inner_join</span><span class="special">()</span></code></a></span></dt>
+<dt><span class="section"><a href="join/left_join.html"><code class="computeroutput"><span class="identifier">left_join</span><span class="special">()</span></code></a></span></dt>
+<dt><span class="section"><a href="join/right_join.html"><code class="computeroutput"><span class="identifier">right_join</span><span class="special">()</span></code></a></span></dt>
+<dt><span class="section"><a href="join/full_join_postgresql_only.html"><code class="computeroutput"><span class="identifier">full_join</span><span class="special">()</span></code>
+          (PostgreSQL only)</a></span></dt>
+<dt><span class="section"><a href="join/jump.html"><code class="computeroutput"><span class="identifier">jump</span><span class="special">()</span></code></a></span></dt>
+<dt><span class="section"><a href="join/collector.html">With a Collector Class</a></span></dt>
+<dt><span class="section"><a href="join/self_joins.html">Self Joins</a></span></dt>
+</dl></div>
+<p>
+          
+        </p>
+<div class="section">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="queries.join.join"></a><a class="link" href="join.html#queries.join.join" title="join()"><code class="computeroutput"><span class="identifier">join</span><span class="special">()</span></code></a>
+</h3></div></div></div>
+<h5>
+<a name="queries.join.join.h0"></a>
+            <span class="phrase"><a name="queries.join.join.as_a_free_function"></a></span><a class="link" href="join.html#queries.join.join.as_a_free_function">As
+            a free function ...</a>
+          </h5>
+<p>
+            The free function <code class="computeroutput"><span class="identifier">join</span><span class="special">()</span></code> builds a query that produces all combinations
+            of the outputs of some other queries. It's a wrapper for SQL's <code class="literal">JOIN</code>.
+          </p>
+<p>
+            For any queries <em class="replaceable"><code>q0</code></em>, <em class="replaceable"><code>q1</code></em>,
+            ..., you can call <code class="computeroutput"><span class="identifier">join</span><span class="special">(</span></code><em class="replaceable"><code>q0</code></em><code class="computeroutput"><span class="special">,</span></code> <em class="replaceable"><code>q1</code></em><code class="computeroutput"><span class="special">,</span></code> ...<code class="computeroutput"><span class="special">)</span></code>.
+          </p>
+<p>
+            It returns a <code class="computeroutput"><span class="identifier">junction</span></code>
+            (that's a kind of query) with the following characteristics:
+          </p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+                Its value type is <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">tuple</span><span class="special">&lt;</span></code><em class="replaceable"><code>T0</code></em><code class="computeroutput"><span class="special">,</span></code> <em class="replaceable"><code>T1</code></em><code class="computeroutput"><span class="special">,</span></code> ...<code class="computeroutput"><span class="special">&gt;</span></code>,
+                where <em class="replaceable"><code>T0</code></em>, <em class="replaceable"><code>T1</code></em>
+                ... are the value types of <em class="replaceable"><code>q0</code></em>, <em class="replaceable"><code>q1</code></em>
+                ... respectively.
+              </li>
+<li class="listitem">
+                Its value mapper is a new <a class="link" href="../mapped_data_types/std_tuple.html#tuple_mapper"><code class="computeroutput"><span class="identifier">tuple_mapper</span><span class="special">&lt;</span></code><em class="replaceable"><code>T0</code></em><code class="computeroutput"><span class="special">,</span></code> <em class="replaceable"><code>T1</code></em><code class="computeroutput"><span class="special">,</span></code> ...<code class="computeroutput"><span class="special">)</span></code></a>,
+                in which the <em class="replaceable"><code>i</code></em>'th member mapper is identical
+                to <em class="replaceable"><code>qi</code></em>'s value mapper.
+              </li>
+<li class="listitem">
+                Its output consists of <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">tuple</span></code>s,
+                formed from each combination of the outputs of <em class="replaceable"><code>q0</code></em>,
+                <em class="replaceable"><code>q1</code></em>, ... .
+              </li>
+</ul></div>
+<h6>
+<a name="queries.join.join.h1"></a>
+            <span class="phrase"><a name="queries.join.join.example"></a></span><a class="link" href="join.html#queries.join.join.example">Example</a>
+          </h6>
+<pre class="programlisting"><span class="keyword">const</span> <span class="identifier">query</span><span class="special">&lt;</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">tuple</span><span class="special">&lt;</span><span class="identifier">cinema</span><span class="special">,</span> <span class="identifier">screen</span><span class="special">,</span> <span class="identifier">movie</span><span class="special">&gt;&gt;</span> <span class="identifier">combinations</span> <span class="special">=</span>
+    <span class="identifier">join</span><span class="special">(</span><span class="identifier">cinemas</span><span class="special">,</span> <span class="identifier">screens</span><span class="special">,</span> <span class="identifier">movies</span><span class="special">);</span>
+</pre>
+<h5>
+<a name="queries.join.join.h2"></a>
+            <span class="phrase"><a name="queries.join.join.or_as_a_method"></a></span><a class="link" href="join.html#queries.join.join.or_as_a_method">...
+            or as a method</a>
+          </h5>
+<p>
+            For any queries <em class="replaceable"><code>l</code></em>, <em class="replaceable"><code>r</code></em>,
+            the call <em class="replaceable"><code>l</code></em><code class="computeroutput"><span class="special">.</span><span class="identifier">join</span><span class="special">(</span></code><em class="replaceable"><code>r</code></em><code class="computeroutput"><span class="special">)</span></code> is equivalent to <code class="computeroutput"><span class="identifier">join</span><span class="special">(</span></code><em class="replaceable"><code>l</code></em><code class="computeroutput"><span class="special">,</span></code> <em class="replaceable"><code>r</code></em><code class="computeroutput"><span class="special">)</span></code>.
+          </p>
+<p>
+            Note that the <code class="computeroutput"><span class="identifier">join</span><span class="special">()</span></code>
+            method, unlike the <code class="computeroutput"><span class="identifier">join</span><span class="special">()</span></code> free function, always makes queries
+            that produce tuples of <span class="emphasis"><em>two</em></span> elements. E.g. <em class="replaceable"><code>a</code></em><code class="computeroutput"><span class="special">.</span><span class="identifier">join</span><span class="special">(</span></code><em class="replaceable"><code>b</code></em><code class="computeroutput"><span class="special">).</span><span class="identifier">join</span><span class="special">(</span></code><em class="replaceable"><code>c</code></em><code class="computeroutput"><span class="special">)</span></code> produces outputs of the form <code class="computeroutput"><span class="special">{(</span></code> -- <code class="computeroutput"><span class="special">,</span></code>
+            -- <code class="computeroutput"><span class="special">},</span></code> -- <code class="computeroutput"><span class="special">}</span></code>;
+            whereas <code class="computeroutput"><span class="identifier">join</span><span class="special">(</span></code><em class="replaceable"><code>a</code></em><code class="computeroutput"><span class="special">,</span></code> <em class="replaceable"><code>b</code></em><code class="computeroutput"><span class="special">,</span></code> <em class="replaceable"><code>c</code></em><code class="computeroutput"><span class="special">)</span></code> produces outputs of the form <code class="computeroutput"><span class="special">{</span></code> -- <code class="computeroutput"><span class="special">,</span></code>
+            -- <code class="computeroutput"><span class="special">,</span></code> -- <code class="computeroutput"><span class="special">}</span></code>.
+          </p>
+<h6>
+<a name="queries.join.join.h3"></a>
+            <span class="phrase"><a name="queries.join.join.example0"></a></span><a class="link" href="join.html#queries.join.join.example0">Example</a>
+          </h6>
+<pre class="programlisting"><span class="keyword">const</span> <span class="identifier">query</span><span class="special">&lt;</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">tuple</span><span class="special">&lt;</span><span class="identifier">screen</span><span class="special">,</span> <span class="identifier">movie</span><span class="special">&gt;&gt;</span> <span class="identifier">possible_screenings</span> <span class="special">=</span>
+    <span class="identifier">screens</span><span class="special">.</span><span class="identifier">join</span><span class="special">(</span><span class="identifier">movies</span><span class="special">);</span>
+</pre>
+</div>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2014 Michael Shepanski<p>
+        Distributed under the Boost Software License, Version 1.0
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="distinct_and_distinct_on.html"><img src="../images/prev.png" alt="Prev"></a><a accesskey="u" href="../queries.html"><img src="../images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../images/home.png" alt="Home"></a><a accesskey="n" href="join/inner_join.html"><img src="../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

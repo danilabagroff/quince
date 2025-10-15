@@ -1,0 +1,204 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>boost::optional&lt;...&gt;</title>
+<link rel="stylesheet" href="../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../index.html" title="QUINCE: QUeries IN C++ Expressions">
+<link rel="up" href="../mapped_data_types.html" title="Chapter&#160;5.&#160;Mapped Data Types">
+<link rel="prev" href="polymorphically_mapped_types.html" title="Polymorphically Mapped Types">
+<link rel="next" href="std_tuple.html" title="std::tuple&lt;...&gt;">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<div class="spirit-nav">
+<a accesskey="p" href="polymorphically_mapped_types.html"><img src="../images/prev.png" alt="Prev"></a><a accesskey="u" href="../mapped_data_types.html"><img src="../images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../images/home.png" alt="Home"></a><a accesskey="n" href="std_tuple.html"><img src="../images/next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="mapped_data_types.boost_optional"></a><a class="link" href="boost_optional.html" title="boost::optional&lt;...&gt;"><code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">optional</span><span class="special">&lt;</span></code>...<code class="computeroutput"><span class="special">&gt;</span></code></a>
+</h2></div></div></div>
+<p>
+          
+        </p>
+<h4>
+<a name="mapped_data_types.boost_optional.h0"></a>
+          <span class="phrase"><a name="mapped_data_types.boost_optional.its_mapper_class_optional_mapper"></a></span><a class="link" href="boost_optional.html#mapped_data_types.boost_optional.its_mapper_class_optional_mapper">Its
+          mapper class: <code class="computeroutput"><span class="identifier">optional_mapper</span><span class="special">&lt;</span></code>...<code class="computeroutput"><span class="special">&gt;</span></code></a>
+        </h4>
+<p>
+          If <em class="replaceable"><code>T</code></em> is any mapped type, then <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">optional</span><span class="special">&lt;</span></code><em class="replaceable"><code>T</code></em><code class="computeroutput"><span class="special">&gt;</span></code> is a mapped type. Furthermore, it is
+          statically mapped: its mapper class is always <code class="computeroutput"><span class="identifier">optional_mapper</span><span class="special">&lt;</span></code><em class="replaceable"><code>T</code></em><code class="computeroutput"><span class="special">&gt;</span></code>, and the compiler knows that when it
+          is compiling your code.
+        </p>
+<p>
+          In addition to mapping <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">optional</span><span class="special">&lt;</span></code><em class="replaceable"><code>T</code></em><code class="computeroutput"><span class="special">&gt;</span></code>s to and from column formats, <code class="computeroutput"><span class="identifier">optional_mapper</span><span class="special">&lt;</span></code><em class="replaceable"><code>T</code></em><code class="computeroutput"><span class="special">&gt;</span></code> provides an <code class="computeroutput"><span class="identifier">is_initialized</span><span class="special">()</span></code> method, operators <code class="computeroutput"><span class="special">-&gt;</span></code>
+          and <code class="computeroutput"><span class="special">*</span></code>, and a <code class="computeroutput"><span class="identifier">get_value_or</span><span class="special">()</span></code>
+          method, which act as analogs of familiar features <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">optional</span><span class="special">&lt;</span></code><em class="replaceable"><code>T</code></em><code class="computeroutput"><span class="special">&gt;</span></code>.
+        </p>
+<p>
+          If <em class="replaceable"><code>omt</code></em> is an instance of <code class="computeroutput"><span class="identifier">optional_mapper</span><span class="special">&lt;</span></code><em class="replaceable"><code>T</code></em><code class="computeroutput"><span class="special">&gt;</span></code>, then:
+        </p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+              <em class="replaceable"><code>omt</code></em><code class="computeroutput"><span class="special">.</span><span class="identifier">is_initialized</span><span class="special">()</span></code>
+              returns a <code class="computeroutput"><span class="identifier">predicate</span></code>
+              (aka <code class="computeroutput"><span class="identifier">exprn_mapper</span><span class="special">&lt;</span><span class="keyword">bool</span><span class="special">&gt;</span></code>),
+              which evaluates to true on the server whenever <em class="replaceable"><code>omt</code></em>
+              evaluates to an <span class="quote">&#8220;<span class="quote">initialized</span>&#8221;</span> optional, i.e. whenever
+              <em class="replaceable"><code>omt</code></em> does <span class="emphasis"><em>not</em></span> evaluate
+              to the server-side equivalent of <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">none</span></code>.
+            </li>
+<li class="listitem">
+              <em class="replaceable"><code>omt</code></em><code class="computeroutput"><span class="special">.</span><span class="keyword">operator</span><span class="special">*()</span></code>
+              returns a const reference to a mapper for type <em class="replaceable"><code>T</code></em>.
+              This is the mapper that maps the <code class="computeroutput"><span class="identifier">optional</span></code>'s
+              content. The exact return type of <em class="replaceable"><code>omt</code></em><code class="computeroutput"><span class="special">.</span><span class="keyword">operator</span><span class="special">*()</span></code> depends on <em class="replaceable"><code>T</code></em>:
+              if <em class="replaceable"><code>T</code></em> is a polymorphically mapped type, it
+              is <code class="computeroutput"><span class="identifier">abstract_mapper</span><span class="special">&lt;</span></code><em class="replaceable"><code>T</code></em><code class="computeroutput"><span class="special">&gt;</span></code>; otherwise it is <em class="replaceable"><code>T</code></em>'s
+              (concrete) mapper class.
+            </li>
+<li class="listitem">
+              <em class="replaceable"><code>omt</code></em><code class="computeroutput"><span class="special">.</span><span class="keyword">operator</span><span class="special">-&gt;()</span></code>
+              returns a const pointer to a mapper for type <em class="replaceable"><code>T</code></em>:
+              the same mapper that <em class="replaceable"><code>omt</code></em><code class="computeroutput"><span class="special">.</span><span class="keyword">operator</span><span class="special">*()</span></code>
+              returns a const reference to.
+            </li>
+<li class="listitem">
+              If <em class="replaceable"><code>expr</code></em> is either an <code class="computeroutput"><span class="identifier">abstract_mapper</span><span class="special">&lt;</span></code><em class="replaceable"><code>T</code></em><code class="computeroutput"><span class="special">&gt;</span></code> or a value of type <em class="replaceable"><code>T</code></em>,
+              then <em class="replaceable"><code>omt</code></em><code class="computeroutput"><span class="special">.</span><span class="identifier">get_value_or</span><span class="special">(</span></code><em class="replaceable"><code>expr</code></em><code class="computeroutput"><span class="special">)</span></code> is an <code class="computeroutput"><span class="identifier">exprn_mapper</span><span class="special">&lt;</span></code><em class="replaceable"><code>T</code></em><code class="computeroutput"><span class="special">&gt;</span></code> that evaluates, on the server side,
+              to <code class="computeroutput"><span class="special">*</span></code><code class="literal">omt</code>
+              when <em class="replaceable"><code>omt</code></em><code class="computeroutput"><span class="special">.</span><span class="identifier">is_initialized</span><span class="special">()</span></code>
+              is true, and to <em class="replaceable"><code>expr</code></em> otherwise.
+            </li>
+</ul></div>
+<p>
+          Just as it is a run-time error to execute a normal C++ expression that
+          applies <code class="computeroutput"><span class="special">*</span></code> or <code class="computeroutput"><span class="special">-&gt;</span></code> to an uninitialized <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">optional</span></code>, it is a run-time error to execute
+          a server-side expression that applies <code class="computeroutput"><span class="special">*</span></code>
+          or <code class="computeroutput"><span class="special">-&gt;</span></code> to data that represents
+          an uninitialized <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">optional</span></code>.
+        </p>
+<h4>
+<a name="mapped_data_types.boost_optional.h1"></a>
+          <span class="phrase"><a name="mapped_data_types.boost_optional.example"></a></span><a class="link" href="boost_optional.html#mapped_data_types.boost_optional.example">Example</a>
+        </h4>
+<pre class="programlisting"><span class="keyword">struct</span> <span class="identifier">movie_info</span> <span class="special">{</span>
+    <span class="identifier">std</span><span class="special">::</span><span class="identifier">string</span> <span class="identifier">title</span><span class="special">;</span>
+    <span class="identifier">boost</span><span class="special">::</span><span class="identifier">optional</span><span class="special">&lt;</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">string</span><span class="special">&gt;</span> <span class="identifier">producer</span><span class="special">;</span>
+    <span class="identifier">std</span><span class="special">::</span><span class="identifier">string</span> <span class="identifier">director</span><span class="special">;</span>
+<span class="special">};</span>
+<span class="identifier">QUINCE_MAP_CLASS</span><span class="special">(</span><span class="identifier">movie_info</span><span class="special">,</span> <span class="special">(</span><span class="identifier">title</span><span class="special">)(</span><span class="identifier">producer</span><span class="special">)(</span><span class="identifier">director</span><span class="special">))</span>
+
+<span class="keyword">extern</span> <span class="identifier">table</span><span class="special">&lt;</span><span class="identifier">movie_info</span><span class="special">&gt;</span> <span class="identifier">movie_infos</span><span class="special">;</span>
+
+<span class="keyword">const</span> <span class="identifier">query</span><span class="special">&lt;</span><span class="identifier">movie_info</span><span class="special">&gt;</span> <span class="identifier">those_with_producers</span> <span class="special">=</span>
+    <span class="identifier">movie_infos</span>
+    <span class="special">.</span><span class="identifier">where</span><span class="special">(</span><span class="identifier">movie_infos</span><span class="special">-&gt;</span><span class="identifier">producer</span><span class="special">.</span><span class="identifier">is_initialized</span><span class="special">());</span>
+
+<span class="keyword">const</span> <span class="identifier">query</span><span class="special">&lt;</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">string</span><span class="special">&gt;</span> <span class="identifier">producers</span> <span class="special">=</span>
+    <span class="identifier">those_with_producers</span>
+    <span class="special">.</span><span class="identifier">select</span><span class="special">(*</span> <span class="identifier">those_with_producers</span><span class="special">-&gt;</span><span class="identifier">producer</span><span class="special">);</span>
+
+<span class="keyword">const</span> <span class="identifier">query</span><span class="special">&lt;</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">string</span><span class="special">&gt;</span> <span class="identifier">padded_producers</span> <span class="special">=</span>
+    <span class="identifier">movie_infos</span>
+    <span class="special">.</span><span class="identifier">select</span><span class="special">(</span><span class="identifier">movie_infos</span><span class="special">-&gt;</span><span class="identifier">producer</span><span class="special">.</span><span class="identifier">get_value_or</span><span class="special">(</span><span class="string">"&lt;unknown&gt;"</span><span class="special">));</span>
+
+<span class="keyword">const</span> <span class="identifier">query</span><span class="special">&lt;</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">string</span><span class="special">&gt;</span> <span class="identifier">top_credits</span> <span class="special">=</span>
+    <span class="identifier">movie_infos</span>
+    <span class="special">.</span><span class="identifier">select</span><span class="special">(</span><span class="identifier">movie_infos</span><span class="special">-&gt;</span><span class="identifier">producer</span><span class="special">.</span><span class="identifier">get_value_or</span><span class="special">(</span><span class="identifier">movie_infos</span><span class="special">-&gt;</span><span class="identifier">director</span><span class="special">));</span>
+</pre>
+<a name="optional_order"></a><h4>
+<a name="mapped_data_types.boost_optional.h2"></a>
+          <span class="phrase"><a name="mapped_data_types.boost_optional.order"></a></span><a class="link" href="boost_optional.html#mapped_data_types.boost_optional.order">Order</a>
+        </h4>
+<p>
+          Optionals cannot currently be compared on the server side with the relational
+          operators, and attempts to do so are caught at compile time.
+        </p>
+<p>
+          Optionals can, however, be sorted on the server side with <code class="computeroutput"><span class="identifier">order</span><span class="special">()</span></code>.
+          Then <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">none</span></code> compares equal to <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">none</span></code> and less than anything else, and
+          in other cases the contents of the two optionals are compared.
+        </p>
+<a name="optionals_representation"></a><h4>
+<a name="mapped_data_types.boost_optional.h3"></a>
+          <span class="phrase"><a name="mapped_data_types.boost_optional.representation"></a></span><a class="link" href="boost_optional.html#mapped_data_types.boost_optional.representation">Representation</a>
+        </h4>
+<p>
+          If it weren't for <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">optional</span></code>s,
+          every C++ type would be mapped to columns with <code class="literal">NOT NULL</code>
+          constraints.
+        </p>
+<p>
+          Most of the time, <code class="computeroutput"><span class="identifier">optional_mapper</span><span class="special">&lt;</span></code><em class="replaceable"><code>T</code></em><code class="computeroutput"><span class="special">&gt;</span></code> simply waives this rule: it maps <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">optional</span><span class="special">&lt;</span></code><em class="replaceable"><code>T</code></em><code class="computeroutput"><span class="special">&gt;</span></code> to the same set of columns as the representation
+          of <em class="replaceable"><code>T</code></em>, sans their <code class="literal">NOT NULL</code>
+          constraints. Then an uninitialized <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">optional</span><span class="special">&lt;</span></code><em class="replaceable"><code>T</code></em><code class="computeroutput"><span class="special">&gt;</span></code> is represented by all columns being
+          <code class="literal">NULL</code>.
+        </p>
+<p>
+          That approach breaks down occasionally. Consider <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">optional</span><span class="special">&lt;</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">optional</span><span class="special">&lt;</span><span class="keyword">float</span><span class="special">&gt;&gt;</span></code>. It has two distinct null-like
+          values:
+        </p>
+<pre class="programlisting"><span class="keyword">const</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">optional</span><span class="special">&lt;</span><span class="keyword">float</span><span class="special">&gt;</span> <span class="identifier">no_float</span><span class="special">;</span>
+<span class="identifier">assert</span><span class="special">(!</span> <span class="identifier">no_float</span><span class="special">);</span>
+
+<span class="keyword">const</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">optional</span><span class="special">&lt;</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">optional</span><span class="special">&lt;</span><span class="keyword">float</span><span class="special">&gt;&gt;</span> <span class="identifier">nothing1</span><span class="special">;</span>
+<span class="keyword">const</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">optional</span><span class="special">&lt;</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">optional</span><span class="special">&lt;</span><span class="keyword">float</span><span class="special">&gt;&gt;</span> <span class="identifier">nothing2</span><span class="special">(</span><span class="identifier">no_float</span><span class="special">);</span>
+
+<span class="identifier">assert</span><span class="special">(!</span> <span class="identifier">nothing1</span><span class="special">);</span>
+<span class="identifier">assert</span><span class="special">(</span><span class="identifier">nothing2</span><span class="special">);</span>
+<span class="identifier">assert</span><span class="special">(</span><span class="identifier">nothing1</span> <span class="special">!=</span> <span class="identifier">nothing2</span><span class="special">);</span>
+</pre>
+<p>
+          The simple, efficient strategy of putting <code class="literal">NULL</code>s for
+          <code class="computeroutput"><span class="identifier">none</span></code>s cannot be applied
+          to <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">optional</span><span class="special">&lt;</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">optional</span><span class="special">&lt;</span><span class="keyword">float</span><span class="special">&gt;&gt;</span></code>,
+          because a <code class="literal">NULL</code> column would be ambiguous between <code class="computeroutput"><span class="identifier">nothing1</span></code> and <code class="computeroutput"><span class="identifier">nothing2</span></code>.
+        </p>
+<p>
+          So <code class="computeroutput"><span class="identifier">optional_mapper</span><span class="special">&lt;</span></code><em class="replaceable"><code>T</code></em><code class="computeroutput"><span class="special">&gt;</span></code> distinguishes two cases:
+        </p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+              If <em class="replaceable"><code>T</code></em>'s representation does not allow all
+              <code class="literal">NULL</code>s, then we stick with the original plan: <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">optional</span><span class="special">&lt;</span></code><em class="replaceable"><code>T</code></em><code class="computeroutput"><span class="special">&gt;</span></code>'s representation is the same as
+              <em class="replaceable"><code>T</code></em>'s, except it does allow <code class="literal">NULL</code>s.
+              Then <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">none</span></code> is represented by all columns
+              <code class="literal">NULL</code>. Call this the <span class="emphasis"><em>optimized representation</em></span>.
+              It applies almost always.
+            </li>
+<li class="listitem">
+              If <em class="replaceable"><code>T</code></em>'s representation allows all <code class="literal">NULL</code>s,
+              then <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">optional</span><span class="special">&lt;</span></code><em class="replaceable"><code>T</code></em><code class="computeroutput"><span class="special">&gt;</span></code>'s representation consists of a
+              representation of a <em class="replaceable"><code>T</code></em>, plus an extra column
+              representing a <code class="computeroutput"><span class="keyword">bool</span></code>. Then
+              <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">none</span></code> is represented by setting the
+              boolean column false and the rest to <code class="literal">NULL</code>, and initialized
+              values are represented by setting the boolean true and the rest to
+              the content. Call this the <span class="emphasis"><em>unoptimized representation</em></span>.
+            </li>
+</ul></div>
+<p>
+          For example, <code class="computeroutput"><span class="keyword">float</span></code> cannot
+          be represented as <code class="literal">NULL</code>, so <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">optional</span><span class="special">&lt;</span><span class="keyword">float</span><span class="special">&gt;</span></code> gets the optimized representation (one
+          column). Thus <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">optional</span><span class="special">&lt;</span><span class="keyword">float</span><span class="special">&gt;</span></code>
+          <span class="emphasis"><em>can</em></span> be represented as a <code class="literal">NULL</code>; so
+          <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">optional</span><span class="special">&lt;</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">optional</span><span class="special">&lt;</span><span class="keyword">float</span><span class="special">&gt;&gt;</span></code>
+          gets the unoptimized representation (two columns). But that representation
+          incudes a flag, which is never <code class="literal">NULL</code>. Therefore <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">optional</span><span class="special">&lt;</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">optional</span><span class="special">&lt;</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">optional</span><span class="special">&lt;</span><span class="keyword">float</span><span class="special">&gt;&gt;&gt;</span></code>
+          gets the optimized representation (still only two columns). And so on.
+        </p>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2014 Michael Shepanski<p>
+        Distributed under the Boost Software License, Version 1.0
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="polymorphically_mapped_types.html"><img src="../images/prev.png" alt="Prev"></a><a accesskey="u" href="../mapped_data_types.html"><img src="../images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../images/home.png" alt="Home"></a><a accesskey="n" href="std_tuple.html"><img src="../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

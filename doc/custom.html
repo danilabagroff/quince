@@ -1,0 +1,116 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Chapter&#160;9.&#160;Custom Mappings</title>
+<link rel="stylesheet" href="boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="index.html" title="QUINCE: QUeries IN C++ Expressions">
+<link rel="up" href="depth.html" title="Part&#160;II.&#160;The Quince API in Depth">
+<link rel="prev" href="tables/table_alteration/set_field_type_postgresql_only.html" title="set_field_type() (PostgreSQL only)">
+<link rel="next" href="custom/predefined.html" title="Predefined Concrete Mapper Class Templates">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<div class="spirit-nav">
+<a accesskey="p" href="tables/table_alteration/set_field_type_postgresql_only.html"><img src="images/prev.png" alt="Prev"></a><a accesskey="u" href="depth.html"><img src="images/up.png" alt="Up"></a><a accesskey="h" href="index.html"><img src="images/home.png" alt="Home"></a><a accesskey="n" href="custom/predefined.html"><img src="images/next.png" alt="Next"></a>
+</div>
+<div class="chapter">
+<div class="titlepage"><div><div><h2 class="title">
+<a name="custom"></a>Chapter&#160;9.&#160;Custom Mappings</h2></div></div></div>
+<div class="toc">
+<p><b>Table of Contents</b></p>
+<dl class="toc">
+<dt><span class="section"><a href="custom.html#custom.degrees_of_freedom">Degrees of Freedom</a></span></dt>
+<dt><span class="section"><a href="custom/predefined.html">Predefined Concrete Mapper Class
+        Templates</a></span></dt>
+<dt><span class="section"><a href="custom/deployment.html">Deployment</a></span></dt>
+<dd><dl>
+<dt><span class="section"><a href="custom/deployment.html#custom.deployment.database">To a Database ...</a></span></dt>
+<dt><span class="section"><a href="custom/deployment/table.html">... or to a Table</a></span></dt>
+</dl></dd>
+</dl>
+</div>
+<p>
+        
+      </p>
+<div class="section">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="custom.degrees_of_freedom"></a><a class="link" href="custom.html#custom.degrees_of_freedom" title="Degrees of Freedom">Degrees of Freedom</a>
+</h2></div></div></div>
+<p>
+          The signature feature of polymorphically mapped types is that application
+          code doesn't know what their concrete mapper classes are. E.g. code that
+          stores and retrieves <code class="computeroutput"><span class="identifier">uint16_t</span></code>s
+          knows that they're mapped by some class that implements the interface
+          <code class="computeroutput"><span class="identifier">abstract_mapper</span><span class="special">&lt;</span><span class="identifier">uint16_t</span><span class="special">&gt;</span></code>,
+          but it doesn't know which class; and so far, we haven't had much to say
+          about it.
+        </p>
+<p>
+          Each backend library has default concrete mapper classes for all of the
+          polymorphically mapped types (see the tables <a class="link" href="quince_postgresql/mappers.html" title="Default mappers">here</a>
+          and <a class="link" href="quince_sqlite/mappers.html" title="Default mappers">here</a>). When we don't say
+          otherwise, quince consults the backend library (whichever one is in charge
+          of the database we are using), and uses its default mapper classes. But
+          we <span class="emphasis"><em>can</em></span> say otherwise, and sometimes we <span class="emphasis"><em>should</em></span>
+          say otherwise, because the defaults don't suit every purpose.
+        </p>
+<p>
+          For any polymorphically mapped type <em class="replaceable"><code>T</code></em>, we can
+          specify a concrete mapper class to map all instances of <em class="replaceable"><code>T</code></em>
+          in a particular database, or all instances of <em class="replaceable"><code>T</code></em>
+          in a particular table.
+        </p>
+<p>
+          So there are two steps. First get hold of a concrete mapper class, then
+          deploy it to a database or table.
+        </p>
+<p>
+          For the first step, you can define a new concrete mapper class, i.e. your
+          own subclass of <code class="computeroutput"><span class="identifier">abstract_mapper</span><span class="special">&lt;</span></code><em class="replaceable"><code>T</code></em><code class="computeroutput"><span class="special">&gt;</span></code> that implements all its pure virtuals.
+          But I'm not going to document that process here, because (a) the most wanted
+          customizations don't require it, and (b) it would involve a detour into
+          quince's lower layers that you don't need to see for any other purpose.
+          <a href="#ftn.custom.degrees_of_freedom.f0" class="footnote" name="custom.degrees_of_freedom.f0"><sup class="footnote">[15]</sup></a>
+        </p>
+<p>
+          The most wanted customizations are for numeric types that the DBMS doesn't
+          represent directly. E.g. PostgreSQL doesn't have a built-in column type
+          for <code class="computeroutput"><span class="identifier">uint16_t</span></code>. Quince_postgresql
+          supplies a default <code class="computeroutput"><span class="identifier">uint16_t</span></code>
+          mapper that uses a 32-bit signed integer, because to me that seemed like
+          a good idea at the time, but for you it might be no good at all. In that
+          case you probably want to represent <code class="computeroutput"><span class="identifier">uint16_t</span></code>
+          in a signed 16-bit integer, and there are a few ways to do that, with different
+          pros and cons.
+        </p>
+<p>
+          Quince defines an assortment of concrete mapper classes that are ready
+          to use in cases like this. You just need to understand what they do, make
+          your choice, and deploy it.
+        </p>
+</div>
+<div class="footnotes">
+<br><hr style="width:100; text-align:left;margin-left: 0">
+<div id="ftn.custom.degrees_of_freedom.f0" class="footnote"><p><a href="#custom.degrees_of_freedom.f0" class="para"><sup class="para">[15] </sup></a>
+            On the other hand, if you want to explore and experiment, don't let me
+            discourage you. Take a look in the quince source code and you will find
+            many concrete subclasses of <code class="computeroutput"><span class="identifier">abstract_mapper</span></code>
+            that you can use as examples. And afterwards, when you have your own
+            mapper, the deployment process is <a class="link" href="custom/deployment.html" title="Deployment">the
+            same as for predefined mappers</a>.
+          </p></div>
+</div>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2014 Michael Shepanski<p>
+        Distributed under the Boost Software License, Version 1.0
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="tables/table_alteration/set_field_type_postgresql_only.html"><img src="images/prev.png" alt="Prev"></a><a accesskey="u" href="depth.html"><img src="images/up.png" alt="Up"></a><a accesskey="h" href="index.html"><img src="images/home.png" alt="Home"></a><a accesskey="n" href="custom/predefined.html"><img src="images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

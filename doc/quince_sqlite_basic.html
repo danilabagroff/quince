@@ -1,0 +1,120 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Basic conversions</title>
+<link rel="stylesheet" href="../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../index.html" title="QUINCE: QUeries IN C++ Expressions">
+<link rel="up" href="../quince_sqlite.html" title="Chapter&#160;13.&#160;quince_sqlite">
+<link rel="prev" href="../quince_sqlite.html" title="Chapter&#160;13.&#160;quince_sqlite">
+<link rel="next" href="mappers.html" title="Default mappers">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<div class="spirit-nav">
+<a accesskey="p" href="../quince_sqlite.html"><img src="../images/prev.png" alt="Prev"></a><a accesskey="u" href="../quince_sqlite.html"><img src="../images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../images/home.png" alt="Home"></a><a accesskey="n" href="mappers.html"><img src="../images/next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="quince_sqlite.basic"></a><a class="link" href="basic.html" title="Basic conversions">Basic conversions</a>
+</h2></div></div></div>
+<p>
+          The following table lists the C++ types for which quince_sqlite provides
+          <a class="link" href="../custom/predefined.html#basic_conversions">basic conversions</a>. So these are
+          the types <em class="replaceable"><code>T</code></em> for which quince_sqlite allows
+          <a class="link" href="../custom/predefined.html#direct_mapper"><code class="computeroutput"><span class="identifier">direct_mapper</span><span class="special">&lt;</span></code><em class="replaceable"><code>T</code></em><code class="computeroutput"><span class="special">&gt;</span></code></a>. The table also shows the SQL
+          types to which they are converted.
+        </p>
+<div class="informaltable"><table class="table">
+<colgroup>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                  <p>
+                    C++ mapped type
+                  </p>
+                </th>
+<th>
+                  <p>
+                    SQL type from quince_sqlite's basic conversion
+                  </p>
+                </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                  <p>
+                    <code class="computeroutput"><span class="identifier">int64_t</span></code>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <code class="literal">INTEGER</code>
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    <code class="computeroutput"><span class="identifier">serial</span></code>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <code class="literal">INTEGER</code>
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    <code class="computeroutput"><span class="keyword">double</span></code>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <code class="literal">REAL</code>
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">string</span></code>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <code class="literal">TEXT</code>
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span><span class="identifier">uint8_t</span><span class="special">&gt;</span></code>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <code class="literal">BLOB</code>
+                  </p>
+                </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2014 Michael Shepanski<p>
+        Distributed under the Boost Software License, Version 1.0
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="../quince_sqlite.html"><img src="../images/prev.png" alt="Prev"></a><a accesskey="u" href="../quince_sqlite.html"><img src="../images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../images/home.png" alt="Home"></a><a accesskey="n" href="mappers.html"><img src="../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

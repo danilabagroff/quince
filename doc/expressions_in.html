@@ -1,0 +1,166 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>in()</title>
+<link rel="stylesheet" href="../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../index.html" title="QUINCE: QUeries IN C++ Expressions">
+<link rel="up" href="../expressions.html" title="Chapter&#160;6.&#160;Expressions for Server-Side Execution">
+<link rel="prev" href="exists.html" title="exists()">
+<link rel="next" href="collective.html" title="Collective Comparisons (PostgreSQL only)">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<div class="spirit-nav">
+<a accesskey="p" href="exists.html"><img src="../images/prev.png" alt="Prev"></a><a accesskey="u" href="../expressions.html"><img src="../images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../images/home.png" alt="Home"></a><a accesskey="n" href="collective.html"><img src="../images/next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="expressions.in"></a><a class="link" href="in.html" title="in()"><code class="computeroutput"><span class="identifier">in</span><span class="special">()</span></code></a>
+</h2></div></div></div>
+<p>
+          
+        </p>
+<p>
+          Quince's <code class="computeroutput"><span class="identifier">in</span><span class="special">()</span></code>
+          function wraps the SQL keyword <code class="literal">IN</code>. There are three overloads,
+          but they have the following in common:
+        </p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+              <code class="computeroutput"><span class="identifier">in</span><span class="special">()</span></code>'s
+              first argument must be of type <em class="replaceable"><code>T</code></em> or <code class="computeroutput"><span class="identifier">abstract_mapper</span><span class="special">&lt;</span></code><em class="replaceable"><code>T</code></em><code class="computeroutput"><span class="special">&gt;</span></code>, for some mapped type <em class="replaceable"><code>T</code></em>
+              such that:
+              <div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: circle; ">
+<li class="listitem">
+                    <em class="replaceable"><code>T</code></em> is represented in a single column
+                    (this is checked at run time), and:
+                  </li>
+<li class="listitem">
+                    <em class="replaceable"><code>T</code></em> is not a <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">optional</span></code>,
+                    and nor are any of its mapped members (if <em class="replaceable"><code>T</code></em>
+                    is a user-defined class, or a <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">tuple</span></code>),
+                    and nor are <span class="emphasis"><em>their</em></span> mapped members, etc. (this
+                    is checked at compile time).
+                  </li>
+</ul></div>
+            </li>
+<li class="listitem">
+              <code class="computeroutput"><span class="identifier">in</span><span class="special">()</span></code>
+              returns a <code class="computeroutput"><span class="identifier">predicate</span></code>.
+            </li>
+<li class="listitem">
+              When executed, that <code class="computeroutput"><span class="identifier">predicate</span></code>
+              evaluates the subexpression represented by the first argument, and
+              tests whether the result is equal to any of a series of comparands.
+            </li>
+<li class="listitem">
+              To do this it may evaluate all of the comparands, or it may stop early
+              when it finds a match.
+            </li>
+</ul></div>
+<p>
+          The three overloads differ in the way they specify that <span class="quote">&#8220;<span class="quote">series of
+          comparands</span>&#8221;</span>:
+        </p>
+<h5>
+<a name="expressions.in.h0"></a>
+          <span class="phrase"><a name="expressions.in.option_1_comparands_are_subseque"></a></span><a class="link" href="in.html#expressions.in.option_1_comparands_are_subseque">Option
+          1: comparands are subsequent arguments to <code class="computeroutput"><span class="identifier">in</span><span class="special">()</span></code></a>
+        </h5>
+<p>
+          <code class="computeroutput"><span class="identifier">in</span><span class="special">()</span></code>
+          takes zero or or more arguments after the first one. Given that the first
+          one was of type <em class="replaceable"><code>T</code></em> or <code class="computeroutput"><span class="identifier">abstract_mapper</span><span class="special">&lt;</span></code><em class="replaceable"><code>T</code></em><code class="computeroutput"><span class="special">&gt;</span></code>, the subsequent arguments must each
+          be of type <em class="replaceable"><code>T</code></em> or <code class="computeroutput"><span class="identifier">abstract_mapper</span><span class="special">&lt;</span></code><em class="replaceable"><code>T</code></em><code class="computeroutput"><span class="special">&gt;</span></code>.
+        </p>
+<p>
+          In this case the comparands are found by evaluating the subexpressions
+          represented by those subsequent arguments.
+        </p>
+<h5>
+<a name="expressions.in.h1"></a>
+          <span class="phrase"><a name="expressions.in.option_2_comparands_are_passed_t"></a></span><a class="link" href="in.html#expressions.in.option_2_comparands_are_passed_t">Option
+          2: comparands are passed through a vector of pointers</a>
+        </h5>
+<p>
+          <code class="computeroutput"><span class="identifier">in</span><span class="special">()</span></code>
+          takes a second argument of type <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span><span class="keyword">const</span> <span class="identifier">abstract_mapper</span><span class="special">&lt;</span></code><em class="replaceable"><code>T</code></em><code class="computeroutput"><span class="special">&gt;</span> <span class="special">*&gt;</span></code>.
+          Actual values of type <em class="replaceable"><code>T</code></em> can be accommodated
+          by converting them to <code class="computeroutput"><span class="identifier">exprn_mapper</span><span class="special">&lt;</span></code><em class="replaceable"><code>T</code></em><code class="computeroutput"><span class="special">&gt;</span></code>s, and taking the address. <code class="computeroutput"><span class="identifier">in</span><span class="special">()</span></code>
+          keeps clones of all the mappers, so it is not affected if you destroy the
+          originals.
+        </p>
+<p>
+          In this case the comparands are found by evaluating the subexpressions
+          represented by the elements of the <code class="computeroutput"><span class="identifier">vector</span></code>.
+        </p>
+<a name="in_subquery"></a><h5>
+<a name="expressions.in.h2"></a>
+          <span class="phrase"><a name="expressions.in.option_3_a_subquery_produces_the"></a></span><a class="link" href="in.html#expressions.in.option_3_a_subquery_produces_the">Option
+          3: a subquery produces the operands</a>
+        </h5>
+<p>
+          <code class="computeroutput"><span class="identifier">in</span><span class="special">()</span></code>
+          takes as its second argument a query with value type <em class="replaceable"><code>T</code></em>.
+        </p>
+<p>
+          The query is allowed to use mappers that belong to an outer context, as
+          <a class="link" href="exists.html#exists_visibility">was the case with <code class="computeroutput"><span class="identifier">exists</span><span class="special">()</span></code></a>.
+        </p>
+<p>
+          In this case the comparands are the outputs of the query.
+        </p>
+<h4>
+<a name="expressions.in.h3"></a>
+          <span class="phrase"><a name="expressions.in.examples"></a></span><a class="link" href="in.html#expressions.in.examples">Examples</a>
+        </h4>
+<pre class="programlisting"><span class="comment">// Find points where x is 3.3f, 6.8f, or the square of y:</span>
+<span class="comment">//</span>
+<span class="keyword">const</span> <span class="identifier">query</span><span class="special">&lt;</span><span class="identifier">point</span><span class="special">&gt;</span> <span class="identifier">special_points</span> <span class="special">=</span>
+    <span class="identifier">points</span>
+    <span class="special">.</span><span class="identifier">where</span><span class="special">(</span><span class="identifier">in</span><span class="special">(</span><span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">x</span><span class="special">,</span> <span class="number">3.3f</span><span class="special">,</span> <span class="number">6.8f</span><span class="special">,</span> <span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">y</span><span class="special">*</span><span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">y</span><span class="special">));</span>
+
+<span class="comment">// Same again but using a std::vector;</span>
+<span class="comment">//</span>
+<span class="keyword">const</span> <span class="identifier">exprn_mapper</span><span class="special">&lt;</span><span class="keyword">float</span><span class="special">&gt;</span> <span class="identifier">exprn3_3</span><span class="special">(</span><span class="number">3.3f</span><span class="special">);</span>
+<span class="keyword">const</span> <span class="identifier">exprn_mapper</span><span class="special">&lt;</span><span class="keyword">float</span><span class="special">&gt;</span> <span class="identifier">exprn6_8</span><span class="special">(</span><span class="number">6.8f</span><span class="special">);</span>
+<span class="keyword">const</span> <span class="identifier">exprn_mapper</span><span class="special">&lt;</span><span class="keyword">float</span><span class="special">&gt;</span> <span class="identifier">y_squared</span> <span class="special">=</span> <span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">y</span> <span class="special">*</span> <span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">y</span><span class="special">;</span>
+<span class="keyword">const</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span><span class="keyword">const</span> <span class="identifier">abstract_mapper</span><span class="special">&lt;</span><span class="keyword">float</span><span class="special">&gt;*&gt;</span> <span class="identifier">special_x_values</span><span class="special">{&amp;</span><span class="identifier">exprn3_3</span><span class="special">,</span> <span class="special">&amp;</span><span class="identifier">exprn6_8</span><span class="special">,</span> <span class="special">&amp;</span><span class="identifier">y_squared</span><span class="special">};</span>
+<span class="keyword">const</span> <span class="identifier">query</span><span class="special">&lt;</span><span class="identifier">point</span><span class="special">&gt;</span> <span class="identifier">special_points_again</span> <span class="special">=</span>
+    <span class="identifier">points</span>
+    <span class="special">.</span><span class="identifier">where</span><span class="special">(</span><span class="identifier">in</span><span class="special">(</span><span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">x</span><span class="special">,</span> <span class="identifier">special_x_values</span><span class="special">));</span>
+
+<span class="comment">// Find points where either x or y is a (positive or negative)</span>
+<span class="comment">// square root of 2:</span>
+<span class="comment">//</span>
+<span class="keyword">const</span> <span class="identifier">query</span><span class="special">&lt;</span><span class="identifier">point</span><span class="special">&gt;</span> <span class="identifier">with_sqrt_two</span> <span class="special">=</span>
+    <span class="identifier">points</span>
+    <span class="special">.</span><span class="identifier">where</span><span class="special">(</span><span class="identifier">in</span><span class="special">(</span><span class="number">2.0f</span><span class="special">,</span> <span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">x</span><span class="special">*</span><span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">x</span><span class="special">,</span> <span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">y</span><span class="special">*</span><span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">y</span><span class="special">));</span>
+
+<span class="comment">// Find points whose x is interesting:</span>
+<span class="comment">//</span>
+<span class="keyword">extern</span> <span class="keyword">const</span> <span class="identifier">query</span><span class="special">&lt;</span><span class="keyword">float</span><span class="special">&gt;</span> <span class="identifier">interesting_numbers</span><span class="special">;</span>
+<span class="keyword">const</span> <span class="identifier">query</span><span class="special">&lt;</span><span class="identifier">point</span><span class="special">&gt;</span> <span class="identifier">interesting_wrt_x</span> <span class="special">=</span>
+    <span class="identifier">points</span>
+    <span class="special">.</span><span class="identifier">where</span><span class="special">(</span><span class="identifier">in</span><span class="special">(</span><span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">x</span><span class="special">,</span> <span class="identifier">interesting_numbers</span><span class="special">));</span>
+
+<span class="comment">// Find points whose x/y ratio is among the first five interesting numbers:</span>
+<span class="comment">//</span>
+<span class="keyword">const</span> <span class="identifier">query</span><span class="special">&lt;</span><span class="identifier">point</span><span class="special">&gt;</span> <span class="identifier">highly_interesting_wrt_xy_ratio</span> <span class="special">=</span>
+    <span class="identifier">points</span>
+    <span class="special">.</span><span class="identifier">where</span><span class="special">(</span><span class="identifier">in</span><span class="special">(</span><span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">x</span> <span class="special">/</span> <span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">y</span><span class="special">,</span> <span class="identifier">interesting_numbers</span><span class="special">.</span><span class="identifier">limit</span><span class="special">(</span><span class="number">5</span><span class="special">)));</span>
+</pre>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2014 Michael Shepanski<p>
+        Distributed under the Boost Software License, Version 1.0
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="exists.html"><img src="../images/prev.png" alt="Prev"></a><a accesskey="u" href="../expressions.html"><img src="../images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../images/home.png" alt="Home"></a><a accesskey="n" href="collective.html"><img src="../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

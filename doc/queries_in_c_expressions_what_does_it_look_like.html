@@ -1,0 +1,114 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>What Does it Look Like?</title>
+<link rel="stylesheet" href="../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../index.html" title="QUINCE: QUeries IN C++ Expressions">
+<link rel="up" href="../queries_in_c_expressions.html" title="Chapter&#160;1.&#160;Queries in C++ Expressions">
+<link rel="prev" href="../queries_in_c_expressions.html" title="Chapter&#160;1.&#160;Queries in C++ Expressions">
+<link rel="next" href="what_does_it_look_like/or_these.html" title="... or these">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<div class="spirit-nav">
+<a accesskey="p" href="../queries_in_c_expressions.html"><img src="../images/prev.png" alt="Prev"></a><a accesskey="u" href="../queries_in_c_expressions.html"><img src="../images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../images/home.png" alt="Home"></a><a accesskey="n" href="what_does_it_look_like/or_these.html"><img src="../images/next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="queries_in_c_expressions.what_does_it_look_like"></a><a class="link" href="what_does_it_look_like.html" title="What Does it Look Like?">What
+        Does it Look Like?</a>
+</h2></div></div></div>
+<div class="toc"><dl class="toc">
+<dt><span class="section"><a href="what_does_it_look_like.html#queries_in_c_expressions.what_does_it_look_like.like_this">Like
+          this ...</a></span></dt>
+<dt><span class="section"><a href="what_does_it_look_like/or_these.html">...
+          or these</a></span></dt>
+</dl></div>
+<div class="section">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="queries_in_c_expressions.what_does_it_look_like.like_this"></a><a class="link" href="what_does_it_look_like.html#queries_in_c_expressions.what_does_it_look_like.like_this" title="Like this ...">Like
+          this ...</a>
+</h3></div></div></div>
+<p>
+            (Disclaimer: what you are about to see is a glimpse of application code
+            that uses quince, largely without explanation. A more detailed guided
+            tour can be found <a class="link" href="../getting_started.html" title="Chapter&#160;3.&#160;Getting Started">here</a>, and more
+            detail still <a class="link" href="../depth.html" title="Part&#160;II.&#160;The Quince API in Depth">here</a>.)
+          </p>
+<p>
+            Consider the following task: print the titles of all the movies that
+            are now playing on some screen in some cinema within a given radius of
+            a given point.
+          </p>
+<p>
+            If we use the following C++ data types:
+          </p>
+<pre class="programlisting"><span class="keyword">struct</span> <span class="identifier">point</span> <span class="special">{</span>
+    <span class="keyword">float</span> <span class="identifier">x</span><span class="special">;</span>
+    <span class="keyword">float</span> <span class="identifier">y</span><span class="special">;</span>
+<span class="special">};</span>
+
+<span class="keyword">struct</span> <span class="identifier">movie</span> <span class="special">{</span>
+    <span class="identifier">serial</span> <span class="identifier">id</span><span class="special">;</span>                  <span class="comment">// primary key with automatically assigned values</span>
+    <span class="identifier">std</span><span class="special">::</span><span class="identifier">string</span> <span class="identifier">title</span><span class="special">;</span>
+<span class="special">};</span>
+
+<span class="keyword">struct</span> <span class="identifier">cinema</span> <span class="special">{</span>
+    <span class="identifier">serial</span> <span class="identifier">id</span><span class="special">;</span>                  <span class="comment">// primary key with automatically assigned values</span>
+    <span class="identifier">point</span> <span class="identifier">location</span><span class="special">;</span>
+<span class="special">};</span>
+
+<span class="keyword">struct</span> <span class="identifier">screen</span> <span class="special">{</span>
+    <span class="identifier">serial</span> <span class="identifier">id</span><span class="special">;</span>                  <span class="comment">// primary key with automatically assigned values</span>
+    <span class="identifier">serial</span> <span class="identifier">cinema_id</span><span class="special">;</span>           <span class="comment">// foreign key to cinemas table</span>
+    <span class="identifier">serial</span> <span class="identifier">current_movie_id</span><span class="special">;</span>    <span class="comment">// foreign key to movies table</span>
+<span class="special">};</span>
+</pre>
+<p>
+            and we assume that the following have been defined elsewhere:
+          </p>
+<pre class="programlisting"><span class="keyword">extern</span> <span class="identifier">serial_table</span><span class="special">&lt;</span><span class="identifier">movie</span><span class="special">&gt;</span> <span class="identifier">movies</span><span class="special">;</span>
+<span class="keyword">extern</span> <span class="identifier">serial_table</span><span class="special">&lt;</span><span class="identifier">cinema</span><span class="special">&gt;</span> <span class="identifier">cinemas</span><span class="special">;</span>
+<span class="keyword">extern</span> <span class="identifier">serial_table</span><span class="special">&lt;</span><span class="identifier">screen</span><span class="special">&gt;</span> <span class="identifier">screens</span><span class="special">;</span>
+
+<span class="keyword">extern</span> <span class="identifier">point</span> <span class="identifier">my_place</span><span class="special">;</span>
+<span class="keyword">extern</span> <span class="keyword">float</span> <span class="identifier">max_radius</span><span class="special">;</span>
+</pre>
+<p>
+            Then one way to construct a suitable query is:
+          </p>
+<pre class="programlisting"><span class="keyword">const</span> <span class="identifier">query</span><span class="special">&lt;</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">string</span><span class="special">&gt;</span> <span class="identifier">titles_playing_nearby</span> <span class="special">=</span>
+    <span class="identifier">cinemas</span>
+    <span class="special">.</span><span class="identifier">where</span><span class="special">(</span>
+           <span class="special">(</span><span class="identifier">cinemas</span><span class="special">-&gt;</span><span class="identifier">location</span><span class="special">.</span><span class="identifier">x</span> <span class="special">-</span> <span class="identifier">my_place</span><span class="special">.</span><span class="identifier">x</span><span class="special">)</span> <span class="special">*</span> <span class="special">(</span><span class="identifier">cinemas</span><span class="special">-&gt;</span><span class="identifier">location</span><span class="special">.</span><span class="identifier">x</span> <span class="special">-</span> <span class="identifier">my_place</span><span class="special">.</span><span class="identifier">x</span><span class="special">)</span>
+         <span class="special">+</span> <span class="special">(</span><span class="identifier">cinemas</span><span class="special">-&gt;</span><span class="identifier">location</span><span class="special">.</span><span class="identifier">y</span> <span class="special">-</span> <span class="identifier">my_place</span><span class="special">.</span><span class="identifier">y</span><span class="special">)</span> <span class="special">*</span> <span class="special">(</span><span class="identifier">cinemas</span><span class="special">-&gt;</span><span class="identifier">location</span><span class="special">.</span><span class="identifier">y</span> <span class="special">-</span> <span class="identifier">my_place</span><span class="special">.</span><span class="identifier">y</span><span class="special">)</span>
+         <span class="special">&lt;=</span> <span class="identifier">max_radius</span> <span class="special">*</span> <span class="identifier">max_radius</span>
+    <span class="special">)</span>
+    <span class="special">.</span><span class="identifier">inner_join</span><span class="special">(</span><span class="identifier">screens</span><span class="special">,</span> <span class="identifier">screens</span><span class="special">-&gt;</span><span class="identifier">cinema_id</span> <span class="special">==</span> <span class="identifier">cinemas</span><span class="special">-&gt;</span><span class="identifier">id</span><span class="special">)</span>
+    <span class="special">.</span><span class="identifier">inner_join</span><span class="special">(</span><span class="identifier">movies</span><span class="special">,</span> <span class="identifier">movies</span><span class="special">-&gt;</span><span class="identifier">id</span> <span class="special">==</span> <span class="identifier">screens</span><span class="special">-&gt;</span><span class="identifier">current_movie_id</span><span class="special">)</span>
+    <span class="special">.</span><span class="identifier">select</span><span class="special">(</span><span class="identifier">movies</span><span class="special">-&gt;</span><span class="identifier">title</span><span class="special">)</span>
+    <span class="special">.</span><span class="identifier">distinct</span><span class="special">();</span>
+</pre>
+<p>
+            Now, to generate the required report, we use a C++11 <code class="computeroutput"><span class="keyword">for</span></code>-loop.
+            This causes the SQL query to be generated and executed, and the loop
+            body to be run as each row of output arrives:
+          </p>
+<pre class="programlisting"><span class="keyword">for</span> <span class="special">(</span><span class="keyword">const</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">string</span> <span class="special">&amp;</span><span class="identifier">title</span><span class="special">:</span> <span class="identifier">titles_playing_nearby</span><span class="special">)</span>
+    <span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="identifier">title</span> <span class="special">&lt;&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">endl</span><span class="special">;</span>
+</pre>
+</div>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2014 Michael Shepanski<p>
+        Distributed under the Boost Software License, Version 1.0
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="../queries_in_c_expressions.html"><img src="../images/prev.png" alt="Prev"></a><a accesskey="u" href="../queries_in_c_expressions.html"><img src="../images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../images/home.png" alt="Home"></a><a accesskey="n" href="what_does_it_look_like/or_these.html"><img src="../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

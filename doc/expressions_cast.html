@@ -1,0 +1,59 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>cast&lt;...&gt;()</title>
+<link rel="stylesheet" href="../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../index.html" title="QUINCE: QUeries IN C++ Expressions">
+<link rel="up" href="../expressions.html" title="Chapter&#160;6.&#160;Expressions for Server-Side Execution">
+<link rel="prev" href="strcat.html" title="String Concatenation">
+<link rel="next" href="function_calls.html" title="Function Calls">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<div class="spirit-nav">
+<a accesskey="p" href="strcat.html"><img src="../images/prev.png" alt="Prev"></a><a accesskey="u" href="../expressions.html"><img src="../images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../images/home.png" alt="Home"></a><a accesskey="n" href="function_calls.html"><img src="../images/next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="expressions.cast"></a><a class="link" href="cast.html" title="cast&lt;...&gt;()"><code class="computeroutput"><span class="identifier">cast</span><span class="special">&lt;</span></code>...<code class="computeroutput"><span class="special">&gt;()</span></code></a>
+</h2></div></div></div>
+<p>
+          
+        </p>
+<p>
+          Quince's <code class="computeroutput"><span class="identifier">cast</span><span class="special">&lt;</span></code>...<code class="computeroutput"><span class="special">&gt;()</span></code> function builds and returns an SQL
+          expression that represents a server-side type conversion operation. It's
+          a wrapper for the SQL keyword <code class="literal">CAST</code>.
+        </p>
+<p>
+          <code class="computeroutput"><span class="identifier">cast</span><span class="special">&lt;</span></code><em class="replaceable"><code>T</code></em><code class="computeroutput"><span class="special">&gt;(</span></code><em class="replaceable"><code>arg</code></em><code class="computeroutput"><span class="special">)</span></code> is allowed when <em class="replaceable"><code>T</code></em>
+          is a mapped type, and the target database's mapping (allowing for any
+          <a class="link" href="../custom/deployment.html#custom.deployment.database" title="To a Database ...">per-database customizations</a>)
+          for <em class="replaceable"><code>T</code></em> represents it as some single-column SQL
+          type <em class="replaceable"><code>t</code></em>. Then <code class="computeroutput"><span class="identifier">cast</span><span class="special">&lt;</span></code><em class="replaceable"><code>T</code></em><code class="computeroutput"><span class="special">&gt;(</span></code><em class="replaceable"><code>arg</code></em><code class="computeroutput"><span class="special">)</span></code> returns an <code class="computeroutput"><span class="identifier">exprn_mapper</span><span class="special">&lt;</span></code><em class="replaceable"><code>T</code></em><code class="computeroutput"><span class="special">&gt;</span></code> that, when executed, evaluates the
+          subexpression that <code class="computeroutput"><span class="identifier">arg</span></code>
+          represents, and applies the SQL conversion <code class="computeroutput"><span class="identifier">CAST</span><span class="special">(</span></code>...<code class="computeroutput"> <span class="identifier">AS</span>
+          </code><em class="replaceable"><code>t</code></em><code class="computeroutput"><span class="special">)</span></code>
+          to the result.
+        </p>
+<p>
+          Whether you say <code class="computeroutput"><span class="identifier">cast</span><span class="special">&lt;</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">optional</span><span class="special">&lt;</span></code><em class="replaceable"><code>foo</code></em><code class="computeroutput"><span class="special">&gt;&gt;(</span></code><em class="replaceable"><code>arg</code></em><code class="computeroutput"><span class="special">)</span></code> or <code class="computeroutput"><span class="identifier">cast</span><span class="special">&lt;</span></code><em class="replaceable"><code>foo</code></em><code class="computeroutput"><span class="special">&gt;(</span></code><em class="replaceable"><code>arg</code></em><code class="computeroutput"><span class="special">)</span></code> makes no difference to the SQL that is
+          actually executed. The only difference is in the type of <code class="computeroutput"><span class="identifier">exprn_mapper</span></code> you get back. If there is
+          any possiblility that <em class="replaceable"><code>arg</code></em> could evaluate to
+          an SQL <code class="literal">NULL</code>, then it is your responsibility to cast
+          to some <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">optional</span><span class="special">&lt;</span></code>...<code class="computeroutput"><span class="special">&gt;</span></code>.
+        </p>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2014 Michael Shepanski<p>
+        Distributed under the Boost Software License, Version 1.0
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="strcat.html"><img src="../images/prev.png" alt="Prev"></a><a accesskey="u" href="../expressions.html"><img src="../images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../images/home.png" alt="Home"></a><a accesskey="n" href="function_calls.html"><img src="../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

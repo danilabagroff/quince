@@ -1,0 +1,69 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Table Alteration</title>
+<link rel="stylesheet" href="../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../index.html" title="QUINCE: QUeries IN C++ Expressions">
+<link rel="up" href="../tables.html" title="Chapter&#160;8.&#160;Tables">
+<link rel="prev" href="manipulation/remove.html" title="remove()">
+<link rel="next" href="table_alteration/add_field.html" title="add_field()">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<div class="spirit-nav">
+<a accesskey="p" href="manipulation/remove.html"><img src="../images/prev.png" alt="Prev"></a><a accesskey="u" href="../tables.html"><img src="../images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../images/home.png" alt="Home"></a><a accesskey="n" href="table_alteration/add_field.html"><img src="../images/next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="tables.table_alteration"></a><a class="link" href="table_alteration.html" title="Table Alteration">Table Alteration</a>
+</h2></div></div></div>
+<div class="toc"><dl class="toc">
+<dt><span class="section"><a href="table_alteration.html#tables.table_alteration.rename_from"><code class="computeroutput"><span class="identifier">rename_from</span><span class="special">()</span></code></a></span></dt>
+<dt><span class="section"><a href="table_alteration/add_field.html"><code class="computeroutput"><span class="identifier">add_field</span><span class="special">()</span></code></a></span></dt>
+<dt><span class="section"><a href="table_alteration/drop_field_postgresql_only.html"><code class="computeroutput"><span class="identifier">drop_field</span><span class="special">()</span></code>
+          (PostgreSQL only)</a></span></dt>
+<dt><span class="section"><a href="table_alteration/rename_field_postgresql_only.html"><code class="computeroutput"><span class="identifier">rename_field</span><span class="special">()</span></code>
+          (PostgreSQL only)</a></span></dt>
+<dt><span class="section"><a href="table_alteration/set_field_type_postgresql_only.html"><code class="computeroutput"><span class="identifier">set_field_type</span><span class="special">()</span></code>
+          (PostgreSQL only)</a></span></dt>
+</dl></div>
+<p>
+          
+        </p>
+<div class="section">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="tables.table_alteration.rename_from"></a><a class="link" href="table_alteration.html#tables.table_alteration.rename_from" title="rename_from()"><code class="computeroutput"><span class="identifier">rename_from</span><span class="special">()</span></code></a>
+</h3></div></div></div>
+<p>
+            All tables have a <code class="computeroutput"><span class="identifier">rename_from</span><span class="special">()</span></code> method, which changes some SQL table's
+            name <span class="emphasis"><em>to</em></span> the table object's target name. It's a wrapper
+            for SQL's <code class="literal">ALTER TABLE</code> ... <code class="literal">RENAME TO</code>.
+          </p>
+<p>
+            The form is <em class="replaceable"><code>t</code></em><code class="computeroutput"><span class="special">.</span><span class="identifier">rename_from</span><span class="special">(</span></code><em class="replaceable"><code>oldname</code></em><code class="computeroutput"><span class="special">)</span></code>, where <em class="replaceable"><code>t</code></em>
+            is a table object, and <em class="replaceable"><code>oldname</code></em> is a <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">string</span></code> containing the current SQL name
+            of some table.
+          </p>
+<p>
+            <code class="computeroutput"><span class="identifier">rename_from</span><span class="special">()</span></code>
+            cannot move a table from one PostgreSQL schema to another, or from one
+            sqlite attached database to another. So <em class="replaceable"><code>oldname</code></em>
+            must be a <a class="link" href="construction.html#binomen">one-part name</a>: the local name
+            of an existing table within the same schema or attached database as
+            <em class="replaceable"><code>t</code></em>'s target.
+          </p>
+</div>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2014 Michael Shepanski<p>
+        Distributed under the Boost Software License, Version 1.0
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="manipulation/remove.html"><img src="../images/prev.png" alt="Prev"></a><a accesskey="u" href="../tables.html"><img src="../images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../images/home.png" alt="Home"></a><a accesskey="n" href="table_alteration/add_field.html"><img src="../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

@@ -1,0 +1,134 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>add_field()</title>
+<link rel="stylesheet" href="../../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../../index.html" title="QUINCE: QUeries IN C++ Expressions">
+<link rel="up" href="../table_alteration.html" title="Table Alteration">
+<link rel="prev" href="../table_alteration.html" title="Table Alteration">
+<link rel="next" href="drop_field_postgresql_only.html" title="drop_field() (PostgreSQL only)">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<div class="spirit-nav">
+<a accesskey="p" href="../table_alteration.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../table_alteration.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="drop_field_postgresql_only.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="tables.table_alteration.add_field"></a><a class="link" href="add_field.html" title="add_field()"><code class="computeroutput"><span class="identifier">add_field</span><span class="special">()</span></code></a>
+</h3></div></div></div>
+<p>
+            All tables have an <code class="computeroutput"><span class="identifier">add_field</span><span class="special">()</span></code> method, which adds one or more columns
+            to the <a class="link" href="../terminology.html#target">target</a>. It's a wrapper for SQL's
+            <code class="literal">ALTER TABLE</code> ... <code class="literal">ADD COLUMN</code>.
+          </p>
+<p>
+            Suppose the SQL table <code class="literal">points</code> already exists, with
+            its columns <code class="computeroutput"><span class="identifier">x</span></code> and <code class="computeroutput"><span class="identifier">y</span></code> (perhaps as a result of running the
+            code examples in the previous section), and now we want to add a new
+            mapped member <code class="computeroutput"><span class="keyword">float</span> <span class="identifier">z</span></code>
+            to each record. We start (at a suitable spot in the code, i.e. in a namespace
+            but not in a function) by defining the value type that we want the table
+            to have:
+          </p>
+<pre class="programlisting"><span class="keyword">struct</span> <span class="identifier">point_3d</span> <span class="special">{</span>
+    <span class="keyword">float</span> <span class="identifier">x</span><span class="special">;</span>
+    <span class="keyword">float</span> <span class="identifier">y</span><span class="special">;</span>
+    <span class="keyword">float</span> <span class="identifier">z</span><span class="special">;</span>
+<span class="special">};</span>
+<span class="identifier">QUINCE_MAP_CLASS</span><span class="special">(</span><span class="identifier">point_3d</span><span class="special">,</span> <span class="special">(</span><span class="identifier">x</span><span class="special">)(</span><span class="identifier">y</span><span class="special">)(</span><span class="identifier">z</span><span class="special">))</span>
+</pre>
+<p>
+            And then, some time after the construction of <code class="computeroutput"><span class="identifier">db</span></code>,
+            we construct the table object:
+          </p>
+<pre class="programlisting"><span class="identifier">table</span><span class="special">&lt;</span><span class="identifier">point_3d</span><span class="special">&gt;</span> <span class="identifier">points</span><span class="special">(</span><span class="identifier">db</span><span class="special">,</span> <span class="string">"points"</span><span class="special">,</span> <span class="special">&amp;</span><span class="identifier">point_3d</span><span class="special">::</span><span class="identifier">x</span><span class="special">);</span>
+</pre>
+<p>
+            The state of affairs right now is:
+          </p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+                We have a table object called <code class="computeroutput"><span class="identifier">points</span></code>,
+                which represents an SQL table with the name <code class="literal">points</code>
+                and three columns <code class="literal">x</code>, <code class="literal">y</code>, <code class="literal">z</code>.
+              </li>
+<li class="listitem">
+                Its target exists (i.e. there is an SQL table at the expected site).
+              </li>
+<li class="listitem">
+                Its target does not <a class="link" href="../terminology.html#conforms_to">conform to</a>
+                it (because it lacks the <code class="literal">z</code> column).
+              </li>
+</ul></div>
+<p>
+            Therefore we cannot call <code class="computeroutput"><span class="identifier">points</span><span class="special">.</span><span class="identifier">open</span><span class="special">()</span></code>. If we tried, it would throw a <code class="computeroutput"><span class="identifier">table_mismatch_exception</span></code>.
+          </p>
+<p>
+            So we do this:
+          </p>
+<pre class="programlisting"><span class="identifier">points</span><span class="special">.</span><span class="identifier">add_field</span><span class="special">(</span><span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">z</span><span class="special">);</span>
+</pre>
+<p>
+            This adds a column to the target, with the name (<code class="literal">z</code>),
+            type (<code class="literal">REAL</code>) and the <code class="literal">NOT NULL</code> setting
+            (set) that the mapper <code class="computeroutput"><span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">z</span></code>
+            expects. (And yes, it really does add the column. Table alteration methods
+            do things, unlike <code class="computeroutput"><span class="identifier">specify_index</span><span class="special">()</span></code> etc. that leave notes to ask <code class="computeroutput"><span class="identifier">open</span><span class="special">()</span></code>
+            to do things.)
+          </p>
+<p>
+            Now the target conforms to the table <code class="computeroutput"><span class="identifier">points</span></code>,
+            so we can go ahead and call <code class="computeroutput"><span class="identifier">points</span><span class="special">.</span><span class="identifier">open</span><span class="special">()</span></code>, and then proceed with querying and
+            data manipulation.
+          </p>
+<p>
+            In this example we passed <code class="computeroutput"><span class="identifier">add_field</span><span class="special">()</span></code> a <code class="computeroutput"><span class="keyword">float</span></code>
+            mapper, so it added a single <code class="literal">REAL</code> column; but we can
+            pass a mapper for any mapped type. If it is a multi-column type, then
+            <code class="computeroutput"><span class="identifier">add_field</span><span class="special">()</span></code>
+            will add multiple columns.
+          </p>
+<h5>
+<a name="tables.table_alteration.add_field.h0"></a>
+            <span class="phrase"><a name="tables.table_alteration.add_field.populating_the_new_field"></a></span><a class="link" href="add_field.html#tables.table_alteration.add_field.populating_the_new_field">Populating
+            the new field</a>
+          </h5>
+<p>
+            By default, <code class="computeroutput"><span class="identifier">add_field</span><span class="special">()</span></code> fills the new columns with a default-constructed
+            value. That is to say, <em class="replaceable"><code>table</code></em><code class="computeroutput"><span class="special">.</span><span class="identifier">add_field</span><span class="special">(</span></code><em class="replaceable"><code>mapper</code></em><code class="computeroutput"><span class="special">)</span></code> makes a default-constructed value of
+            the mapped type (<code class="computeroutput"><span class="keyword">float</span></code> in
+            this case), and initializes the new columns (just the <code class="literal">z</code>
+            column in this case) with an SQL representation of that default-constructed
+            value (<code class="computeroutput"><span class="number">0.0f</span></code> in this case).
+          </p>
+<p>
+            Alternatively you can specify the value as a second argument:
+          </p>
+<pre class="programlisting"><span class="identifier">points</span><span class="special">.</span><span class="identifier">add_field</span><span class="special">(</span><span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">z</span><span class="special">,</span> <span class="special">-</span><span class="number">12.6f</span><span class="special">);</span>
+</pre>
+<p>
+            or use a server-side expression:
+          </p>
+<pre class="programlisting"><span class="identifier">points</span><span class="special">.</span><span class="identifier">add_field</span><span class="special">(</span><span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">z</span><span class="special">,</span> <span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">x</span> <span class="special">+</span> <span class="identifier">points</span><span class="special">-&gt;</span><span class="identifier">y</span><span class="special">);</span>
+</pre>
+<p>
+            The rules governing the arguments are the same as for <a class="link" href="../manipulation/update.html" title="update()"><code class="computeroutput"><span class="identifier">update</span><span class="special">()</span></code></a>:
+            the first argument must be a mapper for some type <em class="replaceable"><code>T</code></em>,
+            and then the second argument can be <em class="replaceable"><code>T</code></em> or
+            <code class="computeroutput"><span class="identifier">abstract_mapper</span><span class="special">&lt;</span></code><em class="replaceable"><code>T</code></em><code class="computeroutput"><span class="special">&gt;</span></code>. The table's value mapper is <a class="link" href="../../expressions/visibility.html" title="Visibility">visible</a> to the second argument.
+          </p>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2014 Michael Shepanski<p>
+        Distributed under the Boost Software License, Version 1.0
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="../table_alteration.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../table_alteration.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="drop_field_postgresql_only.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

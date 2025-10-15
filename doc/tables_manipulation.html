@@ -1,0 +1,81 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Data Manipulation</title>
+<link rel="stylesheet" href="../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../index.html" title="QUINCE: QUeries IN C++ Expressions">
+<link rel="up" href="../tables.html" title="Chapter&#160;8.&#160;Tables">
+<link rel="prev" href="indexes_and_foreign_key_constrai.html" title="Indexes and Foreign Key Constraints">
+<link rel="next" href="manipulation/update.html" title="update()">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<div class="spirit-nav">
+<a accesskey="p" href="indexes_and_foreign_key_constrai.html"><img src="../images/prev.png" alt="Prev"></a><a accesskey="u" href="../tables.html"><img src="../images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../images/home.png" alt="Home"></a><a accesskey="n" href="manipulation/update.html"><img src="../images/next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="tables.manipulation"></a><a class="link" href="manipulation.html" title="Data Manipulation">Data Manipulation</a>
+</h2></div></div></div>
+<div class="toc"><dl class="toc">
+<dt><span class="section"><a href="manipulation.html#tables.manipulation.insert"><code class="computeroutput"><span class="identifier">insert</span><span class="special">()</span></code></a></span></dt>
+<dt><span class="section"><a href="manipulation/update.html"><code class="computeroutput"><span class="identifier">update</span><span class="special">()</span></code></a></span></dt>
+<dt><span class="section"><a href="manipulation/remove.html"><code class="computeroutput"><span class="identifier">remove</span><span class="special">()</span></code></a></span></dt>
+</dl></div>
+<p>
+          
+        </p>
+<div class="section">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="tables.manipulation.insert"></a><a class="link" href="manipulation.html#tables.manipulation.insert" title="insert()"><code class="computeroutput"><span class="identifier">insert</span><span class="special">()</span></code></a>
+</h3></div></div></div>
+<p>
+            <code class="computeroutput"><span class="identifier">table</span></code> has an <code class="computeroutput"><span class="identifier">insert</span><span class="special">()</span></code>
+            method, which takes one value, of the <code class="computeroutput"><span class="identifier">table</span></code>'s
+            value type, as its argument, and adds that value to the table. It's a
+            wrapper for SQL's <code class="literal">INSERT</code>.
+          </p>
+<pre class="programlisting"><span class="identifier">points</span><span class="special">.</span><span class="identifier">insert</span><span class="special">({</span><span class="number">1.4f</span><span class="special">,</span> <span class="special">-</span><span class="number">5.6f</span><span class="special">});</span>
+</pre>
+<p>
+            <code class="computeroutput"><span class="identifier">table</span><span class="special">::</span><span class="identifier">insert</span><span class="special">()</span></code>
+            returns <code class="computeroutput"><span class="keyword">void</span></code>.
+          </p>
+<p>
+            <code class="computeroutput"><span class="identifier">serial_table</span></code> also has
+            an <code class="computeroutput"><span class="identifier">insert</span><span class="special">()</span></code>
+            method, which differs as follows:
+          </p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+                It doesn't use the whole value it is passed: it ignores the primary
+                key member.
+              </li>
+<li class="listitem">
+                It lets the DBMS assign a primary key to the newly inserted record.
+              </li>
+<li class="listitem">
+                Its return type is <code class="computeroutput"><span class="identifier">serial</span></code>,
+                and it returns the DBMS-assigned key.
+              </li>
+<li class="listitem">
+                It has an overload that takes the record by non-const reference.
+                That overload copies the DBMS-assigned key into the given record's
+                primary key member, as well as returning it.
+              </li>
+</ul></div>
+</div>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2014 Michael Shepanski<p>
+        Distributed under the Boost Software License, Version 1.0
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="indexes_and_foreign_key_constrai.html"><img src="../images/prev.png" alt="Prev"></a><a accesskey="u" href="../tables.html"><img src="../images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../images/home.png" alt="Home"></a><a accesskey="n" href="manipulation/update.html"><img src="../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

@@ -1,0 +1,115 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>With a Collector Class</title>
+<link rel="stylesheet" href="../../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../../index.html" title="QUINCE: QUeries IN C++ Expressions">
+<link rel="up" href="../join.html" title="The join() Family of Functions">
+<link rel="prev" href="jump.html" title="jump()">
+<link rel="next" href="self_joins.html" title="Self Joins">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<div class="spirit-nav">
+<a accesskey="p" href="jump.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../join.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="self_joins.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="queries.join.collector"></a><a class="link" href="collector.html" title="With a Collector Class">With a Collector Class</a>
+</h3></div></div></div>
+<p>
+            All the functions in the <code class="computeroutput"><span class="identifier">join</span><span class="special">()</span></code> family, other than <code class="computeroutput"><span class="identifier">jump</span><span class="special">()</span></code>, support mapped classes as an output
+            format, as an alternative to <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">tuple</span></code>s.
+            Just like <a class="link" href="../select/collector.html" title="With Multiple Arguments and a Collector Class">the collector classes
+            for <code class="computeroutput"><span class="identifier">select</span><span class="special">()</span></code></a>,
+            they don't affect the generated SQL, but they might afford some extra
+            convenience, if you like to use meaningful member names instead of <code class="computeroutput"><span class="identifier">get</span><span class="special">&lt;</span><span class="number">0</span><span class="special">&gt;()</span></code>
+            etc.
+          </p>
+<p>
+            If:
+          </p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+                <em class="replaceable"><code>J</code></em> is a call to a function in the <code class="computeroutput"><span class="identifier">join</span><span class="special">()</span></code>
+                family that would have returned a query with value type <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">tuple</span><span class="special">&lt;</span></code><em class="replaceable"><code>j0</code></em><code class="computeroutput"><span class="special">,</span></code> <em class="replaceable"><code>j1</code></em><code class="computeroutput"><span class="special">,</span></code> ...<code class="computeroutput"><span class="special">&gt;</span></code>,
+                and
+              </li>
+<li class="listitem">
+                <em class="replaceable"><code>C</code></em> is a mapped class, with mapped members
+                <em class="replaceable"><code>m0</code></em>, <em class="replaceable"><code>m1</code></em>, ....
+                (in the order they were listed to <code class="computeroutput"><span class="identifier">QUINCE_MAP_CLASS</span></code>),
+                and with no mapped bases,
+              </li>
+</ul></div>
+<p>
+            then you can add <em class="replaceable"><code>C</code></em> as a template parameter
+            to the call <em class="replaceable"><code>J</code></em>, provided that:
+          </p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+                All the conditions for making the call <em class="replaceable"><code>J</code></em>
+                are satisfied
+              </li>
+<li class="listitem">
+                The number of mapped members <em class="replaceable"><code>C</code></em><code class="computeroutput"><span class="special">::</span></code><em class="replaceable"><code>mi</code></em> equals
+                the length of <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">tuple</span><span class="special">&lt;</span></code><em class="replaceable"><code>j0</code></em><code class="computeroutput"><span class="special">,</span></code> <em class="replaceable"><code>j1</code></em><code class="computeroutput"><span class="special">,</span></code> ...<code class="computeroutput"><span class="special">&gt;</span></code>
+                (i.e. the number of queries being joined), and
+              </li>
+<li class="listitem">
+                Each mapped member <em class="replaceable"><code>C</code></em><code class="computeroutput"><span class="special">::</span></code><em class="replaceable"><code>mi</code></em>
+                is of the same type as the corresponding <em class="replaceable"><code>ji</code></em>.
+              </li>
+</ul></div>
+<p>
+            Then the returned query has the following characteristics:
+          </p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+                Its value type is <em class="replaceable"><code>C</code></em>.
+              </li>
+<li class="listitem">
+                Its value mapper is a new <a class="link" href="../../mapped_data_types/user_defined_class_types.html#class_mapper"><code class="computeroutput"><span class="identifier">class_mapper</span><span class="special">&lt;</span></code><em class="replaceable"><code>C</code></em><code class="computeroutput"><span class="special">&gt;</span></code></a>, in which each member
+                <em class="replaceable"><code>mi</code></em> is identical to the <em class="replaceable"><code>i</code></em>'th
+                member of <em class="replaceable"><code>J</code></em>'s value mapper.
+              </li>
+<li class="listitem">
+                Its output is the same as <em class="replaceable"><code>J</code></em>'s, except
+                that what would have gone into member <em class="replaceable"><code>i</code></em>
+                of an output <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">tuple</span></code>
+                now goes into member <em class="replaceable"><code>mi</code></em> of an output
+                <em class="replaceable"><code>C</code></em>.
+              </li>
+</ul></div>
+<h6>
+<a name="queries.join.collector.h0"></a>
+            <span class="phrase"><a name="queries.join.collector.example"></a></span><a class="link" href="collector.html#queries.join.collector.example">Example</a>
+          </h6>
+<pre class="programlisting"><span class="comment">// Somewhere in a namespace, not in a function</span>
+
+<span class="keyword">struct</span> <span class="identifier">movie_deployment</span> <span class="special">{</span>
+    <span class="identifier">boost</span><span class="special">::</span><span class="identifier">optional</span><span class="special">&lt;</span><span class="identifier">screen</span><span class="special">&gt;</span> <span class="identifier">s</span><span class="special">;</span>
+    <span class="identifier">movie</span> <span class="identifier">m</span><span class="special">;</span>
+<span class="special">};</span>
+<span class="identifier">QUINCE_MAP_CLASS</span><span class="special">(</span><span class="identifier">movie_deployment</span><span class="special">,</span> <span class="special">(</span><span class="identifier">s</span><span class="special">)(</span><span class="identifier">m</span><span class="special">));</span>
+
+
+<span class="comment">// Somewhere inside a function:</span>
+
+<span class="keyword">const</span> <span class="identifier">query</span><span class="special">&lt;</span><span class="identifier">movie_deployment</span><span class="special">&gt;</span> <span class="identifier">movie_deployments</span> <span class="special">=</span>
+    <span class="identifier">screens</span><span class="special">.</span><span class="identifier">right_join</span><span class="special">&lt;</span><span class="identifier">movie_deployment</span><span class="special">&gt;(</span><span class="identifier">movies</span><span class="special">,</span> <span class="identifier">screens</span><span class="special">-&gt;</span><span class="identifier">current_movie_id</span> <span class="special">==</span> <span class="identifier">movies</span><span class="special">-&gt;</span><span class="identifier">id</span><span class="special">);</span>
+</pre>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2014 Michael Shepanski<p>
+        Distributed under the Boost Software License, Version 1.0
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="jump.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../join.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="self_joins.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>
